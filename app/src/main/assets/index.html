@@ -121,7 +121,7 @@ canvas{width:100vw;height:100dvh;object-fit:fill;image-rendering:pixelated}
 <div id="armory" class="overlay" style="display:none">
  <div class="card"><div class="logo" style="font-size:30px">АРСЕНАЛ</div>
  <div class="subtitle">Выбери героя и оружие перед забегом</div>
- <div id="heroChoices"></div><div id="weaponChoices"></div>
+ <div id="heroChoices"></div><div id="weaponChoices"></div><button id="lootboxOpen">🎁 ОТКРЫТЬ ЛУТБОКС · 100 ◉</button><div id="collectionChoices" class="small" style="text-align:left;max-height:130px;overflow:auto"></div><div id="petInfo" class="small"></div>
  <button class="primary" id="armoryStart">▶ В БОЙ</button>
  <button id="armoryBack">НАЗАД</button>
  </div>
@@ -144,18 +144,19 @@ let bloodStains=[],deathFx=[],damageNumbers=[],manualFire=false;
 let last=0,spawn=0,shoot=0,enemyId=0,runTime=0,level=1,xp=0,xpNeed=6,gold=0,kills=0,floor=1,shake=0,boss=null,screenFlash=0,ambient=[];
 let upgrades={damage:1,rate:1,speed:1,maxhp:3,magnet:1},weapon='ПИСТОЛЕТ';
 const HEROES=[
- {id:'scout',name:'РАЗВЕДЧИК',desc:'Быстрый и сбалансированный',hp:3,speed:115,damage:1,rate:.42,color:'#e5a56d'},
- {id:'tank',name:'ТАНК',desc:'4 ♥, но медленнее',hp:4,speed:88,damage:1.25,rate:.50,color:'#8ba7c7'},
- {id:'tech',name:'ТЕХНИК',desc:'Стреляет чаще',hp:3,speed:105,damage:1,rate:.31,color:'#65e6cf'}
+ {id:'scout',name:'РАЗВЕДЧИК',desc:'Быстрый и сбалансированный',hp:3,speed:115,damage:1,rate:.42,color:'#e5a56d',cost:0},{id:'tank',name:'ТАНК',desc:'Выносливый',hp:5,speed:82,damage:1.1,rate:.5,color:'#8ba7c7',cost:350},{id:'tech',name:'ТЕХНИК',desc:'Быстрая стрельба',hp:3,speed:105,damage:1,rate:.31,color:'#65e6cf',cost:450},{id:'medic',name:'МЕДИК',desc:'Большой запас здоровья',hp:4,speed:100,damage:.9,rate:.45,color:'#a8f0c0',cost:600},{id:'phantom',name:'ФАНТОМ',desc:'Быстрый боец',hp:3,speed:124,damage:1,rate:.4,color:'#c6a5ff',cost:750},{id:'engineer',name:'ИНЖЕНЕР',desc:'Тяжёлое снаряжение',hp:4,speed:92,damage:1.2,rate:.48,color:'#f0c56b',cost:900}
 ];
+const SKIN_RARITIES=[{id:'common',name:'Обычный',color:'#b9c5d8'},{id:'rare',name:'Редкий',color:'#58a6ff'},{id:'epic',name:'Эпический',color:'#c77dff'},{id:'legendary',name:'Легендарный',color:'#ffbf4a'}];
+const SKINS=HEROES.flatMap(h=>Array.from({length:10},(_,i)=>({id:h.id+'_skin_'+i,hero:h.id,name:['Полевой','Пепельный','Неон','Ледяной','Кровавый','Изумрудный','Призрачный','Королевский','Космический','Реликтовый'][i],rarity:i===0?'common':i<4?'rare':i<7?'epic':'legendary',color:['#c2c9d4','#b0a08d','#4fffe0','#8ce8ff','#ff657a','#6df0a0','#b9a0ff','#f3cf75','#72a6ff','#ff9e52'][i],quality:i===9?'Уникальная аура и частицы':i>=7?'Детальная отделка и свечение':i>=4?'Узоры и акценты':'Базовая перекраска'})));
+const PETS=[{id:'wisp',name:'Искра',desc:'Светящийся спутник'},{id:'drone',name:'Боевой дрон',desc:'Технологический компаньон'},{id:'slime',name:'Слизень',desc:'Подпрыгивает рядом'},{id:'raven',name:'Теневой ворон',desc:'Тёмные перья'},{id:'fox',name:'Огненный лис',desc:'Пылающий след'},{id:'orb',name:'Сфера Бездны',desc:'Фиолетовая аура'}];
 const WEAPONS=[
  {id:'pistol',name:'ПИСТОЛЕТ',desc:'Надёжный баланс',damage:1,rate:.42,bullet:245},
  {id:'shotgun',name:'ДРОБОВИК',desc:'Три пули веером',damage:1,rate:.68,bullet:205},
  {id:'rifle',name:'АВТОМАТ',desc:'Очень быстрая стрельба',damage:.75,rate:.22,bullet:270},
- {id:'laser',name:'ЛАЗЕР',desc:'Мощный энергетический выстрел',damage:2,rate:.55,bullet:330}
+ {id:'laser',name:'ЛАЗЕР',desc:'Мощный энергетический выстрел',damage:2,rate:.55,bullet:330},{id:'burst',name:'ИМПУЛЬСНАЯ ВИНТОВКА',desc:'Очередь из импульсов',damage:.7,rate:.5,bullet:300},{id:'rail',name:'РЕЛЬСОТРОН',desc:'Мощный пробивающий выстрел',damage:3.4,rate:.9,bullet:430},{id:'flame',name:'ОГНЕМЁТ',desc:'Короткие залпы вблизи',damage:.55,rate:.16,bullet:190},{id:'crossbow',name:'АРБАЛЕТ',desc:'Тяжёлый болт',damage:2.6,rate:.72,bullet:370}
 ];
 let chosenHero='scout',chosenWeapon='pistol',activeHero=HEROES[0],activeWeapon=WEAPONS[0];
-let meta={coins:0,best:0,runs:0,permHp:0,permDamage:0,permSpeed:0,items:[],claimed:[],totalKills:0,bosses:0};
+let meta={coins:0,best:0,runs:0,permHp:0,permDamage:0,permSpeed:0,items:[],claimed:[],totalKills:0,bosses:0,ownedHeroes:['scout'],ownedWeapons:['pistol'],skins:[],equippedSkins:{},pets:[],equippedPet:null,weaponLevels:{}};
 let loot=[],paused=false,walkFrame=0,questOpenFrom='menu';
 let roomIndex=1,roomKills=0,roomGoal=6,secretFound=false,secretPos={x:24,y:330},roomProps=[],roomDoorOpen=false,armor=0,artifact=null,attackAnim=0;
 let nextBossTime=180,landscapePhase=0,finalBoss=false,bossWarning=0;
@@ -192,7 +193,7 @@ function interact(){/* Search/interaction system removed. */}
 
 function loadMeta(){
  try{const v=JSON.parse(localStorage.getItem('ds_meta3')||'{}');meta={...meta,...v}}catch(e){}
- renderMeta();
+ meta.ownedHeroes=meta.ownedHeroes||['scout'];meta.ownedWeapons=meta.ownedWeapons||['pistol'];meta.skins=meta.skins||[];meta.equippedSkins=meta.equippedSkins||{};meta.pets=meta.pets||[];meta.weaponLevels=meta.weaponLevels||{};if(!meta.ownedHeroes.includes('scout'))meta.ownedHeroes.push('scout');if(!meta.ownedWeapons.includes('pistol'))meta.ownedWeapons.push('pistol');renderMeta();
 }
 function saveMeta(){try{localStorage.setItem('ds_meta3',JSON.stringify(meta))}catch(e){}renderMeta()}
 function renderMeta(){const el=document.getElementById('metaStats');if(el)el.textContent=`Золото: ${meta.coins} ◉ · Лучший забег: ${meta.best} убийств · Забегов: ${meta.runs}`;}
@@ -217,11 +218,13 @@ function openShop(){
 function showLoot(text){const el=$('lootToast');el.textContent=text;el.style.display='block';setTimeout(()=>el.style.display='none',1500)}
 
 function renderArmory(){
- const hc=document.getElementById('heroChoices'),wc=document.getElementById('weaponChoices');if(!hc||!wc)return;
- hc.innerHTML='<div style="color:#ffda69;font-weight:bold;margin:8px">ГЕРОЙ</div>';
- HEROES.forEach(h=>{const b=document.createElement('button');b.className='choice';b.style.borderColor=chosenHero===h.id?'#ffc83d':'#7188aa';b.innerHTML=`<b>${h.name}${chosenHero===h.id?' ✓':''}</b>${h.desc}`;b.onclick=()=>{chosenHero=h.id;renderArmory()};hc.appendChild(b)});
- wc.innerHTML='<div style="color:#ffda69;font-weight:bold;margin:8px">ОРУЖИЕ</div>';
- WEAPONS.forEach(w=>{const b=document.createElement('button');b.className='choice';b.style.borderColor=chosenWeapon===w.id?'#ffc83d':'#7188aa';b.innerHTML=`<b>${w.name}${chosenWeapon===w.id?' ✓':''}</b>${w.desc}`;b.onclick=()=>{chosenWeapon=w.id;renderArmory()};wc.appendChild(b)});
+ const hc=$('heroChoices'),wc=$('weaponChoices'),cc=$('collectionChoices');if(!hc||!wc)return;
+ hc.innerHTML='<div style="color:#ffda69;font-weight:bold;margin:8px">ГЕРОИ · ЗОЛОТО</div>';
+ HEROES.forEach(h=>{const owned=(meta.ownedHeroes||['scout']).includes(h.id),b=document.createElement('button');b.className='choice';b.style.borderColor=chosenHero===h.id?'#ffc83d':'#7188aa';b.innerHTML='<b>'+h.name+(chosenHero===h.id?' ✓':'')+'</b>'+h.desc+'<br><span style="color:#ffda69">'+(owned?'ОТКРЫТ':h.cost+' ◉')+'</span>';b.onclick=()=>{if(!owned){if(meta.coins<h.cost){toast('Не хватает монет');return}meta.coins-=h.cost;meta.ownedHeroes.push(h.id);saveMeta();sfx('upgrade')}chosenHero=h.id;renderArmory()};hc.appendChild(b)});
+ wc.innerHTML='<div style="color:#ffda69;font-weight:bold;margin:8px">ОРУЖИЕ · ИЗ ЛУТБОКСОВ</div>';
+ WEAPONS.forEach(w=>{const owned=(meta.ownedWeapons||['pistol']).includes(w.id),lvl=(meta.weaponLevels||{})[w.id]||0,b=document.createElement('button');b.className='choice';b.disabled=!owned;b.style.opacity=owned?'1':'.45';b.style.borderColor=chosenWeapon===w.id?'#ffc83d':'#7188aa';b.innerHTML='<b>'+w.name+(chosenWeapon===w.id?' ✓':'')+'</b>'+w.desc+'<br><span>'+(owned?'УРОВЕНЬ '+(lvl+1):'ЗАКРЫТО · ЛУТБОКС')+'</span>';b.onclick=()=>{if(owned){chosenWeapon=w.id;renderArmory()}};wc.appendChild(b)});
+ if(cc){const ownedSkins=(meta.skins||[]).map(id=>SKINS.find(sk=>sk.id===id)).filter(Boolean);cc.innerHTML='<b style="color:#ffda69">СКИНЫ ('+ownedSkins.length+'/'+SKINS.length+')</b><br>'+ownedSkins.map(sk=>{const rar=SKIN_RARITIES.find(r=>r.id===sk.rarity);return '<button class="choice" data-skin="'+sk.id+'" style="border-color:'+rar.color+';color:'+rar.color+';padding:6px;margin:3px;width:auto">'+sk.name+' · '+rar.name+'</button>'}).join('')+'<br><span style="opacity:.8">Легендарные скины получают уникальную отделку и ауру.</span>';cc.querySelectorAll('[data-skin]').forEach(b=>b.onclick=()=>{const sk=SKINS.find(x=>x.id===b.dataset.skin);if(sk){meta.equippedSkins[sk.hero]=sk.id;chosenHero=sk.hero;saveMeta();renderArmory();toast('Скин экипирован')}})}
+ const pet=PETS.find(p=>p.id===meta.equippedPet),pi=$('petInfo');if(pi)pi.innerHTML='Питомцы: '+(meta.pets||[]).map(id=>PETS.find(p=>p.id===id)?.name||id).join(', ')+' · Активный: '+(pet?pet.name:'нет');
 }
 
 
@@ -271,18 +274,18 @@ function updateHud(){
  const ds=$('dashStatus'),db=$('dashBtn');if(ds&&db){ds.textContent=dashCooldown<=0?'ГОТОВ':dashCooldown.toFixed(1)+'с';db.className=dashCooldown<=0?'ready':'cooling';}
  $('xp').style.width=(xp/xpNeed*100)+'%';$('bossbar').style.display=boss?'block':'none';if(boss)$('bossfill').style.width=(boss.hp/boss.maxhp*100)+'%';
 }
-function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',1100)}
+function toast(t){if(/РЫВОК|УКЛОНИСЬ|АТАКА/i.test(t))return;$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',1100)}
 function addEnemy(){
  let side=Math.floor(rand(0,4)),x=side===0?-10:side===1?W+10:rand(0,W),y=side===2?-10:side===3?H+10:rand(0,H);
  if(Math.hypot(x-player.x,y-player.y)<145){x=x<W/2?W+10:-10;y=rand(30,H-30)}
  const roll=Math.random();let type=roll<.16?'fast':roll<.29?'ranged':roll<.39?'brute':roll<.51?'charger':roll<.62?'spitter':'grunt';
  const phase=Math.min(4,Math.floor(runTime/180)),scale=1+phase*.48;
- let hp=(type==='fast'?1.5:type==='brute'?4.2:type==='charger'?2.8:type==='spitter'?2.4:type==='ranged'?2.1:2.5)*scale;
+ let hp=(type==='fast'?6:type==='brute'?20:type==='charger'?14:type==='spitter'?12:type==='ranged'?11:10)*scale*(1+phase*.42);
  const radius={fast:6,brute:11,charger:9,spitter:8,ranged:8,grunt:8}[type];
  enemies.push({id:enemyId++,x,y,r:radius,hp,maxhp:hp,speed:(type==='fast'?rand(48,66):type==='brute'?rand(18,26):type==='charger'?rand(22,30):type==='spitter'?rand(18,25):type==='ranged'?rand(20,30):rand(25,42))+phase*2.2,damage:1+phase*.18,flash:0,type,fire:rand(.8,1.8),attack:rand(.7,1.5),windup:0,chargeX:0,chargeY:0,anim:rand(0,6.28)});
  }
 function spawnBoss(isFinal=false){
- finalBoss=isFinal;const phase=Math.min(5,Math.floor(runTime/180));const hp=isFinal?680:120+phase*80;
+ finalBoss=isFinal;const phase=Math.min(5,Math.floor(runTime/180));const hp=isFinal?2400:520+phase*380;
  boss={x:clamp(player.x+rand(-150,150),70,W-70),y:clamp(player.y+rand(-90,90),55,H-55),r:isFinal?28:22,hp,maxhp:hp,speed:isFinal?43:29+phase*5,fire:isFinal?.65:1.05,flash:0,phase};
  enemies.push({id:enemyId++,x:boss.x,y:boss.y,r:boss.r,hp:boss.hp,maxhp:boss.maxhp,speed:boss.speed,damage:isFinal?2:1+phase*.4,type:'boss'});
  bossWarning=3;toast(isFinal?'⚠ ГЛАВНЫЙ БОСС — ВЫЖИВИ И ПОБЕДИ!':'⚠ БОСС ЛОКАЦИИ '+(phase+1)+'!');sfx('boss');
@@ -292,9 +295,9 @@ function particle(x,y,color,n=5){for(let i=0;i<n;i++)particles.push({x,y,vx:rand
 function nearest(){let best=null,d=1e9;for(let e of enemies){let dd=Math.hypot(e.x-player.x,e.y-player.y);if(dd<d){best=e;d=dd}}return best}
 function shootAt(e){
  if(!e)return;sfx('shot');let dx=e.x-player.x,dy=e.y-player.y,d=Math.hypot(dx,dy)||1;
- const baseAng=Math.atan2(dy,dx), pellets=activeWeapon.id==='shotgun'?3:1;
- for(let i=0;i<pellets;i++){const ang=baseAng+(i-(pellets-1)/2)*(activeWeapon.id==='shotgun'?.19:0);
- bullets.push({x:player.x,y:player.y,vx:Math.cos(ang)*activeWeapon.bullet,vy:Math.sin(ang)*activeWeapon.bullet,r:activeWeapon.id==='laser'?4:3,life:1.15,damage:player.damage*(Math.random()<critChance?2:1),pierce,color:activeWeapon.id==='laser'?'#63f6ff':artifact==='ember'?'#ff7948':'#ffe06a'});}
+ const baseAng=Math.atan2(dy,dx), pellets=activeWeapon.id==='shotgun'?3:activeWeapon.id==='burst'?3:1;
+ for(let i=0;i<pellets;i++){const ang=baseAng+(i-(pellets-1)/2)*(activeWeapon.id==='shotgun'?.19:activeWeapon.id==='burst'?.055:0);const critical=Math.random()<critChance;
+ bullets.push({x:player.x,y:player.y,vx:Math.cos(ang)*activeWeapon.bullet,vy:Math.sin(ang)*activeWeapon.bullet,r:activeWeapon.id==='laser'||activeWeapon.id==='rail'?4:3,life:1.15,damage:player.damage*(critical?2:1),critical,pierce,color:activeWeapon.id==='laser'?'#63f6ff':artifact==='ember'?'#ff7948':'#ffe06a'});}
  particle(player.x+dx/d*9,player.y+dy/d*9,'#ffb44b',2);
 }
 function killEnemy(e){
@@ -303,20 +306,20 @@ function killEnemy(e){
  bloodStains.push({x:e.x,y:e.y,r:e.type==='boss'?15:rand(5,9),life:10,maxLife:10,seed:Math.random()});
  deathFx.push({x:e.x,y:e.y,r:e.r,life:.62,maxLife:.62,color:e.type==='boss'?'#ff405e':'#9de6a0'});
  if(e.type==='boss'){boss=null;gold+=10;meta.bosses++;saveMeta();if(finalBoss){victory();return;}toast('БОСС ЛОКАЦИИ ПОВЕРЖЕН! +10 МОНЕТ');loot.push({x:e.x,y:e.y,type:'artifact',life:30});}
- else if(Math.random()<.11)loot.push({x:e.x,y:e.y,type:'gear',life:22});
- else if(Math.random()<.055)loot.push({x:e.x,y:e.y,type:'artifact',life:22});
- else if(Math.random()<.17)coins.push({x:e.x,y:e.y,r:5});
+ else if(Math.random()<.044)loot.push({x:e.x,y:e.y,type:'gear',life:22});
+ else if(Math.random()<.022)loot.push({x:e.x,y:e.y,type:'artifact',life:22});
+ else if(Math.random()<.068)coins.push({x:e.x,y:e.y,r:5});
  if(xp>=xpNeed){xp-=xpNeed;level++;xpNeed=Math.ceil(xpNeed*1.35);showUpgrades()}
 }
 function showUpgrades(){
  sfx('level');state='upgrade';$('upgrade').style.display='flex';$('stick').style.display='none';
  const opts=[
-  ['УРОН +0.5','Пули наносят на 0.5 больше урона.',()=>{player.damage+=.5;upgrades.damage++;}],
-  ['БЫСТРЫЕ ВЫСТРЕЛЫ','Стреляй на 10% чаще.',()=>{player.fireRate=Math.max(.18,player.fireRate*.90);upgrades.rate++;}],
-  ['БЫСТРЫЕ НОГИ','Скорость движения +8%.',()=>{player.speed*=1.08;upgrades.speed++;}],
+  ['УРОН +0.17','Небольшой прирост урона.',()=>{player.damage+=.17;upgrades.damage++;}],
+  ['БЫСТРЫЕ ВЫСТРЕЛЫ','Скорострельность +3%.',()=>{player.fireRate=Math.max(.2,player.fireRate*.97);upgrades.rate++;}],
+  ['БЫСТРЫЕ НОГИ','Скорость движения +2,7%.',()=>{player.speed*=1.027;upgrades.speed++;}],
   ['ЗАПАС ЗДОРОВЬЯ','Восстанови 1 ♥ и увеличь максимум.',()=>{player.maxhp++;player.hp=Math.min(player.maxhp,player.hp+1);upgrades.maxhp++;}],
   ['МАГНИТ МОНЕТ','Радиус сбора предметов выше.',()=>{upgrades.magnet++;}],
-  ['ОРЛИНЫЙ ГЛАЗ','Шанс критического урона +5%.',()=>{critChance=Math.min(.45,critChance+.05);}],
+  ['ОРЛИНЫЙ ГЛАЗ','Шанс критического урона +1,7%.',()=>{critChance=Math.min(.35,critChance+.017);}],
   ['ПРОБОЙ','Пули проходят сквозь ещё одного врага.',()=>{pierce=Math.min(3,pierce+1);}],
   ['ОРБИТАЛЬНЫЙ ДРОН','Спутник наносит урон ближайшим врагам.',()=>{orbitTimer=Math.min(3,orbitTimer+1);}],
   ['ВТОРОЕ ДЫХАНИЕ','Восстанови 1 ♥.',()=>{player.hp=Math.min(player.maxhp,player.hp+1);}],
@@ -332,7 +335,7 @@ function endGame(){
 function update(dt){
  if(state!=='play')return;runTime+=dt;checkpointTimer+=dt;bossWarning=Math.max(0,bossWarning-dt);if(runTime>=900&&finalBoss&&!boss){victory();return}if(checkpointTimer>=5){checkpointTimer=0;saveRun()}streakTimer=Math.max(0,streakTimer-dt);if(streakTimer<=0)killStreak=0;player.inv=Math.max(0,player.inv-dt);dashCooldown=Math.max(0,dashCooldown-dt);dashTime=Math.max(0,dashTime-dt);spawn-=dt;shoot-=dt;
  if(dashRequested&&dashCooldown<=0){let mx=joy.x,my=joy.y;if(keys.ArrowLeft||keys.a)mx-=1;if(keys.ArrowRight||keys.d)mx+=1;if(keys.ArrowUp||keys.w)my-=1;if(keys.ArrowDown||keys.s)my+=1;let mm=Math.hypot(mx,my);if(mm>.1)dashDir={x:mx/mm,y:my/mm};dashTime=.18;dashCooldown=2.6;player.inv=Math.max(player.inv,.38);particle(player.x,player.y,'#c38aff',16);particle(player.x-dashDir.x*8,player.y-dashDir.y*8,'#8cecff',7);sfx('dash');}dashRequested=false;
- if(spawn<=0){const phaseCount=Math.min(4,Math.floor(runTime/180));const pack=1+(phaseCount>=1?1:0)+(phaseCount>=2&&Math.random()<.65?1:0)+(phaseCount>=3&&Math.random()<.35?1:0);for(let si=0;si<pack;si++)addEnemy();spawn=Math.max(.22,(1.12-landscapePhase*.13)/(1+phaseCount*.12));}
+ if(spawn<=0){const phaseCount=Math.min(4,Math.floor(runTime/180));const pack=2*(1+(phaseCount>=1?1:0)+(phaseCount>=2&&Math.random()<.65?1:0)+(phaseCount>=3&&Math.random()<.35?1:0));for(let si=0;si<pack;si++)addEnemy();spawn=Math.max(.18,(1.12-landscapePhase*.13)/(1+phaseCount*.12));}
  const previousPhase=landscapePhase;landscapePhase=Math.min(4,Math.floor(runTime/180));floor=landscapePhase+1;if(landscapePhase!==previousPhase){makeRoomProps();if(runTime<900)toast('ЛАНДШАФТ ИЗМЕНИЛСЯ: '+['РУИНЫ','ПЕПЕЛЬНЫЕ ПУСТОШИ','ЗАТОПЛЕННЫЙ ХРАМ','КРИСТАЛЬНАЯ БУРЯ','ЦАРСТВО БЕЗДНЫ'][landscapePhase]);}if(runTime>=900&&!finalBoss&&!boss){spawnBoss(true);}else if(runTime>=nextBossTime&&runTime<900&&!boss){spawnBoss(false);nextBossTime+=180;}
  if(boss){boss.fire-=dt;if(boss.fire<=0){boss.fire=boss.hp<boss.maxhp*.45?.58:1.05;
  const phase=boss.hp<boss.maxhp*.45;
@@ -362,7 +365,7 @@ function update(dt){
   }
   if(d<e.r+player.r&&player.inv<=0){const taken=Math.max(.5,1-armor*.25);player.hp-=taken;damageNumbers.push({x:player.x+rand(-5,5),y:player.y-18,v:rand(24,38),value:Math.ceil(taken),life:.9,maxLife:.9,color:'#ff5266'});player.inv=.9;shake=7;screenFlash=.16;particle(player.x,player.y,'#ff5266',12);particle(player.x,player.y,'#fff0d2',4);if(player.hp<=0){updateHud();endGame();return}}
  }
- for(let b of bullets){b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;for(let e of enemies){if(e.hp>0&&Math.hypot(e.x-b.x,e.y-b.y)<e.r+b.r){let dmg=b.damage*(artifact==='ember'?1.12:1);e.hp-=dmg;damageNumbers.push({x:e.x+rand(-4,4),y:e.y-e.r-4,v:rand(20,34),value:Math.ceil(dmg),life:.8,maxLife:.8,color:b.damage>player.damage?'#ffe16b':'#ffffff'});if(artifact==='frost')e.speed=Math.max(8,e.speed*.94);if(e.type==='boss'&&boss){boss.hp=e.hp;boss.x=e.x;boss.y=e.y;}b.pierce=b.pierce||0;particle(b.x,b.y,b.color||'#ffe06a',3);if(b.pierce>0){b.pierce--;b.damage*=.82}else b.life=0;if(e.hp<=0)killEnemy(e);else{particle(e.x,e.y,'#fff0a6',2);screenFlash=Math.max(screenFlash,.025)}break}}}
+ for(let b of bullets){b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;for(let e of enemies){if(e.hp>0&&Math.hypot(e.x-b.x,e.y-b.y)<e.r+b.r){let dmg=b.damage*(artifact==='ember'?1.12:1);e.hp-=dmg;if(b.critical){for(let k=0;k<18;k++){const a=Math.random()*Math.PI*2,sp=rand(30,145);particles.push({x:e.x,y:e.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:rand(.22,.65),color:k%3===0?'#ffb4b4':k%3===1?'#d91f3d':'#8f102b'});}bloodStains.push({x:e.x,y:e.y,r:rand(9,16),life:14,maxLife:14,seed:Math.random()});shake=Math.max(shake,5);}damageNumbers.push({x:e.x+rand(-4,4),y:e.y-e.r-4,v:rand(20,34),value:Math.ceil(dmg),life:.8,maxLife:.8,color:b.damage>player.damage?'#ffe16b':'#ffffff'});if(artifact==='frost')e.speed=Math.max(8,e.speed*.94);if(e.type==='boss'&&boss){boss.hp=e.hp;boss.x=e.x;boss.y=e.y;}b.pierce=b.pierce||0;particle(b.x,b.y,b.color||'#ffe06a',3);if(b.pierce>0){b.pierce--;b.damage*=.82}else b.life=0;if(e.hp<=0)killEnemy(e);else{particle(e.x,e.y,'#fff0a6',2);screenFlash=Math.max(screenFlash,.025)}break}}}
  bullets=bullets.filter(b=>b.life>0&&b.x>-10&&b.x<W+10&&b.y>-10&&b.y<H+10);
  for(let b of ebullets){b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;if(Math.hypot(b.x-player.x,b.y-player.y)<player.r+b.r&&player.inv<=0){const taken=Math.max(.5,1-armor*.25);player.hp-=taken;damageNumbers.push({x:player.x+rand(-5,5),y:player.y-18,v:rand(24,38),value:Math.ceil(taken),life:.9,maxLife:.9,color:'#ff5266'});player.inv=.9;b.life=0;shake=7;screenFlash=.16;particle(player.x,player.y,'#ff5266',10);if(player.hp<=0){endGame();return}}}
  ebullets=ebullets.filter(b=>b.life>0&&b.x>-20&&b.x<W+20&&b.y>-20&&b.y<H+20);
@@ -441,7 +444,7 @@ function draw(dt=0){
  rect(player.x-6,player.y+1+leg,5,7,'#101523');rect(player.x+1,player.y+1-leg,5,7,'#101523');
  rect(player.x-5,player.y+2+leg,3,5,'#d9e5f8');rect(player.x+2,player.y+2-leg,3,5,'#a9c4e7');
  rect(player.x-7,player.y-7-bob,14,14,'#0a101c');
- rect(player.x-5,player.y-6-bob,10,12,activeHero.color||'#e5a56d');
+ const skin=SKINS.find(sk=>sk.id===meta.equippedSkins?.[activeHero.id]);rect(player.x-5,player.y-6-bob,10,12,skin?.color||activeHero.color||'#e5a56d');
  rect(player.x-4,player.y-5-bob,8,3,'#f5d1a1');
  rect(player.x-4,player.y-1-bob,8,4,'#25344f');
  rect(player.x-3,player.y-4-bob,2,2,'#f8ffff');rect(player.x+2,player.y-4-bob,2,2,'#f8ffff');
@@ -538,7 +541,14 @@ function openControlSettings(from){settingsReturn=from;$('menu').style.display='
 (function initControlSettings(){try{applyControlLayout(JSON.parse(localStorage.getItem('ds_control_layout')||'{}'))}catch(e){}const preview=$('layoutPreview');let drag=null;preview.querySelectorAll('.dragControl').forEach(el=>{el.addEventListener('pointerdown',e=>{drag={el,p:preview.getBoundingClientRect()};el.setPointerCapture(e.pointerId);e.preventDefault()});el.addEventListener('pointermove',e=>{if(!drag||drag.el!==el)return;const r=preview.getBoundingClientRect();el.style.left=Math.max(8,Math.min(92,(e.clientX-r.left)/r.width*100))+'%';el.style.top=Math.max(12,Math.min(88,(e.clientY-r.top)/r.height*100))+'%';});el.addEventListener('pointerup',()=>{if(!drag||drag.el!==el)return;const x=parseFloat(el.style.left)/100,y=parseFloat(el.style.top)/100;const id=el.dataset.control;const map={};try{Object.assign(map,JSON.parse(localStorage.getItem('ds_control_layout')||'{}'))}catch(e){}map[id]={x:Math.round((id==='stick'?x*innerWidth:(1-x)*innerWidth)-45),y:Math.round((1-y)*innerHeight-27)};localStorage.setItem('ds_control_layout',JSON.stringify(map));applyControlLayout(map);drag=null});});})();
 $('armoryOpen').onclick=()=>{renderArmory();$('menu').style.display='none';$('armory').style.display='flex'};
 $('armoryBack').onclick=()=>{$('armory').style.display='none';$('menu').style.display='flex'};
-$('armoryStart').onclick=()=>{ $('armory').style.display='none';reset(); };
+$('armoryStart').onclick=()=>{if(!(meta.ownedHeroes||['scout']).includes(chosenHero)){toast('Сначала открой героя');return}if(!(meta.ownedWeapons||['pistol']).includes(chosenWeapon))chosenWeapon='pistol';$('armory').style.display='none';reset();};
+$('lootboxOpen').onclick=()=>{if(meta.coins<100){toast('Нужно 100 монет для лутбокса');return}meta.coins-=100;const roll=Math.random()*100,rarity=roll<58?'common':roll<85?'rare':roll<96?'epic':'legendary';const locked=WEAPONS.filter(w=>!(meta.ownedWeapons||['pistol']).includes(w.id)),skins=SKINS.filter(sk=>!(meta.skins||[]).includes(sk.id)),pets=PETS.filter(p=>!(meta.pets||[]).includes(p.id));let reward;
+if(locked.length&&Math.random()<.58){const w=locked[Math.floor(Math.random()*locked.length)];meta.ownedWeapons.push(w.id);meta.weaponLevels[w.id]=0;reward='Новое оружие: '+w.name;}
+else if(skins.length&&Math.random()<.72){const candidates=skins.filter(sk=>sk.rarity===rarity),pool=candidates.length?candidates:skins,sk=pool[Math.floor(Math.random()*pool.length)];meta.skins.push(sk.id);reward='Скин '+sk.name+' — '+(SKIN_RARITIES.find(r=>r.id===sk.rarity)?.name||sk.rarity)+' · '+sk.quality;}
+else if(pets.length){const p=pets[Math.floor(Math.random()*pets.length)];meta.pets.push(p.id);meta.equippedPet=p.id;reward='Питомец: '+p.name+' — '+p.desc;}
+else{const owned=WEAPONS.filter(w=>(meta.ownedWeapons||[]).includes(w.id)),w=owned[Math.floor(Math.random()*owned.length)]||WEAPONS[0];meta.weaponLevels[w.id]=(meta.weaponLevels[w.id]||0)+1;reward='Улучшение '+w.name+' · уровень '+(meta.weaponLevels[w.id]+1);}
+saveMeta();renderArmory();toast(reward);sfx('upgrade');
+};
 $('again').onclick=reset;$('metaBuy').onclick=()=>{if(meta.coins>=50){meta.coins-=50;const next=meta.permDamage%3;if(next===0)meta.permHp++;else if(next===1)meta.permDamage++;else meta.permSpeed++;meta.permDamage=(meta.permDamage||0);saveMeta();$('endStats').innerHTML+=`<br><span style="color:#9effb4">Постоянное улучшение куплено!</span>`;sfx('upgrade')}else{$('endStats').innerHTML+=`<br><span style="color:#ff7586">Нужно 50 монет. Собирай больше добычи!</span>`}};
 $('home').onclick=()=>{$('end').style.display='none';$('menu').style.display='flex';state='menu';renderMeta()};
 $('pauseBtn').onclick=()=>{if(state==='play'){saveRun();state='paused';$('pause').style.display='flex';$('stick').style.display='none'}};

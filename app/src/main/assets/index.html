@@ -39,10 +39,42 @@ button:active{transform:translateY(2px);filter:brightness(1.15)}
 .choice{font-size:13px;text-align:left;padding:12px}
 .choice b{color:#ffda69;display:block;margin-bottom:5px}
 @media (min-width:700px){.card{width:460px}#stick{width:120px;height:120px}#knob{left:35px;top:35px}}
+
+/* Landscape combat layout and readable touch controls */
+#wrap{overflow:hidden}
+canvas{width:100vw;height:100dvh;object-fit:fill;image-rendering:pixelated}
+.hudtop{left:10px;right:104px;top:max(8px,env(safe-area-inset-top));font-size:11px;gap:8px}
+.hudbox{padding:5px 7px;min-width:78px;background:#050a16ef;border-color:#7188a7;box-shadow:0 2px 0 #0009}
+#hp{font-size:13px;letter-spacing:0}
+#xpOuter{width:min(26vw,180px);height:6px}
+#bossbar{top:8px;left:35%;width:30%;height:9px}
+#pauseBtn{top:49px!important;right:10px!important;padding:6px 8px!important}
+#audioToggle{top:8px!important;right:10px!important;padding:6px 8px!important}
+#stick{left:max(14px,env(safe-area-inset-left));bottom:max(14px,env(safe-area-inset-bottom));width:100px;height:100px;background:#071126d9;border:2px solid #e1ebff99;box-shadow:0 0 0 4px #02061166}
+#knob{width:40px;height:40px;left:28px;top:28px;background:#c8dcffb8;box-shadow:0 2px 10px #0009}
+#shootBtn{position:absolute;right:max(18px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));width:82px;height:82px;border-radius:50%;padding:0;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;pointer-events:auto;background:radial-gradient(circle at 35% 25%,#ff8b68,#b5263f 70%);border:3px solid #ffd2bf;box-shadow:0 0 0 4px #310e1bb0,0 0 18px #ff4b5e77,inset 0 -7px #75172a;color:#fff;font-size:10px;text-shadow:1px 2px #59111c;touch-action:none}
+#shootBtn .shootIcon{font-size:28px;line-height:28px;text-shadow:0 0 8px #fff}
+#shootBtn.pressed{transform:scale(.94);filter:brightness(1.3);box-shadow:0 0 0 4px #310e1bb0,0 0 24px #ff8a67}
+#dashBtn{right:max(26px,env(safe-area-inset-right));bottom:max(112px,calc(env(safe-area-inset-bottom) + 112px));width:62px;height:62px;font-size:9px;box-shadow:0 0 0 3px #160d24aa}
+#interactBtn{right:max(108px,calc(env(safe-area-inset-right) + 108px))!important;bottom:max(22px,env(safe-area-inset-bottom))!important;width:60px!important;height:60px!important;font-size:9px!important}
+#lootToast{top:28%!important}
+#toast{top:27%;font-size:16px}
+#hud button{min-height:0}
+@media (orientation:portrait){
+ #hud:before{content:'ПОВЕРНИТЕ ТЕЛЕФОН ГОРИЗОНТАЛЬНО';position:absolute;z-index:10;left:50%;top:50%;transform:translate(-50%,-50%);width:min(80vw,340px);padding:14px;background:#081326ee;border:2px solid #ffc83d;color:#fff0b0;text-align:center;font-size:13px;line-height:1.5;box-shadow:0 0 0 100vmax #050916ee}
+}
+@media (max-height:380px){
+ .hudtop{top:4px}
+ .hudbox{padding:4px 6px}
+ #stick{width:86px;height:86px}
+ #knob{left:21px;top:21px}
+ #shootBtn{width:70px;height:70px}
+ #dashBtn{width:54px;height:54px;bottom:max(91px,calc(env(safe-area-inset-bottom) + 91px))}
+}
 </style>
 </head>
 <body>
-<div id="wrap"><canvas id="game" width="360" height="640" aria-label="Игровое поле"></canvas></div>
+<div id="wrap"><canvas id="game" width="640" height="360" aria-label="Игровое поле"></canvas></div>
 <div id="hud">
  <div class="hudtop">
   <div class="hudbox"><div id="hp">♥ ♥ ♥</div><div id="coins">◉ 0</div><div id="xpOuter"><div id="xp"></div></div></div>
@@ -53,7 +85,7 @@ button:active{transform:translateY(2px);filter:brightness(1.15)}
  <div id="lootToast" style="position:absolute;top:34%;left:8%;width:84%;text-align:center;font-weight:bold;color:#8fffe0;text-shadow:2px 2px #000;display:none"></div>
  <button id="audioToggle" style="pointer-events:auto;position:absolute;top:105px;right:12px;width:auto;margin:0;padding:7px 9px;font-size:11px;background:#101b30">♫ ЗВУК: ВКЛ</button>
  <div id="stick"><div id="knob"></div></div>
- <button id="dashBtn" class="ready" aria-label="Рывок">⚡<br>РЫВОК<br><span id="dashStatus">ГОТОВ</span></button><button id="interactBtn" style="position:absolute;right:110px;bottom:max(30px,env(safe-area-inset-bottom));width:62px;height:62px;border-radius:50%;padding:3px;margin:0;background:#5b482dcc;border:2px solid #ffe18a;font-size:10px;line-height:1.2;pointer-events:auto">🔎<br>ОБЫСК</button><div id="shootHint">АВТО<br>ОГОНЬ</div><div id="toast"></div>
+ <button id="dashBtn" class="ready" aria-label="Рывок">⚡<br>РЫВОК<br><span id="dashStatus">ГОТОВ</span></button><button id="interactBtn" style="position:absolute;right:110px;bottom:max(30px,env(safe-area-inset-bottom));width:62px;height:62px;border-radius:50%;padding:3px;margin:0;background:#5b482dcc;border:2px solid #ffe18a;font-size:10px;line-height:1.2;pointer-events:auto">🔎<br>ОБЫСК</button><button id="shootBtn" aria-label="Стрелять"><span class="shootIcon">✦</span><span>ОГОНЬ</span></button><div id="toast"></div>
 </div>
 <div id="menu" class="overlay">
  <div class="card">
@@ -91,9 +123,10 @@ button:active{transform:translateY(2px);filter:brightness(1.15)}
 (()=>{
 const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
 ctx.imageSmoothingEnabled=false;
-const W=360,H=640;
+const W=640,H=360;
 const $=id=>document.getElementById(id);
 let state='menu',player,enemies=[],bullets=[],ebullets=[],coins=[],particles=[],keys={},joy={x:0,y:0},joyActive=false;
+let bloodStains=[],deathFx=[],damageNumbers=[],manualFire=false;
 let last=0,spawn=0,shoot=0,enemyId=0,runTime=0,level=1,xp=0,xpNeed=6,gold=0,kills=0,floor=1,shake=0,boss=null,screenFlash=0,ambient=[];
 let upgrades={damage:1,rate:1,speed:1,maxhp:3,magnet:1},weapon='ПИСТОЛЕТ';
 const HEROES=[
@@ -274,6 +307,8 @@ function shootAt(e){
 function killEnemy(e){
  sfx(e.type==='boss'?'boss':'hit');kills++;meta.totalKills++;streakTimer=3;killStreak=Math.min(10,killStreak+1);if(artifact==='vampire'&&Math.random()<.18)player.hp=Math.min(player.maxhp,player.hp+1);if(e.type!=='boss'){roomKills++;roomDoorOpen=roomKills>=roomGoal;if(roomDoorOpen)toast('КОМНАТА ЗАЧИЩЕНА! ДВЕРЬ ОТКРЫТА');}gold+=e.type==='boss'?15:(Math.random()<(meta.items.includes('charm')?.62:.42)?1:0);xp+=e.type==='boss'?5:1;
  particle(e.x,e.y,e.type==='boss'?'#ff3c60':'#8dfb75',e.type==='boss'?16:7);
+ bloodStains.push({x:e.x,y:e.y,r:e.type==='boss'?15:rand(5,9),life:10,maxLife:10,seed:Math.random()});
+ deathFx.push({x:e.x,y:e.y,r:e.r,life:.62,maxLife:.62,color:e.type==='boss'?'#ff405e':'#9de6a0'});
  if(e.type==='boss'){boss=null;floor++;gold+=10;meta.bosses++;saveMeta();toast('БОСС ПОВЕРЖЕН! +10 МОНЕТ');loot.push({x:e.x,y:e.y,type:'chest',life:18});}
  else if(Math.random()<.11)loot.push({x:e.x,y:e.y,type:'gear',life:22});
  else if(Math.random()<.055)loot.push({x:e.x,y:e.y,type:'artifact',life:22});
@@ -328,11 +363,11 @@ function update(dt){
     e.fire-=dt;if(e.fire<=0&&d<260){e.fire=1.65;ebullets.push({x:e.x,y:e.y,vx:vx/d*92,vy:vy/d*92,r:3,life:3,color:'#ffb66b'})}
    }else{e.x+=vx/d*e.speed*dt;e.y+=vy/d*e.speed*dt}
   }
-  if(d<e.r+player.r&&player.inv<=0){player.hp-=Math.max(.5,1-armor*.25);player.inv=.9;shake=7;screenFlash=.16;particle(player.x,player.y,'#ff5266',12);particle(player.x,player.y,'#fff0d2',4);if(player.hp<=0){updateHud();endGame();return}}
+  if(d<e.r+player.r&&player.inv<=0){const taken=Math.max(.5,1-armor*.25);player.hp-=taken;damageNumbers.push({x:player.x+rand(-5,5),y:player.y-18,v:rand(24,38),value:Math.ceil(taken),life:.9,maxLife:.9,color:'#ff5266'});player.inv=.9;shake=7;screenFlash=.16;particle(player.x,player.y,'#ff5266',12);particle(player.x,player.y,'#fff0d2',4);if(player.hp<=0){updateHud();endGame();return}}
  }
- for(let b of bullets){b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;for(let e of enemies){if(e.hp>0&&Math.hypot(e.x-b.x,e.y-b.y)<e.r+b.r){let dmg=b.damage*(artifact==='ember'?1.12:1);e.hp-=dmg;if(artifact==='frost')e.speed=Math.max(8,e.speed*.94);if(e.type==='boss'&&boss){boss.hp=e.hp;boss.x=e.x;boss.y=e.y;}b.pierce=b.pierce||0;particle(b.x,b.y,b.color||'#ffe06a',3);if(b.pierce>0){b.pierce--;b.damage*=.82}else b.life=0;if(e.hp<=0)killEnemy(e);else{particle(e.x,e.y,'#fff0a6',2);screenFlash=Math.max(screenFlash,.025)}break}}}
+ for(let b of bullets){b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;for(let e of enemies){if(e.hp>0&&Math.hypot(e.x-b.x,e.y-b.y)<e.r+b.r){let dmg=b.damage*(artifact==='ember'?1.12:1);e.hp-=dmg;damageNumbers.push({x:e.x+rand(-4,4),y:e.y-e.r-4,v:rand(20,34),value:Math.ceil(dmg),life:.8,maxLife:.8,color:b.damage>player.damage?'#ffe16b':'#ffffff'});if(artifact==='frost')e.speed=Math.max(8,e.speed*.94);if(e.type==='boss'&&boss){boss.hp=e.hp;boss.x=e.x;boss.y=e.y;}b.pierce=b.pierce||0;particle(b.x,b.y,b.color||'#ffe06a',3);if(b.pierce>0){b.pierce--;b.damage*=.82}else b.life=0;if(e.hp<=0)killEnemy(e);else{particle(e.x,e.y,'#fff0a6',2);screenFlash=Math.max(screenFlash,.025)}break}}}
  bullets=bullets.filter(b=>b.life>0&&b.x>-10&&b.x<W+10&&b.y>-10&&b.y<H+10);
- for(let b of ebullets){b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;if(Math.hypot(b.x-player.x,b.y-player.y)<player.r+b.r&&player.inv<=0){player.hp-=Math.max(.5,1-armor*.25);player.inv=.9;b.life=0;shake=7;screenFlash=.16;particle(player.x,player.y,'#ff5266',10);if(player.hp<=0){endGame();return}}}
+ for(let b of ebullets){b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;if(Math.hypot(b.x-player.x,b.y-player.y)<player.r+b.r&&player.inv<=0){const taken=Math.max(.5,1-armor*.25);player.hp-=taken;damageNumbers.push({x:player.x+rand(-5,5),y:player.y-18,v:rand(24,38),value:Math.ceil(taken),life:.9,maxLife:.9,color:'#ff5266'});player.inv=.9;b.life=0;shake=7;screenFlash=.16;particle(player.x,player.y,'#ff5266',10);if(player.hp<=0){endGame();return}}}
  ebullets=ebullets.filter(b=>b.life>0&&b.x>-20&&b.x<W+20&&b.y>-20&&b.y<H+20);
  enemies=enemies.filter(e=>e.hp>0);
  for(let l of loot){l.life-=dt;let d=Math.hypot(l.x-player.x,l.y-player.y);if(d<player.r+15){l.got=true;if(l.type==='chest'){gold+=12;xp+=3;showLoot('СУНДУК! +12 МОНЕТ +3 ОПЫТА');particle(l.x,l.y,'#ffc83d',12)}
@@ -342,7 +377,10 @@ function update(dt){
  if(orbitTimer>0){orbitAngle+=dt*2.8;for(let oi=0;oi<orbitTimer;oi++){const ox=player.x+Math.cos(orbitAngle+oi*Math.PI*2/orbitTimer)*23,oy=player.y+Math.sin(orbitAngle+oi*Math.PI*2/orbitTimer)*23;for(const e of enemies){if(Math.hypot(e.x-ox,e.y-oy)<e.r+5){e.hp-=8*dt;if(e.hp<=0)killEnemy(e)}}particle(ox,oy,'#b9a0ff',1)}}
  for(let c of coins){let d=Math.hypot(c.x-player.x,c.y-player.y);if(d<35+upgrades.magnet*10){c.x+=(player.x-c.x)*Math.min(1,dt*5);c.y+=(player.y-c.y)*Math.min(1,dt*5)}if(d<player.r+c.r+4){c.got=true;gold++;sfx('coin');particle(c.x,c.y,'#ffce45',5)}}
  coins=coins.filter(c=>!c.got);
- for(let p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=Math.pow(.08,dt);p.vy*=Math.pow(.08,dt);p.life-=dt}particles=particles.filter(p=>p.life>0);screenFlash=Math.max(0,screenFlash-dt);walkFrame+=dt*(Math.hypot(dx,dy)>.08?13:3);
+ for(let p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=Math.pow(.08,dt);p.vy*=Math.pow(.08,dt);p.life-=dt}particles=particles.filter(p=>p.life>0);
+ for(const b of bloodStains)b.life-=dt;bloodStains=bloodStains.filter(b=>b.life>0);
+ for(const d of deathFx)d.life-=dt;deathFx=deathFx.filter(d=>d.life>0);
+ for(const n of damageNumbers){n.y-=n.v*dt;n.life-=dt}damageNumbers=damageNumbers.filter(n=>n.life>0);screenFlash=Math.max(0,screenFlash-dt);walkFrame+=dt*(Math.hypot(dx,dy)>.08?13:3);
  updateHud();
 }
 function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))}
@@ -357,6 +395,8 @@ function draw(dt=0){
   rect(x+2,y+2,20,1,'#2b3a51');rect(x+2,y+21,20,1,'#0d1524');
   if(n===3){rect(x+7,y+8,2,2,'#314057');rect(x+14,y+15,3,2,'#111b2d')}
  }
+ // Blood remains on the dungeon floor for about 10 seconds.
+ for(const b of bloodStains){const fade=Math.min(1,b.life/1.4);ctx.globalAlpha=.68*fade;ctx.fillStyle=b.seed>.5?'#741f35':'#9b263b';ctx.beginPath();ctx.ellipse(b.x,b.y,b.r*(1.2+b.seed*.45),b.r*.55,b.seed*2,0,Math.PI*2);ctx.fill();ctx.fillStyle='#4d1728';ctx.beginPath();ctx.ellipse(b.x-2,b.y-1,b.r*.55,b.r*.25,0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
  // Room geometry: destructible-looking stone props, locked/open north door, and a hidden wall.
  for(const p of roomProps){const c=p.kind===0?'#34445a':p.kind===1?'#4a3c54':'#314c4f';rect(p.x-p.w/2,p.y-p.h/2,p.w,p.h,c);rect(p.x-p.w/2,p.y-p.h/2,p.w,3,'#65718a');rect(p.x-p.w/2,p.y+p.h/2-3,p.w,3,'#101827')}
  // North exit door; it changes appearance when the room is cleared.
@@ -409,6 +449,8 @@ function draw(dt=0){
  ctx.restore();
 
 
+ // Enemy death animation: brief squash, fade and outward blood flecks.
+ for(const d of deathFx){const t=1-d.life/d.maxLife;ctx.globalAlpha=Math.max(0,d.life/d.maxLife);ctx.fillStyle=d.color;ctx.beginPath();ctx.ellipse(d.x,d.y,d.r*(.45+t*1.1),Math.max(2,d.r*(.7-t*.4)),0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
  // Animated player sprite: shadow, two-frame legs, outline, armor highlights, weapon recoil and dash afterimages.
  const moving=Math.hypot(joy.x,joy.y)>.08||keys.ArrowLeft||keys.ArrowRight||keys.ArrowUp||keys.ArrowDown||keys.a||keys.d||keys.w||keys.s;
  const leg=Math.sin(walkFrame)* (moving?3:0.8), bob=Math.abs(Math.sin(walkFrame))*(moving?1.5:.4);
@@ -434,6 +476,8 @@ function draw(dt=0){
  if(player.inv>0){rect(player.x-9,player.y-10-bob,18,1,'#9beaff');rect(player.x-9,player.y+10-bob,18,1,'#9beaff')}
  if(screenFlash>0){ctx.fillStyle=`rgba(255,55,80,${Math.min(.18,screenFlash)})`;ctx.fillRect(0,0,W,H)}
 
+ // Floating damage numbers with dark outlines for contrast.
+ for(const n of damageNumbers){ctx.globalAlpha=Math.max(0,n.life/n.maxLife);ctx.font='bold 12px ui-monospace, monospace';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='#080b13';ctx.strokeText(String(n.value),n.x,n.y);ctx.fillStyle=n.color;ctx.fillText(String(n.value),n.x,n.y);ctx.globalAlpha=1;}
  // Extra sparks around active projectiles and particles fade smoothly.
  for(const p of particles){const alpha=Math.max(0,Math.min(1,p.life/.45));rect(p.x-1,p.y-1,3,3,p.color);if(alpha>.5)rect(p.x,p.y,1,1,'#ffffff')}
  ctx.restore();
@@ -491,6 +535,10 @@ function setAudio(on){
  if(on&&audioCtx&&audioCtx.state==='suspended')audioCtx.resume();
 }
 document.getElementById('audioToggle').addEventListener('pointerdown',e=>{e.preventDefault();initAudio();setAudio(!audioOn)});
+const shootBtn=document.getElementById('shootBtn');
+shootBtn.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(state==='play'){manualFire=true;shoot=0;shootBtn.classList.add('pressed');if(shootBtn.setPointerCapture)shootBtn.setPointerCapture(e.pointerId)}});
+const releaseFire=()=>{manualFire=false;shootBtn.classList.remove('pressed')};
+shootBtn.addEventListener('pointerup',releaseFire);shootBtn.addEventListener('pointercancel',releaseFire);shootBtn.addEventListener('lostpointercapture',releaseFire);
 $('dashBtn').addEventListener('pointerdown',e=>{e.preventDefault();if(state==='play')dashRequested=true});
 $('interactBtn').addEventListener('pointerdown',e=>{e.preventDefault();interact()});
 window.addEventListener('keydown',e=>{keys[e.key]=true;if(e.code==='Space'&&state==='play'){e.preventDefault();dashRequested=true}});

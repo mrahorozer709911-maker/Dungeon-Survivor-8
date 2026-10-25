@@ -186,7 +186,7 @@ const $=id=>document.getElementById(id);
 let state='menu',player,enemies=[],bullets=[],ebullets=[],coins=[],particles=[],keys={},joy={x:0,y:0},joyActive=false,adminArena=false;
 let bloodStains=[],deathFx=[],damageNumbers=[],manualFire=false,caseOpening=false,weaponBeams=[],ambientDecor=[];
 let last=0,spawn=0,shoot=0,enemyId=0,runTime=0,level=1,xp=0,xpNeed=6,gold=0,kills=0,floor=1,shake=0,boss=null,screenFlash=0,ambient=[];
-let upgrades={damage:1,rate:1,speed:1,maxhp:3,magnet:1},weapon='ПИСТОЛЕТ';
+let upgrades={damage:1,rate:1,speed:1,maxhp:3,magnet:1},weaponUpgrades={power:0,tempo:0,trait:0},weapon='ПИСТОЛЕТ';
 const HEROES=[
  {id:'scout',name:'РАЗВЕДЧИК',desc:'Быстрый и сбалансированный',hp:3,speed:115,damage:1,rate:.42,color:'#e5a56d',cost:0},{id:'tank',name:'ТАНК',desc:'Выносливый',hp:5,speed:82,damage:1.1,rate:.5,color:'#8ba7c7',cost:350},{id:'tech',name:'ТЕХНИК',desc:'Быстрая стрельба',hp:3,speed:105,damage:1,rate:.31,color:'#65e6cf',cost:450},{id:'medic',name:'МЕДИК',desc:'Большой запас здоровья',hp:4,speed:100,damage:.9,rate:.45,color:'#a8f0c0',cost:600},{id:'phantom',name:'ФАНТОМ',desc:'Быстрый боец',hp:3,speed:124,damage:1,rate:.4,color:'#c6a5ff',cost:750},{id:'engineer',name:'ИНЖЕНЕР',desc:'Тяжёлое снаряжение',hp:4,speed:92,damage:1.2,rate:.48,color:'#f0c56b',cost:900}
 ];
@@ -285,7 +285,7 @@ function saveRun(){
  try{
   const snap={v:1,chosenHero,chosenWeapon,player:{x:player.x,y:player.y,hp:player.hp,maxhp:player.maxhp,speed:player.speed,damage:player.damage,fireRate:player.fireRate},
    runTime,level,xp,xpNeed,gold,kills,floor,roomIndex,roomKills,roomGoal,secretFound,roomDoorOpen,armor,artifact,upgrades,weapon,critChance,pierce,orbitTimer,nextBossTime,landscapePhase,
-   dashCooldown,activeHeroId:activeHero.id,activeWeaponId:activeWeapon.id};
+   dashCooldown,activeHeroId:activeHero.id,activeWeaponId:activeWeapon.id,weaponUpgrades};
   localStorage.setItem('ds_run7',JSON.stringify(snap));
   const b=$('continueRun');if(b)b.style.display='block';
  }catch(e){}
@@ -300,7 +300,7 @@ function resumeRun(){
  player={...snap.player,r:8,inv:1};
  runTime=snap.runTime||0;level=snap.level||1;xp=snap.xp||0;xpNeed=snap.xpNeed||6;gold=snap.gold||0;kills=snap.kills||0;floor=snap.floor||1;nextBossTime=snap.nextBossTime||((Math.floor(runTime/180)+1)*180);landscapePhase=Math.min(4,Math.floor(runTime/180));finalBoss=false;
  roomIndex=snap.roomIndex||1;roomKills=snap.roomKills||0;roomGoal=snap.roomGoal||6;secretFound=!!snap.secretFound;roomDoorOpen=!!snap.roomDoorOpen;
- armor=snap.armor||0;artifact=snap.artifact||null;critChance=snap.critChance||.08;pierce=snap.pierce||0;orbitTimer=snap.orbitTimer||0;upgrades=snap.upgrades||{damage:1,rate:1,speed:1,maxhp:3,magnet:1};weapon=snap.weapon||activeWeapon.name;
+ armor=snap.armor||0;artifact=snap.artifact||null;critChance=snap.critChance||.08;pierce=snap.pierce||0;orbitTimer=snap.orbitTimer||0;upgrades=snap.upgrades||{damage:1,rate:1,speed:1,maxhp:3,magnet:1};weaponUpgrades=snap.weaponUpgrades||{power:0,tempo:0,trait:0};weapon=snap.weapon||activeWeapon.name;
  enemies=[];bullets=[];ebullets=[];coins=[];particles=[];loot=[];boss=null;spawn=.7;shoot=0;dashCooldown=snap.dashCooldown||0;dashTime=0;dashRequested=false;checkpointTimer=0;
  makeRoomProps();updateHud();
  $('menu').style.display='none';$('armory').style.display='none';$('pause').style.display='none';$('shop').style.display='none';$('quests').style.display='none';$('upgrade').style.display='none';$('end').style.display='none';$('hud').style.display='block';$('stick').style.display='block';
@@ -315,7 +315,7 @@ function reset(){
  meta.runs++;saveMeta();clearRunSave();checkpointTimer=0;
  player={x:W/2,y:H/2,r:8,hp:activeHero.hp+Math.min(2,meta.permHp),maxhp:activeHero.hp+Math.min(2,meta.permHp),speed:activeHero.speed*(1+Math.min(6,meta.permSpeed)*.025),inv:0,damage:activeWeapon.damage+Math.min(4,meta.permDamage)*.08,fireRate:activeWeapon.rate};
  enemies=[];bullets=[];ebullets=[];coins=[];particles=[];weaponBeams=[];runTime=0;spawn=0;shoot=0;enemyId=0;level=1;xp=0;xpNeed=6;gold=0;kills=0;floor=1;shake=0;boss=null;nextBossTime=180;landscapePhase=0;finalBoss=false;bossWarning=0;dashCooldown=0;dashTime=0;dashRequested=false;dashDir={x:1,y:0};roomIndex=1;roomKills=0;roomGoal=6;secretFound=false;armor=0;artifact=null;attackAnim=0;makeRoomProps();
- upgrades={damage:1,rate:1,speed:1,maxhp:3,magnet:1};critChance=.08;pierce=0;orbitTimer=0;orbitAngle=0;killStreak=0;streakTimer=0;weapon=activeWeapon.name;
+ upgrades={damage:1,rate:1,speed:1,maxhp:3,magnet:1};weaponUpgrades={power:0,tempo:0,trait:0};critChance=.08;pierce=0;orbitTimer=0;orbitAngle=0;killStreak=0;streakTimer=0;weapon=activeWeapon.name;
  updateHud();state='play';$('menu').style.display='none';$('armory').style.display='none';$('pause').style.display='none';$('shop').style.display='none';$('quests').style.display='none';$('upgrade').style.display='none';$('end').style.display='none';$('hud').style.display='block';$('stick').style.display='block';joy={x:0,y:0};joyActive=false;knob.style.left='32px';knob.style.top='32px';
 }
 function updateHud(){
@@ -331,13 +331,13 @@ function addEnemy(){
  let side=Math.floor(rand(0,4)),x=side===0?-10:side===1?W+10:rand(0,W),y=side===2?-10:side===3?H+10:rand(0,H);
  if(Math.hypot(x-player.x,y-player.y)<145){x=x<W/2?W+10:-10;y=rand(30,H-30)}
  const roll=Math.random();let type=roll<.16?'fast':roll<.29?'ranged':roll<.39?'brute':roll<.51?'charger':roll<.62?'spitter':'grunt';
- const phase=Math.min(4,Math.floor(runTime/180)),scale=1+phase*.42;
- let hp=(type==='fast'?5:type==='brute'?17:type==='charger'?12:type==='spitter'?10:type==='ranged'?9:8.5)*scale*(1+phase*.30);
+ const phase=Math.min(4,Math.floor(runTime/180)),scale=1+phase*.28;
+ let hp=(type==='fast'?5:type==='brute'?17:type==='charger'?12:type==='spitter'?10:type==='ranged'?9:8.5)*scale;
  const radius={fast:6,brute:11,charger:9,spitter:8,ranged:8,grunt:8}[type];
- enemies.push({id:enemyId++,x,y,r:radius,hp,maxhp:hp,speed:(type==='fast'?rand(48,66):type==='brute'?rand(18,26):type==='charger'?rand(22,30):type==='spitter'?rand(18,25):type==='ranged'?rand(20,30):rand(25,42))+phase*2.2,damage:(type==='fast'?.65:type==='brute'?1.6:type==='charger'?1.8:type==='spitter'?.7:type==='ranged'?.8:1)*(1+phase*.18),flash:0,type,fire:rand(.8,1.8),attack:rand(.7,1.5),windup:0,chargeX:0,chargeY:0,anim:rand(0,6.28)});
+ enemies.push({id:enemyId++,x,y,r:radius,hp,maxhp:hp,speed:(type==='fast'?rand(48,66):type==='brute'?rand(18,26):type==='charger'?rand(22,30):type==='spitter'?rand(18,25):type==='ranged'?rand(20,30):rand(25,42))+phase*2.2,damage:(type==='fast'?.65:type==='brute'?1.6:type==='charger'?1.8:type==='spitter'?.7:type==='ranged'?.8:1)*(1+phase*.12),flash:0,type,fire:rand(.8,1.8),attack:rand(.7,1.5),windup:0,chargeX:0,chargeY:0,anim:rand(0,6.28)});
  }
 function spawnBoss(isFinal=false){
- finalBoss=isFinal;const phase=Math.min(5,Math.floor(runTime/180));const hp=isFinal?2050:440+phase*320;
+ finalBoss=isFinal;const phase=Math.min(5,Math.floor(runTime/180));const hp=isFinal?1750:400+phase*250;
  boss={x:clamp(player.x+rand(-150,150),70,W-70),y:clamp(player.y+rand(-90,90),55,H-55),r:isFinal?28:22,hp,maxhp:hp,speed:isFinal?43:29+phase*5,fire:isFinal?.65:1.05,flash:0,phase};
  enemies.push({id:enemyId++,x:boss.x,y:boss.y,r:boss.r,hp:boss.hp,maxhp:boss.maxhp,speed:boss.speed,damage:isFinal?2:1+phase*.4,type:'boss'});
  bossWarning=3;toast(isFinal?'⚠ ГЛАВНЫЙ БОСС — ВЫЖИВИ И ПОБЕДИ!':'⚠ БОСС ЛОКАЦИИ '+(phase+1)+'!');sfx('boss');
@@ -375,7 +375,7 @@ function killEnemy(e,cause){
  else if(Math.random()<.044)loot.push({x:e.x,y:e.y,type:'gear',life:22});
  else if(Math.random()<.022)loot.push({x:e.x,y:e.y,type:'artifact',life:22});
  else if(Math.random()<.068)coins.push({x:e.x,y:e.y,r:5});
- if(xp>=xpNeed){xp-=xpNeed;level++;xpNeed=Math.ceil(xpNeed*1.35);showUpgrades()}
+ if(xp>=xpNeed){xp-=xpNeed;level++;xpNeed=Math.ceil(xpNeed*1.28);showUpgrades()}
 }
 function showUpgrades(){
  sfx('level');state='upgrade';$('upgrade').style.display='flex';$('stick').style.display='none';
@@ -432,7 +432,7 @@ function update(dt){
  if(keys.ArrowLeft||keys.a)dx-=1;if(keys.ArrowRight||keys.d)dx+=1;if(keys.ArrowUp||keys.w)dy-=1;if(keys.ArrowDown||keys.s)dy+=1;
  let mag=Math.hypot(dx,dy);if(mag>1){dx/=mag;dy/=mag}
  if(dashTime>0){dx=dashDir.x;dy=dashDir.y;mag=1;}player.x=clamp(player.x+dx*player.speed*(dashTime>0?3.2:1)*dt,12,W-12);player.y=clamp(player.y+dy*player.speed*(dashTime>0?3.2:1)*dt,35,H-15);
- if(shoot<=0){let e=nearest();if(e&&Math.hypot(e.x-player.x,e.y-player.y)<340){shootAt(e);shoot=player.fireRate*(streakTimer>0?.75:1);attackAnim=.08}}attackAnim=Math.max(0,attackAnim-dt);
+ if(shoot<=0){let e=nearest();if(e&&Math.hypot(e.x-player.x,e.y-player.y)<340){shootAt(e);shoot=Math.max(.11,player.fireRate*Math.pow(.94,weaponUpgrades.tempo||0))*(streakTimer>0?.75:1);attackAnim=.08}}attackAnim=Math.max(0,attackAnim-dt);
  for(let e of enemies){
   if(!e.adminDummy&&e.poison>0){e.poison-=dt;e.poisonTick=(e.poisonTick||0)-dt;if(e.poisonTick<=0){e.poisonTick=.55;e.hp-=Math.max(.5,player.damage*.28);particle(e.x,e.y,'#a6ff61',2);if(e.hp<=0){killEnemy(e);continue}}}
   if(!e.adminDummy&&e.burn>0){e.burn-=dt;e.burnTick=(e.burnTick||0)-dt;if(e.burnTick<=0){e.burnTick=.3;e.hp-=Math.max(.35,player.damage*.20);particle(e.x+rand(-e.r,e.r),e.y+rand(-e.r,e.r),'#ff6a2c',2);if(e.hp<=0){killEnemy(e);continue}}}

@@ -94,6 +94,7 @@ canvas{width:100vw;height:100dvh;object-fit:fill;image-rendering:pixelated}
 .card{width:min(100%,520px);max-height:calc(100dvh - 18px);overflow-y:auto;overscroll-behavior:contain;padding:clamp(12px,3.4vw,22px)}
 .overlay{padding:max(8px,env(safe-area-inset-top)) 8px max(8px,env(safe-area-inset-bottom));overflow-y:auto}
 button{min-height:42px;font-size:clamp(12px,3.2vw,14px);padding:11px 12px}
+.admin-row{display:grid;grid-template-columns:1fr minmax(90px,130px);gap:8px;align-items:center;text-align:left;margin:12px 0}.admin-row input{width:100%;min-width:0;box-sizing:border-box;background:#0a1222;color:#fff;border:1px solid #8e70b2;border-radius:6px;padding:12px;font-size:16px}
 #heroChoices,#weaponChoices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
 .choice{min-width:0;overflow-wrap:anywhere}
 .case-card{text-align:center}
@@ -130,6 +131,7 @@ button{min-height:42px;font-size:clamp(12px,3.2vw,14px);padding:11px 12px}
  </div>
  <div id="bossbar"><div id="bossfill"></div></div>
  <button id="pauseBtn" style="pointer-events:auto;position:absolute;top:150px;right:12px;width:auto;margin:0;padding:7px 10px;font-size:11px">Ⅱ ПАУЗА</button>
+ <button id="adminExit" style="display:none;pointer-events:auto;position:absolute;top:150px;left:12px;width:auto;margin:0;padding:7px 10px;font-size:11px;border-color:#d9a8ff;color:#e4c1ff">✕ ВЫЙТИ ИЗ АРЕНЫ</button>
  <div id="lootToast" style="position:absolute;top:34%;left:8%;width:84%;text-align:center;font-weight:bold;color:#8fffe0;text-shadow:2px 2px #000;display:none"></div>
  <button id="audioToggle" style="pointer-events:auto;position:absolute;top:105px;right:12px;width:auto;margin:0;padding:7px 9px;font-size:11px;background:#101b30">♫ ЗВУК: ВКЛ</button>
  <div id="stick"><div id="knob"></div></div>
@@ -144,6 +146,7 @@ button{min-height:42px;font-size:clamp(12px,3.2vw,14px);padding:11px 12px}
   <button id="armoryOpen">⚔ ГЕРОИ И ОРУЖИЕ</button>
   <button id="caseShopOpen">🎁 МАГАЗИН ЛУТБОКСОВ</button>
   <button id="settingsOpen">🎮 НАСТРОЙКИ УПРАВЛЕНИЯ</button>
+  <button id="adminOpen" style="border-color:#d9a8ff;color:#e4c1ff">🛠 ПАНЕЛЬ АДМИНИСТРАТОРА</button>
   <div class="small" id="metaStats" style="margin:7px 0">Постоянные улучшения: загрузка...</div>
   <button id="questOpen">🏆 ЗАДАНИЯ И ДОСТИЖЕНИЯ</button>
   <button id="shopOpen">🛒 МАГАЗИН МЕЖДУ ЗАБЕГАМИ</button>
@@ -152,6 +155,7 @@ button{min-height:42px;font-size:clamp(12px,3.2vw,14px);padding:11px 12px}
   <p class="small">Создано для сенсорных экранов Android · Работает в браузере · Процедурный звук без скачиваемых аудиофайлов</p>
  </div>
 </div>
+<div id="adminPanel" class="overlay" style="display:none"><div class="card"><div class="logo" style="font-size:30px;color:#d9a8ff">ADMIN PANEL</div><div class="subtitle">Режим разработчика · изменения сохраняются в локальном профиле</div><div class="admin-row"><label for="adminGold">Добавить золото</label><input id="adminGold" type="number" min="1" max="1000000" value="1000" inputmode="numeric"></div><button class="primary" id="adminAddGold">＋ ДОБАВИТЬ ЗОЛОТО</button><button id="adminUnlock">🔓 ОТКРЫТЬ ВСЁ ОРУЖИЕ, СКИНЫ И ПИТОМЦЕВ</button><button id="adminArenaStart" class="primary">⚔ ОТКРЫТЬ ТЕСТОВУЮ АРЕНУ</button><div class="small" style="text-align:left;margin:8px 0">На тестовой арене враги каждого типа неподвижны, бессмертны и не наносят урон. Можно проверять атаки и скины.</div><button id="adminBack">НАЗАД В МЕНЮ</button></div></div>
 <div id="settings" class="overlay" style="display:none"><div class="card"><div class="logo" style="font-size:30px">УПРАВЛЕНИЕ</div><div class="subtitle">Перетащи кнопки на нужные места. Положение сохранится на этом устройстве.</div><div id="layoutPreview" style="position:relative;height:190px;border:2px solid #7188aa;background:#111a2b;margin:10px 0;touch-action:none"><div class="dragControl" data-control="stick">🕹 ДВИЖЕНИЕ</div><div class="dragControl" data-control="shootBtn">🔴 ОГОНЬ</div><div class="dragControl" data-control="dashBtn">⚡ РЫВОК</div></div><button id="layoutReset">СБРОСИТЬ РАСПОЛОЖЕНИЕ</button><button class="primary" id="settingsClose">ГОТОВО</button></div></div>
 <div id="pause" class="overlay" style="display:none"><div class="card"><div class="logo" style="font-size:34px">ПАУЗА</div><div class="subtitle">Передохни, охотник.</div><button class="primary" id="resume">▶ ПРОДОЛЖИТЬ</button><button id="pauseHome">В МЕНЮ</button></div></div>
 <div id="shop" class="overlay" style="display:none"><div class="card"><div class="logo" style="font-size:30px">ЛАВКА</div><div class="subtitle" id="shopCoins">Монеты: 0</div><div id="shopItems"></div><button id="shopClose" class="primary">В ПОДЗЕМЕЛЬЕ</button></div></div>
@@ -177,7 +181,7 @@ const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
 ctx.imageSmoothingEnabled=false;
 const W=1200,H=700,VIEW_W=640,VIEW_H=360;
 const $=id=>document.getElementById(id);
-let state='menu',player,enemies=[],bullets=[],ebullets=[],coins=[],particles=[],keys={},joy={x:0,y:0},joyActive=false;
+let state='menu',player,enemies=[],bullets=[],ebullets=[],coins=[],particles=[],keys={},joy={x:0,y:0},joyActive=false,adminArena=false;
 let bloodStains=[],deathFx=[],damageNumbers=[],manualFire=false,caseOpening=false,weaponBeams=[];
 let last=0,spawn=0,shoot=0,enemyId=0,runTime=0,level=1,xp=0,xpNeed=6,gold=0,kills=0,floor=1,shake=0,boss=null,screenFlash=0,ambient=[];
 let upgrades={damage:1,rate:1,speed:1,maxhp:3,magnet:1},weapon='ПИСТОЛЕТ';
@@ -338,12 +342,13 @@ function particle(x,y,color,n=5){for(let i=0;i<n;i++)particles.push({x,y,vx:rand
 function nearest(){let best=null,d=1e9;for(let e of enemies){let dd=Math.hypot(e.x-player.x,e.y-player.y);if(dd<d){best=e;d=dd}}return best}
 function shootAt(e){
  if(!e)return;const id=activeWeapon.id,dx=e.x-player.x,dy=e.y-player.y,d=Math.hypot(dx,dy)||1,baseAng=Math.atan2(dy,dx),critical=Math.random()<critChance,ox=player.x+Math.cos(baseAng)*10,oy=player.y+Math.sin(baseAng)*10;
- if(id==='flame'){sfx('shot');for(let n=0;n<9;n++){const a=baseAng+rand(-.2,.2),dist=rand(12,76);particles.push({x:ox+Math.cos(a)*dist*.4,y:oy+Math.sin(a)*dist*.4,vx:Math.cos(a)*rand(35,105),vy:Math.sin(a)*rand(35,105)-rand(8,30),life:rand(.16,.38),color:['#fff1a1','#ffb52e','#ff642b','#d92e20'][Math.floor(Math.random()*4)],flame:true,scale:rand(2,5)});}for(const en of enemies){const ex=en.x-player.x,ey=en.y-player.y,ed=Math.hypot(ex,ey)||1,da=Math.atan2(ey,ex)-baseAng;if(ed<94&&Math.abs(Math.atan2(Math.sin(da),Math.cos(da)))<.4){en.hp-=player.damage*.24;en.burn=Math.max(en.burn||0,2.4);en.burnTick=0;particle(en.x,en.y,'#ff7932',2);if(en.hp<=0)killEnemy(en);}}return;}
+ if(id==='flame'){sfx('shot');for(let n=0;n<9;n++){const a=baseAng+rand(-.2,.2),dist=rand(12,76);particles.push({x:ox+Math.cos(a)*dist*.4,y:oy+Math.sin(a)*dist*.4,vx:Math.cos(a)*rand(35,105),vy:Math.sin(a)*rand(35,105)-rand(8,30),life:rand(.16,.38),color:['#fff1a1','#ffb52e','#ff642b','#d92e20'][Math.floor(Math.random()*4)],flame:true,scale:rand(2,5)});}for(const en of enemies){if(en.adminDummy)continue;const ex=en.x-player.x,ey=en.y-player.y,ed=Math.hypot(ex,ey)||1,da=Math.atan2(ey,ex)-baseAng;if(ed<94&&Math.abs(Math.atan2(Math.sin(da),Math.cos(da)))<.4){en.hp-=player.damage*.24;en.burn=Math.max(en.burn||0,2.4);en.burnTick=0;particle(en.x,en.y,'#ff7932',2);if(en.hp<=0)killEnemy(en);}}return;}
  sfx('shot');
- if(id==='rail'||id==='laser'){const len=id==='rail'?360:285;weaponBeams.push({x:player.x,y:player.y,angle:baseAng,len,color:id==='rail'?'#ffdf83':'#74f5ff',width:id==='rail'?5:3,life:.14});for(const en of enemies){const ex=en.x-player.x,ey=en.y-player.y,proj=ex*Math.cos(baseAng)+ey*Math.sin(baseAng),perp=Math.abs(ex*Math.sin(baseAng)-ey*Math.cos(baseAng));if(proj>0&&proj<len&&perp<en.r+(id==='rail'?8:4)){en.hp-=player.damage*(id==='rail'?2.1:1.35);if(id==='rail')en.stun=.24;particle(en.x,en.y,id==='rail'?'#ffe5a0':'#7df7ff',5);if(en.hp<=0)killEnemy(en);}}shake=Math.max(shake,id==='rail'?3:1);return;}
+ if(id==='rail'||id==='laser'){const len=id==='rail'?360:285;weaponBeams.push({x:player.x,y:player.y,angle:baseAng,len,color:id==='rail'?'#ffdf83':'#74f5ff',width:id==='rail'?5:3,life:.14});for(const en of enemies){if(en.adminDummy)continue;const ex=en.x-player.x,ey=en.y-player.y,proj=ex*Math.cos(baseAng)+ey*Math.sin(baseAng),perp=Math.abs(ex*Math.sin(baseAng)-ey*Math.cos(baseAng));if(proj>0&&proj<len&&perp<en.r+(id==='rail'?8:4)){en.hp-=player.damage*(id==='rail'?2.1:1.35);if(id==='rail')en.stun=.24;particle(en.x,en.y,id==='rail'?'#ffe5a0':'#7df7ff',5);if(en.hp<=0)killEnemy(en);}}shake=Math.max(shake,id==='rail'?3:1);return;}
  const count=id==='shotgun'?7:id==='burst'?3:1;for(let i=0;i<count;i++){const spread=id==='shotgun'?.31:id==='burst'?.055:id==='crossbow'?.012:id==='rifle'?.035:.008,ang=baseAng+(i-(count-1)/2)*spread,crit=critical&&i===0,type=id==='crossbow'?'bolt':id==='shotgun'?'pellet':id==='burst'?'pulse':id==='rifle'?'tracer':'bullet';bullets.push({x:ox,y:oy,vx:Math.cos(ang)*activeWeapon.bullet,vy:Math.sin(ang)*activeWeapon.bullet,r:id==='crossbow'?5:id==='shotgun'?2.5:3,life:id==='crossbow'?1.7:1.15,damage:player.damage*(crit?2:1)*(id==='crossbow'?1.65:1),critical:crit,pierce:id==='crossbow'?Math.max(1,pierce):pierce,color:id==='crossbow'?'#d7b78c':id==='burst'?'#bc8cff':id==='rifle'?'#e7ffb0':id==='shotgun'?'#ffbd71':'#ffe06a',type,area:id==='crossbow'?30:0});}if(id==='shotgun')shake=Math.max(shake,2.4);particle(ox,oy,id==='burst'?'#bc8cff':'#ffb44b',2);
 }
 function killEnemy(e){
+ if(e&&e.adminDummy)return;
  sfx(e.type==='boss'?'boss':'hit');kills++;meta.totalKills++;streakTimer=3;killStreak=Math.min(10,killStreak+1);if(artifact==='vampire'&&Math.random()<.18)player.hp=Math.min(player.maxhp,player.hp+1);if(e.type!=='boss'){roomKills++;}gold+=e.type==='boss'?15:(Math.random()<(meta.items.includes('charm')?.62:.42)?1:0);xp+=e.type==='boss'?5:1;
  particle(e.x,e.y,e.type==='boss'?'#ff3c60':'#8dfb75',e.type==='boss'?16:7);
  bloodStains.push({x:e.x,y:e.y,r:e.type==='boss'?15:rand(5,9),life:10,maxLife:10,seed:Math.random()});
@@ -376,10 +381,10 @@ function endGame(){
  meta.coins+=gold;meta.best=Math.max(meta.best,kills);saveMeta();
 }
 function update(dt){
- if(state!=='play')return;runTime+=dt;checkpointTimer+=dt;bossWarning=Math.max(0,bossWarning-dt);if(runTime>=900&&finalBoss&&!boss){victory();return}if(checkpointTimer>=5){checkpointTimer=0;saveRun()}streakTimer=Math.max(0,streakTimer-dt);if(streakTimer<=0)killStreak=0;player.inv=Math.max(0,player.inv-dt);dashCooldown=Math.max(0,dashCooldown-dt);dashTime=Math.max(0,dashTime-dt);spawn-=dt;shoot-=dt;
+ if(state!=='play')return;if(!adminArena)runTime+=dt;if(!adminArena){checkpointTimer+=dt;bossWarning=Math.max(0,bossWarning-dt);if(runTime>=900&&finalBoss&&!boss){victory();return}if(checkpointTimer>=5){checkpointTimer=0;saveRun()}}streakTimer=Math.max(0,streakTimer-dt);if(streakTimer<=0)killStreak=0;player.inv=Math.max(0,player.inv-dt);dashCooldown=Math.max(0,dashCooldown-dt);dashTime=Math.max(0,dashTime-dt);spawn-=dt;shoot-=dt;
  if(dashRequested&&dashCooldown<=0){let mx=joy.x,my=joy.y;if(keys.ArrowLeft||keys.a)mx-=1;if(keys.ArrowRight||keys.d)mx+=1;if(keys.ArrowUp||keys.w)my-=1;if(keys.ArrowDown||keys.s)my+=1;let mm=Math.hypot(mx,my);if(mm>.1)dashDir={x:mx/mm,y:my/mm};dashTime=.18;dashCooldown=2.6;player.inv=Math.max(player.inv,.38);particle(player.x,player.y,'#c38aff',16);particle(player.x-dashDir.x*8,player.y-dashDir.y*8,'#8cecff',7);sfx('dash');}dashRequested=false;
- if(spawn<=0){const phaseCount=Math.min(4,Math.floor(runTime/180));const pack=2*(1+(phaseCount>=1?1:0)+(phaseCount>=2&&Math.random()<.65?1:0)+(phaseCount>=3&&Math.random()<.35?1:0));for(let si=0;si<pack;si++)addEnemy();spawn=Math.max(.18,(1.12-landscapePhase*.13)/(1+phaseCount*.12));}
- const previousPhase=landscapePhase;landscapePhase=Math.min(4,Math.floor(runTime/180));floor=landscapePhase+1;if(landscapePhase!==previousPhase){makeRoomProps();if(runTime<900)toast('ЛАНДШАФТ ИЗМЕНИЛСЯ: '+['РУИНЫ','ПЕПЕЛЬНЫЕ ПУСТОШИ','ЗАТОПЛЕННЫЙ ХРАМ','КРИСТАЛЬНАЯ БУРЯ','ЦАРСТВО БЕЗДНЫ'][landscapePhase]);}if(runTime>=900&&!finalBoss&&!boss){spawnBoss(true);}else if(runTime>=nextBossTime&&runTime<900&&!boss){spawnBoss(false);nextBossTime+=180;}
+ if(!adminArena&&spawn<=0){const phaseCount=Math.min(4,Math.floor(runTime/180));const pack=2*(1+(phaseCount>=1?1:0)+(phaseCount>=2&&Math.random()<.65?1:0)+(phaseCount>=3&&Math.random()<.35?1:0));for(let si=0;si<pack;si++)addEnemy();spawn=Math.max(.18,(1.12-landscapePhase*.13)/(1+phaseCount*.12));}
+ const previousPhase=landscapePhase;landscapePhase=Math.min(4,Math.floor(runTime/180));floor=landscapePhase+1;if(landscapePhase!==previousPhase){makeRoomProps();if(runTime<900)toast('ЛАНДШАФТ ИЗМЕНИЛСЯ: '+['РУИНЫ','ПЕПЕЛЬНЫЕ ПУСТОШИ','ЗАТОПЛЕННЫЙ ХРАМ','КРИСТАЛЬНАЯ БУРЯ','ЦАРСТВО БЕЗДНЫ'][landscapePhase]);}if(!adminArena){if(runTime>=900&&!finalBoss&&!boss){spawnBoss(true);}else if(runTime>=nextBossTime&&runTime<900&&!boss){spawnBoss(false);nextBossTime+=180;}}
  if(boss){boss.fire-=dt;if(boss.fire<=0){boss.fire=boss.hp<boss.maxhp*.45?.58:1.05;
  const phase=boss.hp<boss.maxhp*.45;
  if(Math.random()<.48){
@@ -395,10 +400,10 @@ function update(dt){
  if(dashTime>0){dx=dashDir.x;dy=dashDir.y;mag=1;}player.x=clamp(player.x+dx*player.speed*(dashTime>0?3.2:1)*dt,12,W-12);player.y=clamp(player.y+dy*player.speed*(dashTime>0?3.2:1)*dt,35,H-15);
  if(shoot<=0){let e=nearest();if(e&&Math.hypot(e.x-player.x,e.y-player.y)<340){shootAt(e);shoot=player.fireRate*(streakTimer>0?.75:1);attackAnim=.08}}attackAnim=Math.max(0,attackAnim-dt);
  for(let e of enemies){
-  if(e.poison>0){e.poison-=dt;e.poisonTick=(e.poisonTick||0)-dt;if(e.poisonTick<=0){e.poisonTick=.55;e.hp-=Math.max(.5,player.damage*.28);particle(e.x,e.y,'#a6ff61',2);if(e.hp<=0){killEnemy(e);continue}}}
-  if(e.burn>0){e.burn-=dt;e.burnTick=(e.burnTick||0)-dt;if(e.burnTick<=0){e.burnTick=.3;e.hp-=Math.max(.35,player.damage*.20);particle(e.x+rand(-e.r,e.r),e.y+rand(-e.r,e.r),'#ff6a2c',2);if(e.hp<=0){killEnemy(e);continue}}}
+  if(!e.adminDummy&&e.poison>0){e.poison-=dt;e.poisonTick=(e.poisonTick||0)-dt;if(e.poisonTick<=0){e.poisonTick=.55;e.hp-=Math.max(.5,player.damage*.28);particle(e.x,e.y,'#a6ff61',2);if(e.hp<=0){killEnemy(e);continue}}}
+  if(!e.adminDummy&&e.burn>0){e.burn-=dt;e.burnTick=(e.burnTick||0)-dt;if(e.burnTick<=0){e.burnTick=.3;e.hp-=Math.max(.35,player.damage*.20);particle(e.x+rand(-e.r,e.r),e.y+rand(-e.r,e.r),'#ff6a2c',2);if(e.hp<=0){killEnemy(e);continue}}}
   if(e.stun>0)e.stun-=dt;
-  let vx=player.x-e.x,vy=player.y-e.y,d=Math.hypot(vx,vy)||1;if(e.stun>0)continue;
+  let vx=player.x-e.x,vy=player.y-e.y,d=Math.hypot(vx,vy)||1;if(e.adminDummy)continue;if(e.stun>0)continue;
   if(e.type==='boss'){e.x+=Math.sin(runTime*1.5)*e.speed*.45*dt;e.y+=Math.sign(player.y-e.y)*e.speed*.3*dt;if(boss){boss.x=e.x;boss.y=e.y;boss.hp=e.hp;}}
   else{
    if(e.type==='ranged'||e.type==='spitter'){
@@ -411,7 +416,7 @@ function update(dt){
   }
   if(d<e.r+player.r&&player.inv<=0){if(artifact==='phoenix'&&!player.phoenixUsed&&player.hp<=1){player.phoenixUsed=true;player.hp=Math.min(player.maxhp,2);player.inv=2;particle(player.x,player.y,'#ff9d48',28);toast('ПЕПЕЛ ФЕНИКСА СПАС ТЕБЯ!');continue}const taken=Math.max(.5,1-armor*.25);player.hp-=taken;damageNumbers.push({x:player.x+rand(-5,5),y:player.y-18,v:rand(24,38),value:Math.ceil(taken),life:.9,maxLife:.9,color:'#ff5266'});player.inv=.9;shake=7;screenFlash=.16;particle(player.x,player.y,'#ff5266',12);particle(player.x,player.y,'#fff0d2',4);if(player.hp<=0){updateHud();endGame();return}}
  }
- for(let b of bullets){b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;for(let e of enemies){if(e.hp>0&&Math.hypot(e.x-b.x,e.y-b.y)<e.r+b.r){let dmg=b.damage*(artifact==='ember'?1.12:1);e.hp-=dmg;if(b.area){for(const other of enemies){if(other!==e&&other.hp>0&&Math.hypot(other.x-e.x,other.y-e.y)<b.area){other.hp-=dmg*.55;particle(other.x,other.y,'#ffb77b',3);if(other.hp<=0)killEnemy(other)}}}if(b.type==='bolt'){e.stun=Math.max(e.stun||0,.22);for(let k=0;k<6;k++)particle(e.x,e.y,'#d7b78c',1)}if(b.critical){for(let k=0;k<18;k++){const a=Math.random()*Math.PI*2,sp=rand(30,145);particles.push({x:e.x,y:e.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:rand(.22,.65),color:k%3===0?'#ffb4b4':k%3===1?'#d91f3d':'#8f102b'});}bloodStains.push({x:e.x,y:e.y,r:rand(9,16),life:14,maxLife:14,seed:Math.random()});shake=Math.max(shake,5);}damageNumbers.push({x:e.x+rand(-4,4),y:e.y-e.r-4,v:rand(20,34),value:Math.ceil(dmg),life:.8,maxLife:.8,color:b.damage>player.damage?'#ffe16b':'#ffffff'});if(artifact==='frost')e.speed=Math.max(8,e.speed*.94);if(artifact==='gravity')e.speed=Math.max(7,e.speed*.72);if(artifact==='plague')e.poison=3;if(artifact==='thunder'&&Math.random()<.22){for(const other of enemies){if(other!==e&&other.hp>0&&Math.hypot(other.x-e.x,other.y-e.y)<78){other.hp-=Math.max(2,player.damage*2);particle(other.x,other.y,'#7cecff',7);if(other.hp<=0)killEnemy(other);break}}}if(e.type==='boss'&&boss){boss.hp=e.hp;boss.x=e.x;boss.y=e.y;}b.pierce=b.pierce||0;particle(b.x,b.y,b.color||'#ffe06a',3);if(b.pierce>0){b.pierce--;b.damage*=.82}else b.life=0;if(e.hp<=0)killEnemy(e);else{particle(e.x,e.y,'#fff0a6',2);screenFlash=Math.max(screenFlash,.025)}break}}}
+ for(let b of bullets){b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;for(let e of enemies){if(!e.adminDummy&&e.hp>0&&Math.hypot(e.x-b.x,e.y-b.y)<e.r+b.r){let dmg=b.damage*(artifact==='ember'?1.12:1);e.hp-=dmg;if(b.area){for(const other of enemies){if(!other.adminDummy&&other!==e&&other.hp>0&&Math.hypot(other.x-e.x,other.y-e.y)<b.area){other.hp-=dmg*.55;particle(other.x,other.y,'#ffb77b',3);if(other.hp<=0)killEnemy(other)}}}if(b.type==='bolt'){e.stun=Math.max(e.stun||0,.22);for(let k=0;k<6;k++)particle(e.x,e.y,'#d7b78c',1)}if(b.critical){for(let k=0;k<18;k++){const a=Math.random()*Math.PI*2,sp=rand(30,145);particles.push({x:e.x,y:e.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:rand(.22,.65),color:k%3===0?'#ffb4b4':k%3===1?'#d91f3d':'#8f102b'});}bloodStains.push({x:e.x,y:e.y,r:rand(9,16),life:14,maxLife:14,seed:Math.random()});shake=Math.max(shake,5);}damageNumbers.push({x:e.x+rand(-4,4),y:e.y-e.r-4,v:rand(20,34),value:Math.ceil(dmg),life:.8,maxLife:.8,color:b.damage>player.damage?'#ffe16b':'#ffffff'});if(artifact==='frost')e.speed=Math.max(8,e.speed*.94);if(artifact==='gravity')e.speed=Math.max(7,e.speed*.72);if(artifact==='plague')e.poison=3;if(artifact==='thunder'&&Math.random()<.22){for(const other of enemies){if(!other.adminDummy&&other!==e&&other.hp>0&&Math.hypot(other.x-e.x,other.y-e.y)<78){other.hp-=Math.max(2,player.damage*2);particle(other.x,other.y,'#7cecff',7);if(other.hp<=0)killEnemy(other);break}}}if(e.type==='boss'&&boss){boss.hp=e.hp;boss.x=e.x;boss.y=e.y;}b.pierce=b.pierce||0;particle(b.x,b.y,b.color||'#ffe06a',3);if(b.pierce>0){b.pierce--;b.damage*=.82}else b.life=0;if(!e.adminDummy&&e.hp<=0)killEnemy(e);else{particle(e.x,e.y,'#fff0a6',2);screenFlash=Math.max(screenFlash,.025)}break}}}
  bullets=bullets.filter(b=>b.life>0&&b.x>-10&&b.x<W+10&&b.y>-10&&b.y<H+10);
  for(let b of ebullets){b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;if(Math.hypot(b.x-player.x,b.y-player.y)<player.r+b.r&&player.inv<=0){const taken=Math.max(.5,1-armor*.25);player.hp-=taken;damageNumbers.push({x:player.x+rand(-5,5),y:player.y-18,v:rand(24,38),value:Math.ceil(taken),life:.9,maxLife:.9,color:'#ff5266'});player.inv=.9;b.life=0;shake=7;screenFlash=.16;particle(player.x,player.y,'#ff5266',10);if(player.hp<=0){endGame();return}}}
  ebullets=ebullets.filter(b=>b.life>0&&b.x>-20&&b.x<W+20&&b.y>-20&&b.y<H+20);
@@ -463,7 +468,7 @@ function draw(dt=0){
  for(const beam of weaponBeams){ctx.save();ctx.globalAlpha=Math.min(1,beam.life/.14);ctx.strokeStyle=beam.color;ctx.shadowColor=beam.color;ctx.shadowBlur=10;ctx.lineWidth=beam.width;ctx.beginPath();ctx.moveTo(beam.x,beam.y);ctx.lineTo(beam.x+Math.cos(beam.angle)*beam.len,beam.y+Math.sin(beam.angle)*beam.len);ctx.stroke();ctx.restore();}for(let b of bullets){if(b.type==='bolt'){ctx.save();ctx.translate(b.x,b.y);ctx.rotate(Math.atan2(b.vy,b.vx));rect(-8,-2,15,4,'#75583d');rect(4,-3,5,6,'#d7b78c');rect(7,-2,3,4,'#fff0c4');ctx.restore()}else if(b.type==='pellet'){rect(b.x-2,b.y-2,4,4,'#ffb86a')}else if(b.type==='pulse'){ctx.save();ctx.globalAlpha=.6+Math.sin(runTime*28)*.35;ctx.fillStyle='#bd8bff';ctx.beginPath();ctx.arc(b.x,b.y,5+Math.sin(runTime*20)*1.5,0,Math.PI*2);ctx.fill();ctx.restore()}else if(b.type==='tracer'){rect(b.x-7,b.y-1,12,2,'#a7ffb3');rect(b.x+2,b.y-2,4,4,'#f2ffcf')}else{ctx.save();ctx.shadowColor=b.color;ctx.shadowBlur=7;rect(b.x-4,b.y-2,8,4,b.color);rect(b.x-2,b.y-3,4,6,'#fff7c2');ctx.restore()}}
  for(let b of ebullets){rect(b.x-4,b.y-4,8,8,'#ff4767');rect(b.x-2,b.y-2,4,4,'#ffc4d0')}
  for(let e of enemies){
-  const bob=Math.sin(runTime*8+(e.anim||0))*1.8+Math.sin(runTime*3+(e.anim||0))*.7;rect(e.x-e.r+2,e.y+e.r-1,e.r*2-4,3,'#05091499');
+  const bob=e.adminDummy?0:Math.sin(runTime*8+(e.anim||0))*1.8+Math.sin(runTime*3+(e.anim||0))*.7;rect(e.x-e.r+2,e.y+e.r-1,e.r*2-4,3,'#05091499');
   let color=e.type==='boss'?'#a72b57':e.type==='fast'?'#6bd98a':e.type==='ranged'?'#e6a45b':e.type==='brute'?'#b56b88':e.type==='charger'?'#e86a48':e.type==='spitter'?'#8ebc4c':'#3fbd75';
   const pulse=1+Math.sin(runTime*10+(e.anim||0))*.07,er=e.r*pulse;
   if(e.type==='charger'&&e.windup>0){ctx.globalAlpha=.5+Math.sin(runTime*30)*.35;ctx.strokeStyle='#ff754d';ctx.lineWidth=2;ctx.beginPath();ctx.arc(e.x,e.y,e.r+7+Math.sin(runTime*18)*2,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;}
@@ -473,7 +478,7 @@ function draw(dt=0){
   if(e.type==='charger'){rect(e.x-e.r-3,e.y-2+bob,5,3,'#ffbd79');rect(e.x+e.r-2,e.y-2+bob,5,3,'#ffbd79')}
   if(e.type==='spitter'){rect(e.x-2,e.y+2+bob,4,4,'#d9ff8b');}
   rect(e.x-e.r,e.y-e.r-5,e.r*2,3,'#391b2c');rect(e.x-e.r,e.y-e.r-5,e.r*2*e.hp/e.maxhp,3,'#ff536a');
-  if(e.type==='boss'){rect(e.x-5,e.y+2,10,4,'#32142b');rect(e.x-13,e.y- e.r-3,6,4,'#ffbd51');rect(e.x+7,e.y-e.r-3,6,4,'#ffbd51')}
+  if(e.type==='boss'){rect(e.x-5,e.y+2,10,4,'#32142b');rect(e.x-13,e.y- e.r-3,6,4,'#ffbd51');rect(e.x+7,e.y-e.r-3,6,4,'#ffbd51')}if(e.adminDummy){ctx.save();ctx.font='bold 9px monospace';ctx.textAlign='center';ctx.fillStyle='#e6c7ff';ctx.shadowColor='#9c5bff';ctx.shadowBlur=5;ctx.fillText(({grunt:'ОБЫЧНЫЙ',fast:'БЫСТРЫЙ',ranged:'СТРЕЛОК',brute:'ТЯЖЁЛЫЙ',charger:'РЫВОК',spitter:'ЯДОВИТЫЙ',boss:'БОСС'})[e.type]||e.type,e.x,e.y+e.r+13);ctx.fillStyle='#d9a8ff';ctx.fillText('∞ HP',e.x,e.y-e.r-9);ctx.restore();}
  }
 
  // Minimap removed for continuous survival arena.
@@ -576,7 +581,14 @@ window.addEventListener('keydown',e=>{keys[e.key]=true;if(e.code==='Space'&&stat
 function loop(t){let dt=Math.min(.033,(t-last)/1000||0);last=t;if(state!=='paused')update(dt);if(state==='play'||state==='upgrade'||state==='paused')draw(dt);requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
 loadMeta();
-$('start').onclick=reset;
+$('start').onclick=()=>{adminArena=false;reset()};
+$('adminOpen').onclick=()=>{$('menu').style.display='none';$('adminPanel').style.display='flex'};
+$('adminBack').onclick=()=>{$('adminPanel').style.display='none';$('menu').style.display='flex';renderMeta()};
+$('adminAddGold').onclick=()=>{const n=Math.max(1,Math.min(1000000,Math.floor(Number($('adminGold').value)||0)));meta.coins+=n;saveMeta();$('adminGold').value=String(n);toast('Добавлено золота: '+n);sfx('coin')};
+$('adminUnlock').onclick=()=>{meta.ownedHeroes=HEROES.map(h=>h.id);meta.ownedWeapons=WEAPONS.map(w=>w.id);meta.skins=SKINS.map(sk=>sk.id);meta.pets=PETS.map(p=>p.id);meta.weaponLevels=meta.weaponLevels||{};WEAPONS.forEach(w=>meta.weaponLevels[w.id]=Math.max(0,meta.weaponLevels[w.id]||0));if(PETS.length)meta.equippedPet=PETS[0].id;saveMeta();renderArmory();toast('Всё разблокировано!');sfx('upgrade')};
+function startAdminArena(){adminArena=true;reset();adminArena=true;runTime=0;spawn=999999;boss=null;finalBoss=false;enemies=[];bullets=[];ebullets=[];coins=[];loot=[];player.hp=player.maxhp=999;player.inv=999;const types=[['grunt',8],['fast',6],['ranged',8],['brute',11],['charger',9],['spitter',8],['boss',22]];types.forEach(([type,r],i)=>{const angle=-Math.PI/2+i*Math.PI*2/types.length,dist=i===6?190:135;enemies.push({id:enemyId++,x:player.x+Math.cos(angle)*dist,y:player.y+Math.sin(angle)*dist,r,hp:1e12,maxhp:1e12,speed:0,damage:0,flash:0,type,fire:999,attack:0,windup:0,anim:i*.7,adminDummy:true,poison:0,burn:0,stun:0})});$('adminPanel').style.display='none';$('menu').style.display='none';$('pause').style.display='none';$('adminExit').style.display='block';$('pauseBtn').style.display='none';$('stage').textContent='ADMIN · ТЕСТОВАЯ АРЕНА';$('biome').textContent='БЕССМЕРТНЫЕ МАНЕКЕНЫ';$('heroName').textContent=activeHero.name+' · БЕССМЕРТИЕ';updateHud()}
+$('adminArenaStart').onclick=startAdminArena;
+$('adminExit').onclick=()=>{adminArena=false;state='menu';$('adminExit').style.display='none';$('pauseBtn').style.display='block';$('hud').style.display='none';$('stick').style.display='none';$('menu').style.display='flex';enemies=[];bullets=[];ebullets=[];renderMeta()};
 $('settingsOpen').onclick=()=>{openControlSettings('menu')};
 $('settingsClose').onclick=()=>{saveControlLayout();$('settings').style.display='none';if(settingsReturn==='menu')$('menu').style.display='flex';else $('pause').style.display='flex'};
 $('layoutReset').onclick=()=>{localStorage.removeItem('ds_control_layout');applyControlLayout({});renderControlPreview()};

@@ -281,7 +281,7 @@ function addEnemy(){
 }
 function spawnBoss(isFinal=false){
  finalBoss=isFinal;const phase=Math.min(5,Math.floor(runTime/180));const hp=isFinal?520:90+phase*65;
- boss={x:W/2,y:70,r:isFinal?28:22,hp,maxhp:hp,speed:isFinal?43:29+phase*5,fire:isFinal?.65:1.05,flash:0,phase};
+ boss={x:clamp(player.x+rand(-150,150),70,W-70),y:clamp(player.y+rand(-90,90),55,H-55),r:isFinal?28:22,hp,maxhp:hp,speed:isFinal?43:29+phase*5,fire:isFinal?.65:1.05,flash:0,phase};
  enemies.push({id:enemyId++,x:boss.x,y:boss.y,r:boss.r,hp:boss.hp,maxhp:boss.maxhp,speed:boss.speed,damage:isFinal?2:1+phase*.4,type:'boss'});
  bossWarning=3;toast(isFinal?'⚠ ГЛАВНЫЙ БОСС — ВЫЖИВИ И ПОБЕДИ!':'⚠ БОСС ЛОКАЦИИ '+(phase+1)+'!');sfx('boss');
 }

@@ -244,7 +244,7 @@ function interact(){/* Search/interaction system removed. */}
 
 function loadMeta(){
  try{const v=JSON.parse(localStorage.getItem('ds_meta3')||'{}');meta={...meta,...v}}catch(e){}
- meta.ownedHeroes=[...new Set(meta.ownedHeroes||['scout'])];meta.ownedWeapons=[...new Set(meta.ownedWeapons||['pistol'])];meta.skins=[...new Set(meta.skins||[])];meta.equippedSkins=meta.equippedSkins||{};meta.pets=[...new Set(meta.pets||[])];meta.weaponLevels=meta.weaponLevels||{};meta.items=meta.items||[];meta.claimed=meta.claimed||[];if(!meta.ownedHeroes.includes('scout'))meta.ownedHeroes.unshift('scout');if(!meta.ownedWeapons.includes('pistol'))meta.ownedWeapons.unshift('pistol');if(!meta.ownedHeroes.includes('scout'))meta.ownedHeroes.push('scout');if(!meta.ownedWeapons.includes('pistol'))meta.ownedWeapons.push('pistol');renderMeta();
+ meta.ownedHeroes=[...new Set(meta.ownedHeroes||['scout'])];meta.ownedWeapons=[...new Set(meta.ownedWeapons||['pistol'])];meta.skins=[...new Set(meta.skins||[])];meta.equippedSkins=meta.equippedSkins||{};meta.pets=[...new Set(meta.pets||[])];meta.weaponLevels=meta.weaponLevels||{};meta.items=meta.items||[];meta.claimed=meta.claimed||[];if(!meta.ownedHeroes.includes('scout'))meta.ownedHeroes.unshift('scout');if(!meta.ownedWeapons.includes('pistol'))meta.ownedWeapons.unshift('pistol');renderMeta();
 }
 function saveMeta(){try{localStorage.setItem('ds_meta3',JSON.stringify(meta))}catch(e){}renderMeta()}
 function openCaseShop(){if(caseOpening)return;$('menu').style.display='none';$('armory').style.display='none';$('caseShop').style.display='flex';$('caseCoins').textContent='Монеты: '+meta.coins+' ◉ · Оружие, скины и питомцы';$('caseResult').textContent='ВЫБЕРИ КЕЙС';$('caseTrack').innerHTML='';$('caseBox').classList.remove('opening');}

@@ -1,0 +1,14 @@
+plugins {
+    id 'com.android.application'
+}
+android {
+    namespace 'com.dungeonsurvivor.game'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'com.dungeonsurvivor.game'
+        minSdk 23
+        targetSdk 35
+        versionCode 8
+        versionName '8.0'
+    }
+}

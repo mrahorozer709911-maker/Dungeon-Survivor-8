@@ -354,7 +354,8 @@ function shootAt(e){
  const count=id==='shotgun'?7:id==='burst'?3:1;for(let i=0;i<count;i++){const spread=id==='shotgun'?.31:id==='burst'?.055:id==='crossbow'?.012:id==='rifle'?.035:.008,ang=baseAng+(i-(count-1)/2)*spread,crit=critical&&i===0,type=id==='crossbow'?'bolt':id==='shotgun'?'pellet':id==='burst'?'pulse':id==='rifle'?'tracer':'bullet';bullets.push({x:ox,y:oy,vx:Math.cos(ang)*activeWeapon.bullet,vy:Math.sin(ang)*activeWeapon.bullet,r:id==='crossbow'?5:id==='shotgun'?2.5:3,life:id==='crossbow'?1.7:1.15,damage:player.damage*(crit?2:1)*(id==='crossbow'?1.65:1),critical:crit,pierce:id==='crossbow'?Math.max(1,pierce):pierce,color:id==='crossbow'?'#d7b78c':id==='burst'?'#bc8cff':id==='rifle'?'#e7ffb0':id==='shotgun'?'#ffbd71':'#ffe06a',type,area:id==='crossbow'?30:0});}if(id==='shotgun')shake=Math.max(shake,2.4);particle(ox,oy,id==='burst'?'#bc8cff':'#ffb44b',2);
 }
 function killEnemy(e,cause){
- if(e&&e.adminDummy)return;
+ if(!e||e.adminDummy||e.dead)return;
+ e.dead=true;
  cause=cause||e.deathCause||(e.burn>0?'fire':e.poison>0?'poison':'physical');
  sfx(e.type==='boss'?'boss':cause==='fire'?'burnDeath':cause==='poison'?'poisonDeath':cause==='lightning'?'lightningDeath':cause==='explosion'?'explodeDeath':'hit');kills++;meta.totalKills++;streakTimer=3;killStreak=Math.min(10,killStreak+1);if(artifact==='vampire'&&Math.random()<.18)player.hp=Math.min(player.maxhp,player.hp+1);if(e.type!=='boss'){roomKills++;}gold+=e.type==='boss'?15:(Math.random()<(meta.items.includes('charm')?.62:.42)?1:0);xp+=e.type==='boss'?5:1;
  const chunks=cause==='explosion'?10:cause==='physical'?8:5;

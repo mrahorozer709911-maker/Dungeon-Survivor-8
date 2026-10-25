@@ -259,7 +259,7 @@ function clearRunSave(){try{localStorage.removeItem('ds_run7')}catch(e){}const b
 function reset(){
  initAudio();setAudio(audioOn);sfx('upgrade');
  activeHero=HEROES.find(h=>h.id===chosenHero)||HEROES[0];
- activeWeapon=WEAPONS.find(w=>w.id===chosenWeapon)||WEAPONS[0];
+ {const base=WEAPONS.find(w=>w.id===chosenWeapon)||WEAPONS[0],wl=(meta.weaponLevels||{})[base.id]||0;activeWeapon={...base,damage:base.damage*(1+wl*.12),rate:Math.max(.12,base.rate*Math.pow(.97,wl))};}
  meta.runs++;saveMeta();clearRunSave();checkpointTimer=0;
  player={x:W/2,y:H/2,r:8,hp:activeHero.hp+Math.min(2,meta.permHp),maxhp:activeHero.hp+Math.min(2,meta.permHp),speed:activeHero.speed*(1+Math.min(6,meta.permSpeed)*.025),inv:0,damage:activeWeapon.damage+Math.min(4,meta.permDamage)*.08,fireRate:activeWeapon.rate};
  enemies=[];bullets=[];ebullets=[];coins=[];particles=[];runTime=0;spawn=0;shoot=0;enemyId=0;level=1;xp=0;xpNeed=6;gold=0;kills=0;floor=1;shake=0;boss=null;nextBossTime=180;landscapePhase=0;finalBoss=false;bossWarning=0;dashCooldown=0;dashTime=0;dashRequested=false;dashDir={x:1,y:0};roomIndex=1;roomKills=0;roomGoal=6;secretFound=false;armor=0;artifact=null;attackAnim=0;makeRoomProps();
@@ -438,13 +438,15 @@ function draw(dt=0){
  const leg=Math.sin(walkFrame)* (moving?3:0.8), bob=Math.abs(Math.sin(walkFrame))*(moving?1.5:.4);
  rect(player.x-7,player.y+7,14,4,'#050711aa');
  if(dashTime>0){for(let i=1;i<=3;i++){rect(player.x-dashDir.x*i*5-4,player.y-dashDir.y*i*5-5,8,10,i===1?'#7deaff88':'#7deaff44')}}
+ // Companion pet follows the hero and bobs in a small orbit.
+ const pet=PETS.find(p=>p.id===meta.equippedPet);if(pet){const pa=runTime*2.2,px=player.x+Math.cos(pa)*17,py=player.y+Math.sin(pa)*10-12+Math.sin(runTime*7)*2;const pc=pet.id==='fox'?'#ff9b45':pet.id==='raven'?'#9f8bcf':pet.id==='slime'?'#82e879':pet.id==='orb'?'#bb87ff':pet.id==='drone'?'#83d9ff':'#fff0a0';ctx.fillStyle=pc;ctx.beginPath();ctx.arc(px,py,pet.id==='drone'?4:3.5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffffff';ctx.fillRect(px-1,py-1,2,2);if(pet.id==='fox'){ctx.globalAlpha=.55;ctx.fillStyle='#ff8b35';ctx.beginPath();ctx.arc(px-5,py+3,2,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}}
  // Orbiting energy drones.
  for(let oi=0;oi<orbitTimer;oi++){const ox=player.x+Math.cos(orbitAngle+oi*Math.PI*2/orbitTimer)*23,oy=player.y+Math.sin(orbitAngle+oi*Math.PI*2/orbitTimer)*23;rect(ox-5,oy-5,10,10,'#513c91');rect(ox-3,oy-3,6,6,'#d5baff');rect(ox-1,oy-1,2,2,'#ffffff')}
  // Outline and legs
  rect(player.x-6,player.y+1+leg,5,7,'#101523');rect(player.x+1,player.y+1-leg,5,7,'#101523');
  rect(player.x-5,player.y+2+leg,3,5,'#d9e5f8');rect(player.x+2,player.y+2-leg,3,5,'#a9c4e7');
  rect(player.x-7,player.y-7-bob,14,14,'#0a101c');
- const skin=SKINS.find(sk=>sk.id===meta.equippedSkins?.[activeHero.id]);rect(player.x-5,player.y-6-bob,10,12,skin?.color||activeHero.color||'#e5a56d');
+ const skin=SKINS.find(sk=>sk.id===meta.equippedSkins?.[activeHero.id]);if(skin&&skin.rarity==='legendary'){ctx.globalAlpha=.25+.12*Math.sin(runTime*5);ctx.fillStyle=skin.color;ctx.beginPath();ctx.arc(player.x,player.y,15+Math.sin(runTime*4)*2,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}rect(player.x-5,player.y-6-bob,10,12,skin?.color||activeHero.color||'#e5a56d');
  rect(player.x-4,player.y-5-bob,8,3,'#f5d1a1');
  rect(player.x-4,player.y-1-bob,8,4,'#25344f');
  rect(player.x-3,player.y-4-bob,2,2,'#f8ffff');rect(player.x+2,player.y-4-bob,2,2,'#f8ffff');

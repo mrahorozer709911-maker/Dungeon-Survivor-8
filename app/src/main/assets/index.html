@@ -509,6 +509,8 @@ function draw(dt=0){
  for(let e of enemies){
   const bob=e.adminDummy?0:Math.sin(runTime*8+(e.anim||0))*1.8+Math.sin(runTime*3+(e.anim||0))*.7;
   if(e.type==='boss'){
+    // Clear visual telegraph before each boss volley; visuals only.
+   if(boss&&boss.fire<.42){const tele=Math.max(0,Math.min(1,1-boss.fire/.42)),tr=e.r+15+tele*28;ctx.save();ctx.globalAlpha=.28+.62*tele;ctx.strokeStyle=finalBoss?'#ff4c91':'#ff654f';ctx.shadowColor=finalBoss?'#ff247e':'#ff4538';ctx.shadowBlur=8+tele*12;ctx.lineWidth=1.5+tele*2;ctx.beginPath();ctx.ellipse(e.x,e.y+e.r*.45,tr*1.5,tr*.58,0,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=.35+.55*tele;ctx.lineWidth=2;ctx.beginPath();ctx.arc(e.x,e.y+e.r*.45,tr*.9,-Math.PI/2,-Math.PI/2+Math.PI*2*tele);ctx.stroke();for(let q=0;q<8;q++){const a=q*Math.PI/4+runTime*.5,ri=tr*.72,ro=tr*(.88+.12*tele);ctx.beginPath();ctx.moveTo(e.x+Math.cos(a)*ri,e.y+e.r*.45+Math.sin(a)*ri*.58);ctx.lineTo(e.x+Math.cos(a)*ro,e.y+e.r*.45+Math.sin(a)*ro*.58);ctx.stroke();}ctx.restore();}
    const pulse=.5+.5*Math.sin(runTime*5+(e.anim||0)),rr=e.r+10+pulse*5;
    ctx.save();ctx.globalAlpha=.28+.2*pulse;ctx.strokeStyle='#bd7bff';ctx.shadowColor='#9c55ff';ctx.shadowBlur=15;ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(e.x,e.y+e.r*.35,rr*1.45,rr*.55,runTime*.35,0,Math.PI*2);ctx.stroke();
    ctx.globalAlpha=.55;ctx.lineWidth=1.5;ctx.strokeStyle='#ffe08a';ctx.beginPath();ctx.ellipse(e.x,e.y+e.r*.35,rr*1.18,rr*.42,-runTime*.5,runTime*.4,runTime*.4+Math.PI*1.45);ctx.stroke();

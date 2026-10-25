@@ -387,7 +387,9 @@ function endGame(){
 }
 function update(dt){
  if(state!=='play')return;if(!adminArena)runTime+=dt;if(!adminArena){checkpointTimer+=dt;bossWarning=Math.max(0,bossWarning-dt);if(runTime>=900&&finalBoss&&!boss){victory();return}if(checkpointTimer>=5){checkpointTimer=0;saveRun()}}streakTimer=Math.max(0,streakTimer-dt);if(streakTimer<=0)killStreak=0;player.inv=Math.max(0,player.inv-dt);dashCooldown=Math.max(0,dashCooldown-dt);dashTime=Math.max(0,dashTime-dt);spawn-=dt;shoot-=dt;
- if(dashRequested&&dashCooldown<=0){let mx=joy.x,my=joy.y;if(keys.ArrowLeft||keys.a)mx-=1;if(keys.ArrowRight||keys.d)mx+=1;if(keys.ArrowUp||keys.w)my-=1;if(keys.ArrowDown||keys.s)my+=1;let mm=Math.hypot(mx,my);if(mm>.1)dashDir={x:mx/mm,y:my/mm};dashTime=.18;dashCooldown=2.6;player.inv=Math.max(player.inv,.38);particle(player.x,player.y,'#c38aff',16);particle(player.x-dashDir.x*8,player.y-dashDir.y*8,'#8cecff',7);sfx('dash');}dashRequested=false;
+ // Convert screen-relative controls into world coordinates for the angled 2.5D camera.
+  const controlToWorld=(sx,sy)=>{const a=Math.PI/4,c=Math.cos(a),sn=Math.sin(a);let wx=c*sx-sn*sy,wy=(sn*sx+c*sy)/.72;const m=Math.hypot(wx,wy)||1;return {x:wx/m,y:wy/m};};
+  if(dashRequested&&dashCooldown<=0){let mx=joy.x,my=joy.y;if(keys.ArrowLeft||keys.a)mx-=1;if(keys.ArrowRight||keys.d)mx+=1;if(keys.ArrowUp||keys.w)my-=1;if(keys.ArrowDown||keys.s)my+=1;let mm=Math.hypot(mx,my);if(mm>.1)dashDir=controlToWorld(mx,my);dashTime=.18;dashCooldown=2.6;player.inv=Math.max(player.inv,.38);particle(player.x,player.y,'#c38aff',16);particle(player.x-dashDir.x*8,player.y-dashDir.y*8,'#8cecff',7);sfx('dash');}dashRequested=false;
  if(!adminArena&&spawn<=0){const phaseCount=Math.min(4,Math.floor(runTime/180));const pack=2*(1+(phaseCount>=1?1:0)+(phaseCount>=2&&Math.random()<.65?1:0)+(phaseCount>=3&&Math.random()<.35?1:0));for(let si=0;si<pack;si++)addEnemy();spawn=Math.max(.18,(1.12-landscapePhase*.13)/(1+phaseCount*.12));}
  const previousPhase=landscapePhase;landscapePhase=Math.min(4,Math.floor(runTime/180));floor=landscapePhase+1;if(landscapePhase!==previousPhase){makeRoomProps();if(runTime<900)toast('ЛАНДШАФТ ИЗМЕНИЛСЯ: '+['РУИНЫ','ПЕПЕЛЬНЫЕ ПУСТОШИ','ЗАТОПЛЕННЫЙ ХРАМ','КРИСТАЛЬНАЯ БУРЯ','ЦАРСТВО БЕЗДНЫ'][landscapePhase]);}if(!adminArena){if(runTime>=900&&!finalBoss&&!boss){spawnBoss(true);}else if(runTime>=nextBossTime&&runTime<900&&!boss){spawnBoss(false);nextBossTime+=180;}}
  if(boss){boss.fire-=dt;if(boss.fire<=0){boss.fire=boss.hp<boss.maxhp*.45?.58:1.05;
@@ -399,10 +401,12 @@ function update(dt){
   for(let a=0;a<count;a++){let aa=ang+(a-(count-1)/2)*.2;ebullets.push({x:boss.x,y:boss.y,vx:Math.cos(aa)*(phase?145:110),vy:Math.sin(aa)*(phase?145:110),r:5,life:4,damage:boss.damage||1})}
  }
  if(phase)toast('БОСС ЯРОСТЬ — УКЛОНЯЙСЯ!');}}
- let dx=joy.x,dy=joy.y;
- if(keys.ArrowLeft||keys.a)dx-=1;if(keys.ArrowRight||keys.d)dx+=1;if(keys.ArrowUp||keys.w)dy-=1;if(keys.ArrowDown||keys.s)dy+=1;
- let mag=Math.hypot(dx,dy);if(mag>1){dx/=mag;dy/=mag}
- if(dashTime>0){dx=dashDir.x;dy=dashDir.y;mag=1;}player.x=clamp(player.x+dx*player.speed*(dashTime>0?3.2:1)*dt,12,W-12);player.y=clamp(player.y+dy*player.speed*(dashTime>0?3.2:1)*dt,35,H-15);
+ let sx=joy.x,sy=joy.y;
+ if(keys.ArrowLeft||keys.a)sx-=1;if(keys.ArrowRight||keys.d)sx+=1;if(keys.ArrowUp||keys.w)sy-=1;if(keys.ArrowDown||keys.s)sy+=1;
+ let inputMag=Math.hypot(sx,sy);if(inputMag>1){sx/=inputMag;sy/=inputMag}
+ let {x:dx,y:dy}=controlToWorld(sx,sy);if(inputMag<.001){dx=0;dy=0}
+ let mag=Math.min(1,inputMag);
+ if(dashTime>0){dx=dashDir.x;dy=dashDir.y;mag=1;}player.x=clamp(player.x+dx*player.speed*(dashTime>0?3.2:1)*dt*mag,12,W-12);player.y=clamp(player.y+dy*player.speed*(dashTime>0?3.2:1)*dt*mag,35,H-15);
  if(shoot<=0){let e=nearest();if(e&&Math.hypot(e.x-player.x,e.y-player.y)<340){shootAt(e);shoot=player.fireRate*(streakTimer>0?.75:1);attackAnim=.08}}attackAnim=Math.max(0,attackAnim-dt);
  for(let e of enemies){
   if(!e.adminDummy&&e.poison>0){e.poison-=dt;e.poisonTick=(e.poisonTick||0)-dt;if(e.poisonTick<=0){e.poisonTick=.55;e.hp-=Math.max(.5,player.damage*.28);particle(e.x,e.y,'#a6ff61',2);if(e.hp<=0){killEnemy(e);continue}}}

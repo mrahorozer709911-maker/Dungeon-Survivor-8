@@ -71,6 +71,18 @@ canvas{width:100vw;height:100dvh;object-fit:fill;image-rendering:pixelated}
  #shootBtn{width:70px;height:70px}
  #dashBtn{width:54px;height:54px;bottom:max(91px,calc(env(safe-area-inset-bottom) + 91px))}
 }
+
+#settings .card{width:min(92vw,500px)}
+.dragControl{position:absolute;display:flex;align-items:center;justify-content:center;width:90px;height:54px;border-radius:50%;border:2px solid #dce9ff;background:#1b2b47ee;color:#fff;font-size:10px;font-weight:bold;touch-action:none;user-select:none;transform:translate(-50%,-50%);box-shadow:0 0 12px #0009}
+#layoutPreview .dragControl[data-control="stick"]{left:16%;top:65%}
+#layoutPreview .dragControl[data-control="shootBtn"]{left:84%;top:65%;background:#922b3c}
+#layoutPreview .dragControl[data-control="dashBtn"]{left:75%;top:28%;background:#39285d}
+#stick{left:var(--stick-x,14px);bottom:var(--stick-y,14px);width:100px;height:100px}
+#knob{width:40px;height:40px;left:28px;top:28px}
+#shootBtn{right:var(--shoot-x,18px);bottom:var(--shoot-y,18px)}
+#dashBtn{right:var(--dash-x,26px);bottom:var(--dash-y,112px)}
+#pauseBtn{top:48px!important;right:10px!important}
+#interactBtn{display:none!important}
 </style>
 </head>
 <body>
@@ -85,7 +97,7 @@ canvas{width:100vw;height:100dvh;object-fit:fill;image-rendering:pixelated}
  <div id="lootToast" style="position:absolute;top:34%;left:8%;width:84%;text-align:center;font-weight:bold;color:#8fffe0;text-shadow:2px 2px #000;display:none"></div>
  <button id="audioToggle" style="pointer-events:auto;position:absolute;top:105px;right:12px;width:auto;margin:0;padding:7px 9px;font-size:11px;background:#101b30">♫ ЗВУК: ВКЛ</button>
  <div id="stick"><div id="knob"></div></div>
- <button id="dashBtn" class="ready" aria-label="Рывок">⚡<br>РЫВОК<br><span id="dashStatus">ГОТОВ</span></button><button id="interactBtn" style="position:absolute;right:110px;bottom:max(30px,env(safe-area-inset-bottom));width:62px;height:62px;border-radius:50%;padding:3px;margin:0;background:#5b482dcc;border:2px solid #ffe18a;font-size:10px;line-height:1.2;pointer-events:auto">🔎<br>ОБЫСК</button><button id="shootBtn" aria-label="Стрелять"><span class="shootIcon">✦</span><span>ОГОНЬ</span></button><div id="toast"></div>
+ <button id="dashBtn" class="ready" aria-label="Рывок">⚡<br>РЫВОК<br><span id="dashStatus">ГОТОВ</span></button><button id="interactBtn" style="display:none;position:absolute;right:110px;bottom:max(30px,env(safe-area-inset-bottom));width:62px;height:62px;border-radius:50%;padding:3px;margin:0;background:#5b482dcc;border:2px solid #ffe18a;font-size:10px;line-height:1.2;pointer-events:auto">🔎<br>ОБЫСК</button><button id="shootBtn" aria-label="Стрелять"><span class="shootIcon">✦</span><span>ОГОНЬ</span></button><div id="toast"></div>
 </div>
 <div id="menu" class="overlay">
  <div class="card">
@@ -94,6 +106,7 @@ canvas{width:100vw;height:100dvh;object-fit:fill;image-rendering:pixelated}
   <button class="primary" id="start">▶ НОВЫЙ ЗАБЕГ</button>
   <button id="continueRun" style="display:none">↻ ПРОДОЛЖИТЬ ЭКСПЕДИЦИЮ</button>
   <button id="armoryOpen">⚔ ГЕРОИ И ОРУЖИЕ</button>
+  <button id="settingsOpen">🎮 НАСТРОЙКИ УПРАВЛЕНИЯ</button>
   <div class="small" id="metaStats" style="margin:7px 0">Постоянные улучшения: загрузка...</div>
   <button id="questOpen">🏆 ЗАДАНИЯ И ДОСТИЖЕНИЯ</button>
   <button id="shopOpen">🛒 МАГАЗИН МЕЖДУ ЗАБЕГАМИ</button>
@@ -102,6 +115,7 @@ canvas{width:100vw;height:100dvh;object-fit:fill;image-rendering:pixelated}
   <p class="small">Создано для сенсорных экранов Android · Работает в браузере · Процедурный звук без скачиваемых аудиофайлов</p>
  </div>
 </div>
+<div id="settings" class="overlay" style="display:none"><div class="card"><div class="logo" style="font-size:30px">УПРАВЛЕНИЕ</div><div class="subtitle">Перетащи кнопки на нужные места. Положение сохранится на этом устройстве.</div><div id="layoutPreview" style="position:relative;height:190px;border:2px solid #7188aa;background:#111a2b;margin:10px 0;touch-action:none"><div class="dragControl" data-control="stick">🕹 ДВИЖЕНИЕ</div><div class="dragControl" data-control="shootBtn">🔴 ОГОНЬ</div><div class="dragControl" data-control="dashBtn">⚡ РЫВОК</div></div><button id="layoutReset">СБРОСИТЬ РАСПОЛОЖЕНИЕ</button><button class="primary" id="settingsClose">ГОТОВО</button></div></div>
 <div id="pause" class="overlay" style="display:none"><div class="card"><div class="logo" style="font-size:34px">ПАУЗА</div><div class="subtitle">Передохни, охотник.</div><button class="primary" id="resume">▶ ПРОДОЛЖИТЬ</button><button id="pauseHome">В МЕНЮ</button></div></div>
 <div id="shop" class="overlay" style="display:none"><div class="card"><div class="logo" style="font-size:30px">ЛАВКА</div><div class="subtitle" id="shopCoins">Монеты: 0</div><div id="shopItems"></div><button id="shopClose" class="primary">В ПОДЗЕМЕЛЬЕ</button></div></div>
 <div id="armory" class="overlay" style="display:none">
@@ -144,6 +158,7 @@ let chosenHero='scout',chosenWeapon='pistol',activeHero=HEROES[0],activeWeapon=W
 let meta={coins:0,best:0,runs:0,permHp:0,permDamage:0,permSpeed:0,items:[],claimed:[],totalKills:0,bosses:0};
 let loot=[],paused=false,walkFrame=0,questOpenFrom='menu';
 let roomIndex=1,roomKills=0,roomGoal=6,secretFound=false,secretPos={x:24,y:330},roomProps=[],roomDoorOpen=false,armor=0,artifact=null,attackAnim=0;
+let nextBossTime=180,landscapePhase=0,finalBoss=false,bossWarning=0;
 let dashCooldown=0,dashTime=0,dashRequested=false,dashDir={x:1,y:0},checkpointTimer=0;
 let critChance=.08,pierce=0,orbitTimer=0,orbitAngle=0,killStreak=0,streakTimer=0;
 const EQUIPMENT=[
@@ -164,42 +179,16 @@ const ARTIFACTS=[
  {id:'void',name:'Око Бездны',desc:'Пули пробивают врагов',color:'#c8a4ff'}
 ];
 function makeRoomProps(){
- ambient=Array.from({length:34},()=>({x:rand(8,W-8),y:rand(35,H-8),phase:rand(0,6.28),speed:rand(5,16),size:Math.random()<.7?1:2}));
+ ambient=Array.from({length:90},()=>({x:rand(8,W-8),y:rand(35,H-8),phase:rand(0,6.28),speed:rand(5,16),size:Math.random()<.7?1:2}));
  roomProps=[];
- // Deterministic-ish props for each room, leaving the center navigable.
- for(let i=0;i<5;i++){
-  const x=42+((roomIndex*47+i*67)%270), y=115+((roomIndex*31+i*83)%430);
-  if(Math.hypot(x-W/2,y-H/2)>62) roomProps.push({x,y,w:18+(i%2)*8,h:16+(i%3)*5,kind:i%3});
- }
- roomDoorOpen=roomKills>=roomGoal;
+ for(let i=0;i<18;i++){const x=28+((landscapePhase*71+i*97)%580),y=45+((landscapePhase*43+i*61)%270);if(Math.hypot(x-W/2,y-H/2)>42)roomProps.push({x,y,w:14+(i%3)*7,h:12+(i%4)*5,kind:(i+landscapePhase)%3});}
+ roomDoorOpen=false;
 }
 function showRoomToast(){
  toast(roomDoorOpen?'ДВЕРЬ ОТКРЫТА — ИДИ К ВЕРХУ':'Зачисти комнату: '+roomKills+'/'+roomGoal);
 }
-function enterNextRoom(){
- roomIndex++;roomKills=0;roomGoal=5+Math.min(7,Math.floor(roomIndex/2));roomDoorOpen=false;secretFound=false;
- player.x=W/2;player.y=H-45;enemies=[];bullets=[];ebullets=[];loot=[];coins=[];
- makeRoomProps();saveRun();updateHud();
- if(roomIndex%3===0){loot.push({x:W/2,y:H/2,type:'chest',life:999});toast('СЕКРЕТНАЯ КОМНАТА! СУНДУК ВНУТРИ')}
- else toast('КОМНАТА '+roomIndex);
-}
-function interact(){
- if(state!=='play')return;
- // Secret wall is near the left edge. First interaction reveals a cache.
- if(!secretFound&&Math.hypot(player.x-secretPos.x,player.y-secretPos.y)<62){
-  secretFound=true;loot.push({x:secretPos.x+24,y:secretPos.y,type:'chest',life:999});
-  particle(secretPos.x,secretPos.y,'#c38aff',18);showLoot('СЕКРЕТНЫЙ ПРОХОД НАЙДЕН!');sfx('upgrade');return;
- }
- // Door at top center opens after the room's enemies are defeated.
- if(player.y<76&&Math.abs(player.x-W/2)<65){
-  if(roomDoorOpen){enterNextRoom();return}
-  showRoomToast();return;
- }
- // Open nearby chest manually if available.
- const chest=loot.find(l=>l.type==='chest'&&!l.got&&Math.hypot(l.x-player.x,l.y-player.y)<45);
- if(chest){chest.life=Math.max(chest.life,10);chest.ready=true;return}
- toast('Рядом нет тайника или двери');
-}
+function enterNextRoom(){/* Single large survival arena: no room transitions. */}
+function interact(){/* Search/interaction system removed. */}
 
 function loadMeta(){
  try{const v=JSON.parse(localStorage.getItem('ds_meta3')||'{}');meta={...meta,...v}}catch(e){}
@@ -240,7 +229,7 @@ function saveRun(){
  if(state!=='play'&&state!=='upgrade')return;
  try{
   const snap={v:1,chosenHero,chosenWeapon,player:{x:player.x,y:player.y,hp:player.hp,maxhp:player.maxhp,speed:player.speed,damage:player.damage,fireRate:player.fireRate},
-   runTime,level,xp,xpNeed,gold,kills,floor,roomIndex,roomKills,roomGoal,secretFound,roomDoorOpen,armor,artifact,upgrades,weapon,critChance,pierce,orbitTimer,
+   runTime,level,xp,xpNeed,gold,kills,floor,roomIndex,roomKills,roomGoal,secretFound,roomDoorOpen,armor,artifact,upgrades,weapon,critChance,pierce,orbitTimer,nextBossTime,landscapePhase,
    dashCooldown,activeHeroId:activeHero.id,activeWeaponId:activeWeapon.id};
   localStorage.setItem('ds_run7',JSON.stringify(snap));
   const b=$('continueRun');if(b)b.style.display='block';
@@ -254,7 +243,7 @@ function resumeRun(){
  activeHero=HEROES.find(h=>h.id===snap.activeHeroId)||HEROES[0];
  activeWeapon=WEAPONS.find(w=>w.id===snap.activeWeaponId)||WEAPONS[0];
  player={...snap.player,r:8,inv:1};
- runTime=snap.runTime||0;level=snap.level||1;xp=snap.xp||0;xpNeed=snap.xpNeed||6;gold=snap.gold||0;kills=snap.kills||0;floor=snap.floor||1;
+ runTime=snap.runTime||0;level=snap.level||1;xp=snap.xp||0;xpNeed=snap.xpNeed||6;gold=snap.gold||0;kills=snap.kills||0;floor=snap.floor||1;nextBossTime=snap.nextBossTime||((Math.floor(runTime/180)+1)*180);landscapePhase=Math.min(4,Math.floor(runTime/180));finalBoss=false;
  roomIndex=snap.roomIndex||1;roomKills=snap.roomKills||0;roomGoal=snap.roomGoal||6;secretFound=!!snap.secretFound;roomDoorOpen=!!snap.roomDoorOpen;
  armor=snap.armor||0;artifact=snap.artifact||null;critChance=snap.critChance||.08;pierce=snap.pierce||0;orbitTimer=snap.orbitTimer||0;upgrades=snap.upgrades||{damage:1,rate:1,speed:1,maxhp:3,magnet:1};weapon=snap.weapon||activeWeapon.name;
  enemies=[];bullets=[];ebullets=[];coins=[];particles=[];loot=[];boss=null;spawn=.7;shoot=0;dashCooldown=snap.dashCooldown||0;dashTime=0;dashRequested=false;checkpointTimer=0;
@@ -270,14 +259,14 @@ function reset(){
  activeWeapon=WEAPONS.find(w=>w.id===chosenWeapon)||WEAPONS[0];
  meta.runs++;saveMeta();clearRunSave();checkpointTimer=0;
  player={x:W/2,y:H/2,r:8,hp:activeHero.hp+meta.permHp,maxhp:activeHero.hp+meta.permHp,speed:activeHero.speed*(1+meta.permSpeed*.04),inv:0,damage:activeWeapon.damage+meta.permDamage*.15,fireRate:activeWeapon.rate};
- enemies=[];bullets=[];ebullets=[];coins=[];particles=[];runTime=0;spawn=0;shoot=0;enemyId=0;level=1;xp=0;xpNeed=6;gold=0;kills=0;floor=1;shake=0;boss=null;dashCooldown=0;dashTime=0;dashRequested=false;dashDir={x:1,y:0};roomIndex=1;roomKills=0;roomGoal=6;secretFound=false;armor=0;artifact=null;attackAnim=0;makeRoomProps();
+ enemies=[];bullets=[];ebullets=[];coins=[];particles=[];runTime=0;spawn=0;shoot=0;enemyId=0;level=1;xp=0;xpNeed=6;gold=0;kills=0;floor=1;shake=0;boss=null;nextBossTime=180;landscapePhase=0;finalBoss=false;bossWarning=0;dashCooldown=0;dashTime=0;dashRequested=false;dashDir={x:1,y:0};roomIndex=1;roomKills=0;roomGoal=6;secretFound=false;armor=0;artifact=null;attackAnim=0;makeRoomProps();
  upgrades={damage:1,rate:1,speed:1,maxhp:3,magnet:1};critChance=.08;pierce=0;orbitTimer=0;orbitAngle=0;killStreak=0;streakTimer=0;weapon=activeWeapon.name;
  updateHud();state='play';$('menu').style.display='none';$('armory').style.display='none';$('pause').style.display='none';$('shop').style.display='none';$('quests').style.display='none';$('upgrade').style.display='none';$('end').style.display='none';$('hud').style.display='block';$('stick').style.display='block';joy={x:0,y:0};joyActive=false;knob.style.left='32px';knob.style.top='32px';
 }
 function updateHud(){
  $('hp').textContent='♥ '.repeat(Math.max(0,player?.hp||0))+'♡ '.repeat(Math.max(0,(player?.maxhp||3)-(player?.hp||0)));
- $('coins').textContent='◉ '+gold;$('stage').textContent='ЭТАЖ '+floor+' · КОМНАТА '+roomIndex;$('kills').textContent='УБИЙСТВА: '+kills;$('weapon').textContent=weapon;
- $('biome').textContent=floor<3?'КАТАКОМБЫ':floor<5?'АДСКИЕ ЗАЛЫ':floor<7?'ЗАТОПЛЕННЫЙ ХРАМ':floor<9?'КРИСТАЛЬНЫЕ ПЕЩЕРЫ':'БЕЗДНА';
+ $('coins').textContent='◉ '+gold;$('stage').textContent='ВЫЖИВАНИЕ '+Math.floor(runTime/60)+':'+String(Math.floor(runTime%60)).padStart(2,'0');$('kills').textContent='УБИЙСТВА: '+kills;$('weapon').textContent=weapon;
+ $('biome').textContent=['ЗАБРОШЕННЫЕ РУИНЫ','ПЕПЕЛЬНЫЕ ПУСТОШИ','ЗАТОПЛЕННЫЙ ХРАМ','КРИСТАЛЬНАЯ БУРЯ','ЦАРСТВО БЕЗДНЫ'][Math.min(4,landscapePhase)];
  $('heroName').textContent=(activeHero?.name||'РАЗВЕДЧИК')+(armor?' · БРОНЯ '+armor:'')+(artifact?' · '+artifact.toUpperCase():'');
  const ds=$('dashStatus'),db=$('dashBtn');if(ds&&db){ds.textContent=dashCooldown<=0?'ГОТОВ':dashCooldown.toFixed(1)+'с';db.className=dashCooldown<=0?'ready':'cooling';}
  $('xp').style.width=(xp/xpNeed*100)+'%';$('bossbar').style.display=boss?'block':'none';if(boss)$('bossfill').style.width=(boss.hp/boss.maxhp*100)+'%';
@@ -287,14 +276,16 @@ function addEnemy(){
  let side=Math.floor(rand(0,4)),x=side===0?-10:side===1?W+10:rand(0,W),y=side===2?-10:side===3?H+10:rand(0,H);
  if(Math.hypot(x-player.x,y-player.y)<120){x=x<W/2?W+10:-10;y=rand(30,H-30)}
  let roll=Math.random(),type=roll<.18?'fast':roll<.31?'ranged':roll<.39?'brute':'grunt';
- let hp=type==='fast'?1:type==='brute'?3+Math.floor(floor/2):1+Math.floor(floor/3);
- enemies.push({id:enemyId++,x,y,r:type==='fast'?6:type==='brute'?11:8,hp,maxhp:hp,speed:type==='fast'?rand(48,66):type==='brute'?rand(18,26):type==='ranged'?rand(20,30):rand(25,42)+floor*1.3,damage:1,flash:0,type,fire:rand(.8,1.8),attack:0});
+ let hp=type==='fast'?1+landscapePhase*.5:type==='brute'?3+landscapePhase*2:1+landscapePhase;
+ enemies.push({id:enemyId++,x,y,r:type==='fast'?6:type==='brute'?11:8,hp,maxhp:hp,speed:(type==='fast'?rand(48,66):type==='brute'?rand(18,26):type==='ranged'?rand(20,30):rand(25,42))+landscapePhase*3,damage:1+landscapePhase*.25,flash:0,type,fire:rand(.8,1.8),attack:0});
 }
-function spawnBoss(){
- boss={x:W/2,y:95,r:20,hp:20+floor*7,maxhp:20+floor*7,speed:27+floor,fire:1.1,flash:0};
- enemies.push({id:enemyId++,x:boss.x,y:boss.y,r:boss.r,hp:boss.hp,maxhp:boss.maxhp,speed:boss.speed,damage:1,type:'boss'});
- toast('БОСС ПОДЗЕМЕЛЬЯ!');
+function spawnBoss(isFinal=false){
+ finalBoss=isFinal;const phase=Math.min(5,Math.floor(runTime/180));const hp=isFinal?520:90+phase*65;
+ boss={x:W/2,y:70,r:isFinal?28:22,hp,maxhp:hp,speed:isFinal?43:29+phase*5,fire:isFinal?.65:1.05,flash:0,phase};
+ enemies.push({id:enemyId++,x:boss.x,y:boss.y,r:boss.r,hp:boss.hp,maxhp:boss.maxhp,speed:boss.speed,damage:isFinal?2:1+phase*.4,type:'boss'});
+ bossWarning=3;toast(isFinal?'⚠ ГЛАВНЫЙ БОСС — ВЫЖИВИ И ПОБЕДИ!':'⚠ БОСС ЛОКАЦИИ '+(phase+1)+'!');sfx('boss');
 }
+function victory(){clearRunSave();sfx('upgrade');state='end';$('hud').style.display='none';$('end').style.display='flex';$('endStats').innerHTML='ПОБЕДА!<br>Ты выжил 15 минут и победил главного босса.<br>Убийств: '+kills+'<br>Монет собрано: '+gold+'<br>Уровень героя: '+level+'<br><br><span style="color:#9effb4">Легенда арены!</span>';meta.coins+=gold;meta.best=Math.max(meta.best,kills);saveMeta();}
 function particle(x,y,color,n=5){for(let i=0;i<n;i++)particles.push({x,y,vx:rand(-55,55),vy:rand(-55,55),life:rand(.15,.45),color})}
 function nearest(){let best=null,d=1e9;for(let e of enemies){let dd=Math.hypot(e.x-player.x,e.y-player.y);if(dd<d){best=e;d=dd}}return best}
 function shootAt(e){
@@ -305,7 +296,7 @@ function shootAt(e){
  particle(player.x+dx/d*9,player.y+dy/d*9,'#ffb44b',2);
 }
 function killEnemy(e){
- sfx(e.type==='boss'?'boss':'hit');kills++;meta.totalKills++;streakTimer=3;killStreak=Math.min(10,killStreak+1);if(artifact==='vampire'&&Math.random()<.18)player.hp=Math.min(player.maxhp,player.hp+1);if(e.type!=='boss'){roomKills++;roomDoorOpen=roomKills>=roomGoal;if(roomDoorOpen)toast('КОМНАТА ЗАЧИЩЕНА! ДВЕРЬ ОТКРЫТА');}gold+=e.type==='boss'?15:(Math.random()<(meta.items.includes('charm')?.62:.42)?1:0);xp+=e.type==='boss'?5:1;
+ sfx(e.type==='boss'?'boss':'hit');kills++;meta.totalKills++;streakTimer=3;killStreak=Math.min(10,killStreak+1);if(artifact==='vampire'&&Math.random()<.18)player.hp=Math.min(player.maxhp,player.hp+1);if(e.type!=='boss'){roomKills++;}gold+=e.type==='boss'?15:(Math.random()<(meta.items.includes('charm')?.62:.42)?1:0);xp+=e.type==='boss'?5:1;
  particle(e.x,e.y,e.type==='boss'?'#ff3c60':'#8dfb75',e.type==='boss'?16:7);
  bloodStains.push({x:e.x,y:e.y,r:e.type==='boss'?15:rand(5,9),life:10,maxLife:10,seed:Math.random()});
  deathFx.push({x:e.x,y:e.y,r:e.r,life:.62,maxLife:.62,color:e.type==='boss'?'#ff405e':'#9de6a0'});
@@ -333,14 +324,14 @@ function showUpgrades(){
  opts.forEach(o=>{let b=document.createElement('button');b.className='choice';b.innerHTML='<b>✦ '+o[0]+'</b>'+o[1];b.onclick=()=>{o[2]();sfx('upgrade');$('upgrade').style.display='none';$('stick').style.display='block';state='play';updateHud();toast('УЛУЧШЕНИЕ ПОЛУЧЕНО')};$('choices').appendChild(b)});
 }
 function endGame(){
- clearRunSave();sfx('death');state='end';$('hud').style.display='none';$('end').style.display='flex';$('endStats').innerHTML=`Этаж: ${floor}<br>Убийств: ${kills}<br>Монет собрано: ${gold}<br>Уровень героя: ${level}<br><br><span style="color:#ffcf54">Каждый забег делает тебя сильнее.</span>`;
+ clearRunSave();sfx('death');state='end';$('hud').style.display='none';$('end').style.display='flex';$('endStats').innerHTML=`Время выживания: ${Math.floor(runTime/60)}:${String(Math.floor(runTime%60)).padStart(2,'0')}<br>Убийств: ${kills}<br>Монет собрано: ${gold}<br>Уровень героя: ${level}<br><br><span style="color:#ffcf54">Попробуй продержаться все 15 минут.</span>`;
  meta.coins+=gold;meta.best=Math.max(meta.best,kills);saveMeta();
 }
 function update(dt){
- if(state!=='play')return;runTime+=dt;checkpointTimer+=dt;if(checkpointTimer>=5){checkpointTimer=0;saveRun()}streakTimer=Math.max(0,streakTimer-dt);if(streakTimer<=0)killStreak=0;player.inv=Math.max(0,player.inv-dt);dashCooldown=Math.max(0,dashCooldown-dt);dashTime=Math.max(0,dashTime-dt);spawn-=dt;shoot-=dt;
+ if(state!=='play')return;runTime+=dt;checkpointTimer+=dt;bossWarning=Math.max(0,bossWarning-dt);if(runTime>=900&&finalBoss&&!boss){victory();return}if(checkpointTimer>=5){checkpointTimer=0;saveRun()}streakTimer=Math.max(0,streakTimer-dt);if(streakTimer<=0)killStreak=0;player.inv=Math.max(0,player.inv-dt);dashCooldown=Math.max(0,dashCooldown-dt);dashTime=Math.max(0,dashTime-dt);spawn-=dt;shoot-=dt;
  if(dashRequested&&dashCooldown<=0){let mx=joy.x,my=joy.y;if(keys.ArrowLeft||keys.a)mx-=1;if(keys.ArrowRight||keys.d)mx+=1;if(keys.ArrowUp||keys.w)my-=1;if(keys.ArrowDown||keys.s)my+=1;let mm=Math.hypot(mx,my);if(mm>.1)dashDir={x:mx/mm,y:my/mm};dashTime=.18;dashCooldown=2.6;player.inv=Math.max(player.inv,.38);particle(player.x,player.y,'#c38aff',16);particle(player.x-dashDir.x*8,player.y-dashDir.y*8,'#8cecff',7);sfx('dash');}dashRequested=false;
- if(spawn<=0){addEnemy();spawn=Math.max(.27,1.1-floor*.045);}
- if(runTime>0&&Math.floor(runTime/35)+1>floor&&!boss){floor=Math.floor(runTime/35)+1;spawnBoss()}
+ if(spawn<=0){addEnemy();spawn=Math.max(.24,1.05-landscapePhase*.12);}
+ landscapePhase=Math.min(4,Math.floor(runTime/180));floor=landscapePhase+1;if(runTime>=900&&!finalBoss&&!boss){spawnBoss(true);}else if(runTime>=nextBossTime&&runTime<900&&!boss){spawnBoss(false);nextBossTime+=180;}
  if(boss){boss.fire-=dt;if(boss.fire<=0){boss.fire=boss.hp<boss.maxhp*.45?.58:1.05;
  const phase=boss.hp<boss.maxhp*.45;
  if(Math.random()<.48){
@@ -354,7 +345,7 @@ function update(dt){
  if(keys.ArrowLeft||keys.a)dx-=1;if(keys.ArrowRight||keys.d)dx+=1;if(keys.ArrowUp||keys.w)dy-=1;if(keys.ArrowDown||keys.s)dy+=1;
  let mag=Math.hypot(dx,dy);if(mag>1){dx/=mag;dy/=mag}
  if(dashTime>0){dx=dashDir.x;dy=dashDir.y;mag=1;}player.x=clamp(player.x+dx*player.speed*(dashTime>0?3.2:1)*dt,12,W-12);player.y=clamp(player.y+dy*player.speed*(dashTime>0?3.2:1)*dt,35,H-15);
- if(shoot<=0){let e=nearest();if(e&&Math.hypot(e.x-player.x,e.y-player.y)<270){shootAt(e);shoot=player.fireRate*(streakTimer>0?.75:1);attackAnim=.08}}attackAnim=Math.max(0,attackAnim-dt);
+ if(shoot<=0){let e=nearest();if(e&&Math.hypot(e.x-player.x,e.y-player.y)<340){shootAt(e);shoot=player.fireRate*(streakTimer>0?.75:1);attackAnim=.08}}attackAnim=Math.max(0,attackAnim-dt);
  for(let e of enemies){
   let vx=player.x-e.x,vy=player.y-e.y,d=Math.hypot(vx,vy)||1;
   if(e.type==='boss'){e.x+=Math.sin(runTime*1.5)*e.speed*.45*dt;e.y+=Math.sign(player.y-e.y)*e.speed*.3*dt;if(boss){boss.x=e.x;boss.y=e.y;boss.hp=e.hp;}}
@@ -386,25 +377,21 @@ function update(dt){
 function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))}
 function draw(dt=0){
  ctx.save();if(shake>0){ctx.translate(rand(-shake,shake),rand(-shake,shake));shake=Math.max(0,shake-.5)}
- const biomeColor=floor<3?'#111a2b':floor<5?'#241326':floor<7?'#102c35':floor<9?'#20173b':'#160f27';
+ const biomeColor=['#182438','#35251e','#12313a','#282044','#160f27'][Math.min(4,landscapePhase)];
  rect(0,0,W,H,biomeColor);
  // stone tile dungeon
  for(let y=0;y<H;y+=24)for(let x=0;x<W;x+=24){
   let n=(Math.floor(x/24)*17+Math.floor(y/24)*31)%7;
-  rect(x+1,y+1,22,22,floor<3?(n===0?'#202d43':n===1?'#1b283c':'#192438'):floor<5?(n===0?'#48243b':n===1?'#351c32':'#2b192d'):floor<7?(n===0?'#24505a':n===1?'#1b414b':'#16343e'):floor<9?(n===0?'#48376a':n===1?'#352653':'#291e43'):(n===0?'#3e254f':n===1?'#2b1a3c':'#20152f'));
+  rect(x+1,y+1,22,22,landscapePhase===0?(n===0?'#293b52':n===1?'#213047':'#1a283d'):landscapePhase===1?(n===0?'#62402d':n===1?'#492d25':'#34231f'):landscapePhase===2?(n===0?'#24505a':n===1?'#1b414b':'#16343e'):landscapePhase===3?(n===0?'#48376a':n===1?'#352653':'#291e43'):(n===0?'#3e254f':n===1?'#2b1a3c':'#20152f'));
   rect(x+2,y+2,20,1,'#2b3a51');rect(x+2,y+21,20,1,'#0d1524');
   if(n===3){rect(x+7,y+8,2,2,'#314057');rect(x+14,y+15,3,2,'#111b2d')}
  }
  // Blood remains on the dungeon floor for about 10 seconds.
  for(const b of bloodStains){const fade=Math.min(1,b.life/1.4);ctx.globalAlpha=.68*fade;ctx.fillStyle=b.seed>.5?'#741f35':'#9b263b';ctx.beginPath();ctx.ellipse(b.x,b.y,b.r*(1.2+b.seed*.45),b.r*.55,b.seed*2,0,Math.PI*2);ctx.fill();ctx.fillStyle='#4d1728';ctx.beginPath();ctx.ellipse(b.x-2,b.y-1,b.r*.55,b.r*.25,0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
- // Room geometry: destructible-looking stone props, locked/open north door, and a hidden wall.
+ // Large open arena props; no doors, room markers or secret passages.
  for(const p of roomProps){const c=p.kind===0?'#34445a':p.kind===1?'#4a3c54':'#314c4f';rect(p.x-p.w/2,p.y-p.h/2,p.w,p.h,c);rect(p.x-p.w/2,p.y-p.h/2,p.w,3,'#65718a');rect(p.x-p.w/2,p.y+p.h/2-3,p.w,3,'#101827')}
- // North exit door; it changes appearance when the room is cleared.
- rect(W/2-29,0,58,8,roomDoorOpen?'#ffc83d':'#6c4254');rect(W/2-23,8,46,26,roomDoorOpen?'#5e4b25':'#2a1b2b');rect(W/2-17,13,34,18,roomDoorOpen?'#ffdf76':'#1a1424');
- // Hidden wall glints until discovered.
- if(!secretFound){rect(secretPos.x-7,secretPos.y-18,14,36,'#344157');rect(secretPos.x-5,secretPos.y-15,10,30,'#27344a');if(Math.floor(runTime*3)%2===0)rect(secretPos.x-2,secretPos.y-4,4,8,'#bd8aff')}
- // torches
- for(let x of [24, W-24])for(let y of [95,245,395,545]){
+ // Environmental lights shift with each three-minute biome.
+ for(let x of [24,W-24])for(let y of [70,180,290]){
   const flick=Math.sin(runTime*17+x+y)*2;
   rect(x-2,y-5,4,10,'#80533b');rect(x-3,y-9-flick*.25,6,5,'#ff9e38');rect(x-5-flick*.2,y-12-flick*.3,10+flick*.4,3,'#ffcf5b');
   rect(x-7,y-15,14,2,'#ff663b');
@@ -413,8 +400,7 @@ function draw(dt=0){
  for(const m of ambient){const yy=(m.y-runTime*m.speed% (H-40)+H-40)%(H-40)+35;const pulse=.35+.35*(Math.sin(runTime*2+m.phase)+1)/2;rect(m.x+Math.sin(runTime+m.phase)*3,yy,m.size,m.size,pulse>.55?'#9beaff':'#536d91')}
  // Soft edge vignette for more depth while keeping pixel-art crisp.
  const vg=ctx.createRadialGradient(W/2,H/2,90,W/2,H/2,390);vg.addColorStop(0,'#00000000');vg.addColorStop(1,'#02040bb8');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
- // exit portal at higher floors
- if(floor>1){rect(25,95,18,30,'#642d9e');rect(28,98,12,24,'#d15cff')}
+ // Landscape changes are visual only; the arena remains continuous.
  for(let l of loot){ctx.save();ctx.shadowBlur=12;ctx.shadowColor=l.type==='chest'?'#ffc83d':l.type==='artifact'?'#c79aff':'#8fffe0';ctx.fillStyle='#050914';ctx.beginPath();ctx.arc(l.x,l.y,12,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle=l.type==='chest'?'#ffe9a0':l.type==='artifact'?'#ead9ff':'#c5fff0';ctx.lineWidth=2;ctx.beginPath();ctx.arc(l.x,l.y,10,0,Math.PI*2);ctx.stroke();if(l.type==='chest'){rect(l.x-8,l.y-6,16,12,'#a66a32');rect(l.x-8,l.y-6,16,4,'#ffc45b');rect(l.x-2,l.y-2,4,5,'#fff0a1')}else if(l.type==='artifact'){rect(l.x-6,l.y-7,12,14,'#8c62d9');rect(l.x-3,l.y-4,6,8,'#d9c5ff');rect(l.x-1,l.y-2,2,4,'#ffffff')}else{rect(l.x-5,l.y-5,10,10,'#8fffe0');rect(l.x-2,l.y-2,4,4,'#f4ffff')}ctx.restore();}
  for(let c of coins){const bob=Math.sin(runTime*7+c.x)*2;ctx.save();ctx.shadowColor='#ffc83d';ctx.shadowBlur=12;ctx.fillStyle='#080b13';ctx.beginPath();ctx.arc(c.x,c.y+bob,9,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle='#fff0a1';ctx.lineWidth=2;ctx.beginPath();ctx.arc(c.x,c.y+bob,7,0,Math.PI*2);ctx.stroke();rect(c.x-5,c.y-3+bob,10,7,'#7d4c13');rect(c.x-4,c.y-5+bob,8,8,'#ffca45');rect(c.x-2,c.y-3+bob,4,4,'#fff0a1');rect(c.x-1,c.y-4+bob,2,2,'#ffffff');ctx.restore();}
  for(let b of bullets){rect(b.x-5,b.y-2,10,4,'#9a6b26');rect(b.x-3,b.y-3,6,6,b.color);rect(b.x-1,b.y-1,2,2,'#fff7c2')}
@@ -540,19 +526,31 @@ shootBtn.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation
 const releaseFire=()=>{manualFire=false;shootBtn.classList.remove('pressed')};
 shootBtn.addEventListener('pointerup',releaseFire);shootBtn.addEventListener('pointercancel',releaseFire);shootBtn.addEventListener('lostpointercapture',releaseFire);
 $('dashBtn').addEventListener('pointerdown',e=>{e.preventDefault();if(state==='play')dashRequested=true});
-$('interactBtn').addEventListener('pointerdown',e=>{e.preventDefault();interact()});
+$('interactBtn').style.display='none';
 window.addEventListener('keydown',e=>{keys[e.key]=true;if(e.code==='Space'&&state==='play'){e.preventDefault();dashRequested=true}});
 
 function loop(t){let dt=Math.min(.033,(t-last)/1000||0);last=t;if(state!=='paused')update(dt);if(state==='play'||state==='upgrade'||state==='paused')draw(dt);requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
 loadMeta();
 $('start').onclick=reset;
+$('settingsOpen').onclick=()=>{openControlSettings('menu')};
+$('settingsClose').onclick=()=>{saveControlLayout();$('settings').style.display='none';if(settingsReturn==='menu')$('menu').style.display='flex';else $('pause').style.display='flex'};
+$('layoutReset').onclick=()=>{localStorage.removeItem('ds_control_layout');applyControlLayout({});renderControlPreview()};
+let settingsReturn='menu';
+function applyControlLayout(layout){for(const id of ['stick','shootBtn','dashBtn']){const el=$(id);if(!el)continue;const p=layout[id]||{};if(p.x!=null)el.style.setProperty(id==='stick'?'--stick-x':id==='shootBtn'?'--shoot-x':'--dash-x',p.x+'px');if(p.y!=null)el.style.setProperty(id==='stick'?'--stick-y':id==='shootBtn'?'--shoot-y':'--dash-y',p.y+'px');}}
+function readControlLayout(){const o={};for(const id of ['stick','shootBtn','dashBtn']){const el=$(id),r=el.getBoundingClientRect();o[id]={x:Math.max(0,Math.round(innerWidth-r.right)),y:Math.max(0,Math.round(innerHeight-r.bottom))};}return o}
+function saveControlLayout(){try{localStorage.setItem('ds_control_layout',JSON.stringify(readControlLayout()))}catch(e){}}
+function renderControlPreview(){const preview=$('layoutPreview');const saved=JSON.parse(localStorage.getItem('ds_control_layout')||'{}');for(const el of preview.querySelectorAll('.dragControl')){const p=saved[el.dataset.control]||{};el.style.left=(p.x!=null?Math.max(8,Math.min(92,100-p.x/innerWidth*100)):({stick:16,shootBtn:84,dashBtn:75}[el.dataset.control]))+'%';el.style.top=(p.y!=null?Math.max(12,Math.min(88,100-p.y/innerHeight*100)):({stick:65,shootBtn:65,dashBtn:28}[el.dataset.control]))+'%';}}
+function openControlSettings(from){settingsReturn=from;$('menu').style.display='none';$('pause').style.display='none';$('settings').style.display='flex';renderControlPreview();}
+(function initControlSettings(){try{applyControlLayout(JSON.parse(localStorage.getItem('ds_control_layout')||'{}'))}catch(e){}const preview=$('layoutPreview');let drag=null;preview.querySelectorAll('.dragControl').forEach(el=>{el.addEventListener('pointerdown',e=>{drag={el,p:preview.getBoundingClientRect()};el.setPointerCapture(e.pointerId);e.preventDefault()});el.addEventListener('pointermove',e=>{if(!drag||drag.el!==el)return;const r=preview.getBoundingClientRect();el.style.left=Math.max(8,Math.min(92,(e.clientX-r.left)/r.width*100))+'%';el.style.top=Math.max(12,Math.min(88,(e.clientY-r.top)/r.height*100))+'%';});el.addEventListener('pointerup',()=>{if(!drag||drag.el!==el)return;const x=parseFloat(el.style.left)/100,y=parseFloat(el.style.top)/100;const id=el.dataset.control;const map={};try{Object.assign(map,JSON.parse(localStorage.getItem('ds_control_layout')||'{}'))}catch(e){}map[id]={x:Math.round((1-x)*innerWidth-45),y:Math.round((1-y)*innerHeight-27)};localStorage.setItem('ds_control_layout',JSON.stringify(map));applyControlLayout(map);drag=null});});})();
 $('armoryOpen').onclick=()=>{renderArmory();$('menu').style.display='none';$('armory').style.display='flex'};
 $('armoryBack').onclick=()=>{$('armory').style.display='none';$('menu').style.display='flex'};
 $('armoryStart').onclick=()=>{ $('armory').style.display='none';reset(); };
 $('again').onclick=reset;$('metaBuy').onclick=()=>{if(meta.coins>=50){meta.coins-=50;const next=meta.permDamage%3;if(next===0)meta.permHp++;else if(next===1)meta.permDamage++;else meta.permSpeed++;meta.permDamage=(meta.permDamage||0);saveMeta();$('endStats').innerHTML+=`<br><span style="color:#9effb4">Постоянное улучшение куплено!</span>`;sfx('upgrade')}else{$('endStats').innerHTML+=`<br><span style="color:#ff7586">Нужно 50 монет. Собирай больше добычи!</span>`}};
 $('home').onclick=()=>{$('end').style.display='none';$('menu').style.display='flex';state='menu';renderMeta()};
 $('pauseBtn').onclick=()=>{if(state==='play'){saveRun();state='paused';$('pause').style.display='flex';$('stick').style.display='none'}};
+$('pause').querySelector('.card').insertAdjacentHTML('beforeend','<button id="pauseSettings">🎮 НАСТРОИТЬ КНОПКИ</button>');
+document.getElementById('pauseSettings').onclick=()=>openControlSettings('pause');
 $('resume').onclick=()=>{$('pause').style.display='none';$('stick').style.display='block';state='play'};
 $('pauseHome').onclick=()=>{$('pause').style.display='none';$('hud').style.display='none';$('menu').style.display='flex';state='menu';renderMeta()};
 $('shopOpen').onclick=openShop;

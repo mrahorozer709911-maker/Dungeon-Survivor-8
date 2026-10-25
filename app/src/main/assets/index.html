@@ -114,7 +114,7 @@ button{min-height:42px;font-size:clamp(12px,3.2vw,14px);padding:11px 12px}
 .case-card-item{flex:0 0 76px;height:66px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#101a2c;border:2px solid var(--rarity);color:var(--rarity);font-size:23px}
 .case-card-item small{font-size:8px;margin-top:5px}
 .case-result{position:absolute;bottom:88px;left:5%;right:5%;font-weight:bold;font-size:clamp(12px,3.4vw,16px);color:#ffc83d;text-shadow:0 2px #000;overflow-wrap:anywhere}
-@keyframes dragonFloat{0%,100%{transform:translateY(0) rotate(-3deg) scale(1)}50%{transform:translateY(-9px) rotate(2deg) scale(1.03)}}
+@keyframes dragonFloat{0%,100%{transform:perspective(500px) translateY(0) rotateY(-18deg) rotateX(7deg) rotateZ(-3deg) scale(1)}50%{transform:perspective(500px) translateY(-9px) rotateY(-12deg) rotateX(10deg) rotateZ(2deg) scale(1.03)}}
 @keyframes heroFloat{0%,100%{transform:translateY(0) rotate(-20deg)}50%{transform:translateY(-6px) rotate(-14deg)}}
 @keyframes logoPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.25)}}
 @keyframes caseShake{0%,100%{margin-left:-3px;rotate:-2deg}50%{margin-left:3px;rotate:2deg}}

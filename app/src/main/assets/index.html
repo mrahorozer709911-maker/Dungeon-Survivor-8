@@ -258,7 +258,7 @@ function reset(){
  activeHero=HEROES.find(h=>h.id===chosenHero)||HEROES[0];
  activeWeapon=WEAPONS.find(w=>w.id===chosenWeapon)||WEAPONS[0];
  meta.runs++;saveMeta();clearRunSave();checkpointTimer=0;
- player={x:W/2,y:H/2,r:8,hp:activeHero.hp+meta.permHp,maxhp:activeHero.hp+meta.permHp,speed:activeHero.speed*(1+meta.permSpeed*.04),inv:0,damage:activeWeapon.damage+meta.permDamage*.15,fireRate:activeWeapon.rate};
+ player={x:W/2,y:H/2,r:8,hp:activeHero.hp+Math.min(2,meta.permHp),maxhp:activeHero.hp+Math.min(2,meta.permHp),speed:activeHero.speed*(1+Math.min(6,meta.permSpeed)*.025),inv:0,damage:activeWeapon.damage+Math.min(4,meta.permDamage)*.08,fireRate:activeWeapon.rate};
  enemies=[];bullets=[];ebullets=[];coins=[];particles=[];runTime=0;spawn=0;shoot=0;enemyId=0;level=1;xp=0;xpNeed=6;gold=0;kills=0;floor=1;shake=0;boss=null;nextBossTime=180;landscapePhase=0;finalBoss=false;bossWarning=0;dashCooldown=0;dashTime=0;dashRequested=false;dashDir={x:1,y:0};roomIndex=1;roomKills=0;roomGoal=6;secretFound=false;armor=0;artifact=null;attackAnim=0;makeRoomProps();
  upgrades={damage:1,rate:1,speed:1,maxhp:3,magnet:1};critChance=.08;pierce=0;orbitTimer=0;orbitAngle=0;killStreak=0;streakTimer=0;weapon=activeWeapon.name;
  updateHud();state='play';$('menu').style.display='none';$('armory').style.display='none';$('pause').style.display='none';$('shop').style.display='none';$('quests').style.display='none';$('upgrade').style.display='none';$('end').style.display='none';$('hud').style.display='block';$('stick').style.display='block';joy={x:0,y:0};joyActive=false;knob.style.left='32px';knob.style.top='32px';
@@ -274,13 +274,15 @@ function updateHud(){
 function toast(t){$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',1100)}
 function addEnemy(){
  let side=Math.floor(rand(0,4)),x=side===0?-10:side===1?W+10:rand(0,W),y=side===2?-10:side===3?H+10:rand(0,H);
- if(Math.hypot(x-player.x,y-player.y)<120){x=x<W/2?W+10:-10;y=rand(30,H-30)}
- let roll=Math.random(),type=roll<.18?'fast':roll<.31?'ranged':roll<.39?'brute':'grunt';
- let hp=type==='fast'?1+landscapePhase*.5:type==='brute'?3+landscapePhase*2:1+landscapePhase;
- enemies.push({id:enemyId++,x,y,r:type==='fast'?6:type==='brute'?11:8,hp,maxhp:hp,speed:(type==='fast'?rand(48,66):type==='brute'?rand(18,26):type==='ranged'?rand(20,30):rand(25,42))+landscapePhase*3,damage:1+landscapePhase*.25,flash:0,type,fire:rand(.8,1.8),attack:0});
-}
+ if(Math.hypot(x-player.x,y-player.y)<145){x=x<W/2?W+10:-10;y=rand(30,H-30)}
+ const roll=Math.random();let type=roll<.16?'fast':roll<.29?'ranged':roll<.39?'brute':roll<.51?'charger':roll<.62?'spitter':'grunt';
+ const phase=Math.min(4,Math.floor(runTime/180)),scale=1+phase*.48;
+ let hp=(type==='fast'?1.5:type==='brute'?4.2:type==='charger'?2.8:type==='spitter'?2.4:type==='ranged'?2.1:2.5)*scale;
+ const radius={fast:6,brute:11,charger:9,spitter:8,ranged:8,grunt:8}[type];
+ enemies.push({id:enemyId++,x,y,r:radius,hp,maxhp:hp,speed:(type==='fast'?rand(48,66):type==='brute'?rand(18,26):type==='charger'?rand(22,30):type==='spitter'?rand(18,25):type==='ranged'?rand(20,30):rand(25,42))+phase*2.2,damage:1+phase*.18,flash:0,type,fire:rand(.8,1.8),attack:rand(.7,1.5),windup:0,chargeX:0,chargeY:0,anim:rand(0,6.28)});
+ }
 function spawnBoss(isFinal=false){
- finalBoss=isFinal;const phase=Math.min(5,Math.floor(runTime/180));const hp=isFinal?520:90+phase*65;
+ finalBoss=isFinal;const phase=Math.min(5,Math.floor(runTime/180));const hp=isFinal?680:120+phase*80;
  boss={x:clamp(player.x+rand(-150,150),70,W-70),y:clamp(player.y+rand(-90,90),55,H-55),r:isFinal?28:22,hp,maxhp:hp,speed:isFinal?43:29+phase*5,fire:isFinal?.65:1.05,flash:0,phase};
  enemies.push({id:enemyId++,x:boss.x,y:boss.y,r:boss.r,hp:boss.hp,maxhp:boss.maxhp,speed:boss.speed,damage:isFinal?2:1+phase*.4,type:'boss'});
  bossWarning=3;toast(isFinal?'⚠ ГЛАВНЫЙ БОСС — ВЫЖИВИ И ПОБЕДИ!':'⚠ БОСС ЛОКАЦИИ '+(phase+1)+'!');sfx('boss');
@@ -309,15 +311,15 @@ function killEnemy(e){
 function showUpgrades(){
  sfx('level');state='upgrade';$('upgrade').style.display='flex';$('stick').style.display='none';
  const opts=[
-  ['УРОН +1','Пули наносят больше урона.',()=>{player.damage++;upgrades.damage++;}],
-  ['БЫСТРЫЕ ВЫСТРЕЛЫ','Стреляй на 18% чаще.',()=>{player.fireRate=Math.max(.14,player.fireRate*.82);upgrades.rate++;}],
-  ['БЫСТРЫЕ НОГИ','Скорость движения +15%.',()=>{player.speed*=1.15;upgrades.speed++;}],
+  ['УРОН +0.5','Пули наносят на 0.5 больше урона.',()=>{player.damage+=.5;upgrades.damage++;}],
+  ['БЫСТРЫЕ ВЫСТРЕЛЫ','Стреляй на 10% чаще.',()=>{player.fireRate=Math.max(.18,player.fireRate*.90);upgrades.rate++;}],
+  ['БЫСТРЫЕ НОГИ','Скорость движения +8%.',()=>{player.speed*=1.08;upgrades.speed++;}],
   ['ЗАПАС ЗДОРОВЬЯ','Восстанови 1 ♥ и увеличь максимум.',()=>{player.maxhp++;player.hp=Math.min(player.maxhp,player.hp+1);upgrades.maxhp++;}],
   ['МАГНИТ МОНЕТ','Радиус сбора предметов выше.',()=>{upgrades.magnet++;}],
-  ['ОРЛИНЫЙ ГЛАЗ','Шанс критического урона +8%.',()=>{critChance=Math.min(.6,critChance+.08);}],
-  ['ПРОБОЙ','Пули проходят сквозь ещё одного врага.',()=>{pierce=Math.min(5,pierce+1);}],
-  ['ОРБИТАЛЬНЫЙ ДРОН','Спутник наносит урон ближайшим врагам.',()=>{orbitTimer=Math.min(4,orbitTimer+1);}],
-  ['ВТОРОЕ ДЫХАНИЕ','Восстанови 2 ♥.',()=>{player.hp=Math.min(player.maxhp,player.hp+2);}],
+  ['ОРЛИНЫЙ ГЛАЗ','Шанс критического урона +5%.',()=>{critChance=Math.min(.45,critChance+.05);}],
+  ['ПРОБОЙ','Пули проходят сквозь ещё одного врага.',()=>{pierce=Math.min(3,pierce+1);}],
+  ['ОРБИТАЛЬНЫЙ ДРОН','Спутник наносит урон ближайшим врагам.',()=>{orbitTimer=Math.min(3,orbitTimer+1);}],
+  ['ВТОРОЕ ДЫХАНИЕ','Восстанови 1 ♥.',()=>{player.hp=Math.min(player.maxhp,player.hp+1);}],
   ['БОЕВОЙ АЗАРТ','Временно ускоряет стрельбу после убийства.',()=>{killStreak=Math.min(10,killStreak+1);streakTimer=3;}]
  ].sort(()=>Math.random()-.5).slice(0,3);
  $('choices').innerHTML='';
@@ -330,12 +332,12 @@ function endGame(){
 function update(dt){
  if(state!=='play')return;runTime+=dt;checkpointTimer+=dt;bossWarning=Math.max(0,bossWarning-dt);if(runTime>=900&&finalBoss&&!boss){victory();return}if(checkpointTimer>=5){checkpointTimer=0;saveRun()}streakTimer=Math.max(0,streakTimer-dt);if(streakTimer<=0)killStreak=0;player.inv=Math.max(0,player.inv-dt);dashCooldown=Math.max(0,dashCooldown-dt);dashTime=Math.max(0,dashTime-dt);spawn-=dt;shoot-=dt;
  if(dashRequested&&dashCooldown<=0){let mx=joy.x,my=joy.y;if(keys.ArrowLeft||keys.a)mx-=1;if(keys.ArrowRight||keys.d)mx+=1;if(keys.ArrowUp||keys.w)my-=1;if(keys.ArrowDown||keys.s)my+=1;let mm=Math.hypot(mx,my);if(mm>.1)dashDir={x:mx/mm,y:my/mm};dashTime=.18;dashCooldown=2.6;player.inv=Math.max(player.inv,.38);particle(player.x,player.y,'#c38aff',16);particle(player.x-dashDir.x*8,player.y-dashDir.y*8,'#8cecff',7);sfx('dash');}dashRequested=false;
- if(spawn<=0){addEnemy();spawn=Math.max(.24,1.05-landscapePhase*.12);}
+ if(spawn<=0){const phaseCount=Math.min(4,Math.floor(runTime/180));const pack=1+(phaseCount>=1?1:0)+(phaseCount>=2&&Math.random()<.65?1:0)+(phaseCount>=3&&Math.random()<.35?1:0);for(let si=0;si<pack;si++)addEnemy();spawn=Math.max(.22,(1.12-landscapePhase*.13)/(1+phaseCount*.12));}
  const previousPhase=landscapePhase;landscapePhase=Math.min(4,Math.floor(runTime/180));floor=landscapePhase+1;if(landscapePhase!==previousPhase){makeRoomProps();if(runTime<900)toast('ЛАНДШАФТ ИЗМЕНИЛСЯ: '+['РУИНЫ','ПЕПЕЛЬНЫЕ ПУСТОШИ','ЗАТОПЛЕННЫЙ ХРАМ','КРИСТАЛЬНАЯ БУРЯ','ЦАРСТВО БЕЗДНЫ'][landscapePhase]);}if(runTime>=900&&!finalBoss&&!boss){spawnBoss(true);}else if(runTime>=nextBossTime&&runTime<900&&!boss){spawnBoss(false);nextBossTime+=180;}
  if(boss){boss.fire-=dt;if(boss.fire<=0){boss.fire=boss.hp<boss.maxhp*.45?.58:1.05;
  const phase=boss.hp<boss.maxhp*.45;
  if(Math.random()<.48){
-  const count=phase?14:8;for(let a=0;a<count;a++){let ang=a*Math.PI*2/count+runTime*.25;ebullets.push({x:boss.x,y:boss.y,vx:Math.cos(ang)*(phase?120:82),vy:Math.sin(ang)*(phase?120:82),r:4,life:4})}
+  const count=phase?12:7;for(let a=0;a<count;a++){let ang=a*Math.PI*2/count+runTime*.25;ebullets.push({x:boss.x,y:boss.y,vx:Math.cos(ang)*(phase?120:82),vy:Math.sin(ang)*(phase?120:82),r:4,life:4})}
  }else{
   const ang=Math.atan2(player.y-boss.y,player.x-boss.x),count=phase?5:3;
   for(let a=0;a<count;a++){let aa=ang+(a-(count-1)/2)*.2;ebullets.push({x:boss.x,y:boss.y,vx:Math.cos(aa)*(phase?145:110),vy:Math.sin(aa)*(phase?145:110),r:5,life:4})}
@@ -350,8 +352,12 @@ function update(dt){
   let vx=player.x-e.x,vy=player.y-e.y,d=Math.hypot(vx,vy)||1;
   if(e.type==='boss'){e.x+=Math.sin(runTime*1.5)*e.speed*.45*dt;e.y+=Math.sign(player.y-e.y)*e.speed*.3*dt;if(boss){boss.x=e.x;boss.y=e.y;boss.hp=e.hp;}}
   else{
-   if(e.type==='ranged'){if(d>120){e.x-=vx/d*e.speed*dt;e.y-=vy/d*e.speed*dt}else if(d<85){e.x+=vx/d*e.speed*dt;e.y+=vy/d*e.speed*dt}
-    e.fire-=dt;if(e.fire<=0&&d<260){e.fire=1.65;ebullets.push({x:e.x,y:e.y,vx:vx/d*92,vy:vy/d*92,r:3,life:3,color:'#ffb66b'})}
+   if(e.type==='ranged'||e.type==='spitter'){
+    if(d>(e.type==='spitter'?175:120)){e.x-=vx/d*e.speed*dt;e.y-=vy/d*e.speed*dt}else if(d<(e.type==='spitter'?125:85)){e.x+=vx/d*e.speed*dt;e.y+=vy/d*e.speed*dt}
+    e.fire-=dt;if(e.fire<=0&&d<(e.type==='spitter'?310:260)){e.fire=e.type==='spitter'?2.15:1.8;const sp=e.type==='spitter'?105:92;ebullets.push({x:e.x,y:e.y,vx:vx/d*sp,vy:vy/d*sp,r:e.type==='spitter'?5:3,life:3,color:e.type==='spitter'?'#a5f078':'#ffb66b'});e.attack=.22;particle(e.x,e.y,e.type==='spitter'?'#a5f078':'#ffb66b',3)}
+   }else if(e.type==='charger'){
+    e.attack-=dt;if(e.windup>0){e.windup-=dt;if(e.windup<=0){e.chargeX=vx/d;e.chargeY=vy/d;e.attack=2.1;particle(e.x,e.y,'#ff8c59',8)}}else if(e.attack<=0&&d<230){e.windup=.55;e.attack=2.1;toast('РЫВОК! УКЛОНИСЬ');}
+    if(e.windup>0){particle(e.x,e.y,'#ff8c59',1)}else if(e.attack>1.75){e.x+=e.chargeX*e.speed*3.2*dt;e.y+=e.chargeY*e.speed*3.2*dt}else{e.x+=vx/d*e.speed*dt;e.y+=vy/d*e.speed*dt}
    }else{e.x+=vx/d*e.speed*dt;e.y+=vy/d*e.speed*dt}
   }
   if(d<e.r+player.r&&player.inv<=0){const taken=Math.max(.5,1-armor*.25);player.hp-=taken;damageNumbers.push({x:player.x+rand(-5,5),y:player.y-18,v:rand(24,38),value:Math.ceil(taken),life:.9,maxLife:.9,color:'#ff5266'});player.inv=.9;shake=7;screenFlash=.16;particle(player.x,player.y,'#ff5266',12);particle(player.x,player.y,'#fff0d2',4);if(player.hp<=0){updateHud();endGame();return}}
@@ -363,7 +369,7 @@ function update(dt){
  enemies=enemies.filter(e=>e.hp>0);
  for(let l of loot){l.life-=dt;let d=Math.hypot(l.x-player.x,l.y-player.y);if(d<player.r+15){l.got=true;if(l.type==='chest'){gold+=12;xp+=3;showLoot('СУНДУК! +12 МОНЕТ +3 ОПЫТА');particle(l.x,l.y,'#ffc83d',12)}
  else if(l.type==='artifact'){const a=ARTIFACTS[Math.floor(Math.random()*ARTIFACTS.length)];artifact=a.id;if(a.id==='guardian')armor++;if(a.id==='vampire')player.hp=Math.min(player.maxhp,player.hp+1);if(a.id==='storm')critChance=Math.min(.65,critChance+.12);if(a.id==='void')pierce=Math.min(5,pierce+1);showLoot('АРТЕФАКТ: '+a.name+' — '+a.desc);particle(l.x,l.y,a.color,14);saveMeta()}
- else{const r=Math.random();if(r<.25){player.hp=Math.min(player.maxhp,player.hp+1);showLoot('РЕДКИЙ ЛУТ: +1 ♥')}else if(r<.5){player.damage+=.5;showLoot('РЕДКИЙ ЛУТ: УРОН +0.5')}else if(r<.72){armor++;showLoot('БРОНЯ +1: УРОН СНИЖЕН')}else{player.speed*=1.06;showLoot('РЕДКИЙ ЛУТ: СКОРОСТЬ +6%')}particle(l.x,l.y,'#8fffe0',10)}}}
+ else{const r=Math.random();if(r<.25){player.hp=Math.min(player.maxhp,player.hp+1);showLoot('РЕДКИЙ ЛУТ: +1 ♥')}else if(r<.5){player.damage+=.25;showLoot('РЕДКИЙ ЛУТ: УРОН +0.25')}else if(r<.72){armor++;showLoot('БРОНЯ +1: УРОН СНИЖЕН')}else{player.speed*=1.04;showLoot('РЕДКИЙ ЛУТ: СКОРОСТЬ +4%')}particle(l.x,l.y,'#8fffe0',10)}}}
  loot=loot.filter(l=>!l.got&&l.life>0);
  if(orbitTimer>0){orbitAngle+=dt*2.8;for(let oi=0;oi<orbitTimer;oi++){const ox=player.x+Math.cos(orbitAngle+oi*Math.PI*2/orbitTimer)*23,oy=player.y+Math.sin(orbitAngle+oi*Math.PI*2/orbitTimer)*23;for(const e of enemies){if(Math.hypot(e.x-ox,e.y-oy)<e.r+5){e.hp-=8*dt;if(e.hp<=0)killEnemy(e)}}particle(ox,oy,'#b9a0ff',1)}}
  for(let c of coins){let d=Math.hypot(c.x-player.x,c.y-player.y);if(d<35+upgrades.magnet*10){c.x+=(player.x-c.x)*Math.min(1,dt*5);c.y+=(player.y-c.y)*Math.min(1,dt*5)}if(d<player.r+c.r+4){c.got=true;gold++;sfx('coin');particle(c.x,c.y,'#ffce45',5)}}
@@ -409,9 +415,14 @@ function draw(dt=0){
  for(let b of ebullets){rect(b.x-4,b.y-4,8,8,'#ff4767');rect(b.x-2,b.y-2,4,4,'#ffc4d0')}
  for(let e of enemies){
   const bob=Math.sin(runTime*8+e.x*.1)*1.5;rect(e.x-e.r+2,e.y+e.r-1,e.r*2-4,3,'#05091499');
-  let color=e.type==='boss'?'#a72b57':e.type==='fast'?'#6bd98a':e.type==='ranged'?'#e6a45b':e.type==='brute'?'#b56b88':'#3fbd75';
-  rect(e.x-e.r,e.y-e.r+bob,e.r*2,e.r*2,color);rect(e.x-e.r+2,e.y-e.r+2+bob,e.r*2-4,e.r-2,e.type==='boss'?'#d94364':e.type==='ranged'?'#ffd08b':e.type==='brute'?'#e18bab':'#73e88e');
-  rect(e.x-e.r+2,e.y-2+bob,3,3,'#f6f5d0');rect(e.x+e.r-5,e.y-2+bob,3,3,'#f6f5d0');rect(e.x-e.r+3,e.y+3+bob, e.r*2-6,2,'#173026');
+  let color=e.type==='boss'?'#a72b57':e.type==='fast'?'#6bd98a':e.type==='ranged'?'#e6a45b':e.type==='brute'?'#b56b88':e.type==='charger'?'#e86a48':e.type==='spitter'?'#8ebc4c':'#3fbd75';
+  const pulse=1+Math.sin(runTime*10+(e.anim||0))*.07,er=e.r*pulse;
+  if(e.type==='charger'&&e.windup>0){ctx.globalAlpha=.5+Math.sin(runTime*30)*.35;ctx.strokeStyle='#ff754d';ctx.lineWidth=2;ctx.beginPath();ctx.arc(e.x,e.y,e.r+7+Math.sin(runTime*18)*2,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;}
+  if(e.type==='spitter'&&e.attack>.05){ctx.globalAlpha=.7;ctx.fillStyle='#c4ff78';ctx.beginPath();ctx.arc(e.x,e.y,e.r+4,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
+  rect(e.x-er,e.y-er+bob,er*2,er*2,color);rect(e.x-er+2,e.y-er+2+bob,er*2-4,e.r-2,e.type==='boss'?'#d94364':e.type==='ranged'?'#ffd08b':e.type==='brute'?'#e18bab':e.type==='charger'?'#ffac73':e.type==='spitter'?'#d2f58a':'#73e88e');
+  const eyeY=e.y-2+bob+(e.windup>0?1:0);rect(e.x-e.r+2,eyeY,3,3,'#f6f5d0');rect(e.x+e.r-5,eyeY,3,3,'#f6f5d0');rect(e.x-e.r+3,e.y+3+bob,e.r*2-6,2,'#173026');
+  if(e.type==='charger'){rect(e.x-e.r-3,e.y-2+bob,5,3,'#ffbd79');rect(e.x+e.r-2,e.y-2+bob,5,3,'#ffbd79')}
+  if(e.type==='spitter'){rect(e.x-2,e.y+2+bob,4,4,'#d9ff8b');}
   rect(e.x-e.r,e.y-e.r-5,e.r*2,3,'#391b2c');rect(e.x-e.r,e.y-e.r-5,e.r*2*e.hp/e.maxhp,3,'#ff536a');
   if(e.type==='boss'){rect(e.x-5,e.y+2,10,4,'#32142b');rect(e.x-13,e.y- e.r-3,6,4,'#ffbd51');rect(e.x+7,e.y-e.r-3,6,4,'#ffbd51')}
  }
@@ -439,7 +450,7 @@ function draw(dt=0){
  rect(player.x-7,player.y-1-bob,3,4,'#9cb8d8');rect(player.x+4,player.y-1-bob,3,4,'#9cb8d8');
  const recoil=attackAnim>0?3:0;
  rect(player.x+5,player.y-1-bob,8+recoil,3,'#26344e');rect(player.x+10+recoil,player.y-2-bob,4,5,'#ffc85d');
- if(attackAnim>0){rect(player.x+14+recoil,player.y-3-bob,5,7,'#fff0a1');rect(player.x+18+recoil,player.y-1-bob,3,3,'#ff9b45')}
+ if(attackAnim>0){rect(player.x+14+recoil,player.y-3-bob,5,7,activeWeapon.id==='laser'?'#9effff':activeWeapon.id==='shotgun'?'#ffb178':'#fff0a1');rect(player.x+18+recoil,player.y-1-bob,3,3,activeWeapon.id==='laser'?'#48eaff':'#ff9b45');if(activeWeapon.id==='laser'){rect(player.x+20+recoil,player.y,8,1,'#9effff');}else if(activeWeapon.id==='shotgun'){rect(player.x+19+recoil,player.y-4,4,2,'#ffdfb0');}}
  // Brief invulnerability shimmer; never hides the player.
  if(player.inv>0){rect(player.x-9,player.y-10-bob,18,1,'#9beaff');rect(player.x-9,player.y+10-bob,18,1,'#9beaff')}
  if(screenFlash>0){ctx.fillStyle=`rgba(255,55,80,${Math.min(.18,screenFlash)})`;ctx.fillRect(0,0,W,H)}
@@ -474,7 +485,7 @@ function tone(freq,dur,type='square',vol=.15,when=0, destination=sfxGain){
 }
 function sfx(name){
  if(!audioCtx||!audioOn)return;
- if(name==='shot'){tone(180,.045,'square',.08);tone(90,.06,'triangle',.07,.015)}
+ if(name==='shot'){if(activeWeapon?.id==='shotgun'){tone(115,.09,'sawtooth',.12);tone(62,.12,'triangle',.09,.015);tone(900,.025,'square',.04)}else if(activeWeapon?.id==='rifle'){tone(250,.025,'square',.065);tone(125,.045,'sawtooth',.055,.012)}else if(activeWeapon?.id==='laser'){tone(920,.09,'sawtooth',.085);tone(420,.14,'sine',.08,.015);tone(1500,.045,'triangle',.04,.025)}else{tone(185,.04,'square',.07);tone(92,.055,'triangle',.055,.012)}}
  if(name==='hit'){tone(105,.09,'sawtooth',.11);tone(62,.12,'square',.07,.02)}
  if(name==='coin'){tone(880,.07,'square',.11);tone(1320,.1,'square',.09,.07)}
  if(name==='level'){[523,659,784,1047].forEach((f,i)=>tone(f,.16,'square',.12,i*.075))}

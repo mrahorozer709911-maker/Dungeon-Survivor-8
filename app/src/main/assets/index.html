@@ -177,7 +177,11 @@ const ARTIFACTS=[
  {id:'vampire',name:'Клык ночи',desc:'Иногда восстанавливает здоровье',color:'#ff5d9e'},
  {id:'guardian',name:'Печать стража',desc:'+1 броня на этот забег',color:'#a8c7ff'},
  {id:'storm',name:'Сердце бури',desc:'Критические удары',color:'#e7f5ff'},
- {id:'void',name:'Око Бездны',desc:'Пули пробивают врагов',color:'#c8a4ff'}
+ {id:'void',name:'Око Бездны',desc:'Пули пробивают врагов',color:'#c8a4ff'},
+ {id:'plague',name:'Чумное ядро',desc:'Попадания отравляют цель на 3 секунды',color:'#a6ff61'},
+ {id:'thunder',name:'Громовой конденсатор',desc:'Попадания иногда поражают соседних врагов цепной молнией',color:'#7cecff'},
+ {id:'gravity',name:'Сингулярность',desc:'Попадания сильно замедляют врагов',color:'#b78aff'},
+ {id:'phoenix',name:'Пепел феникса',desc:'Один раз за забег спасает от смертельного удара',color:'#ff9d48'}
 ];
 function makeRoomProps(){
  ambient=Array.from({length:90},()=>({x:rand(8,W-8),y:rand(35,H-8),phase:rand(0,6.28),speed:rand(5,16),size:Math.random()<.7?1:2}));
@@ -352,6 +356,7 @@ function update(dt){
  if(dashTime>0){dx=dashDir.x;dy=dashDir.y;mag=1;}player.x=clamp(player.x+dx*player.speed*(dashTime>0?3.2:1)*dt,12,W-12);player.y=clamp(player.y+dy*player.speed*(dashTime>0?3.2:1)*dt,35,H-15);
  if(shoot<=0){let e=nearest();if(e&&Math.hypot(e.x-player.x,e.y-player.y)<340){shootAt(e);shoot=player.fireRate*(streakTimer>0?.75:1);attackAnim=.08}}attackAnim=Math.max(0,attackAnim-dt);
  for(let e of enemies){
+  if(e.poison>0){e.poison-=dt;e.poisonTick=(e.poisonTick||0)-dt;if(e.poisonTick<=0){e.poisonTick=.55;e.hp-=Math.max(.5,player.damage*.28);particle(e.x,e.y,'#a6ff61',2);if(e.hp<=0){killEnemy(e);continue}}}
   let vx=player.x-e.x,vy=player.y-e.y,d=Math.hypot(vx,vy)||1;
   if(e.type==='boss'){e.x+=Math.sin(runTime*1.5)*e.speed*.45*dt;e.y+=Math.sign(player.y-e.y)*e.speed*.3*dt;if(boss){boss.x=e.x;boss.y=e.y;boss.hp=e.hp;}}
   else{
@@ -363,9 +368,9 @@ function update(dt){
     if(e.windup>0){particle(e.x,e.y,'#ff8c59',1)}else if(e.attack>1.75){e.x+=e.chargeX*e.speed*3.2*dt;e.y+=e.chargeY*e.speed*3.2*dt}else{e.x+=vx/d*e.speed*dt;e.y+=vy/d*e.speed*dt}
    }else{e.x+=vx/d*e.speed*dt;e.y+=vy/d*e.speed*dt}
   }
-  if(d<e.r+player.r&&player.inv<=0){const taken=Math.max(.5,1-armor*.25);player.hp-=taken;damageNumbers.push({x:player.x+rand(-5,5),y:player.y-18,v:rand(24,38),value:Math.ceil(taken),life:.9,maxLife:.9,color:'#ff5266'});player.inv=.9;shake=7;screenFlash=.16;particle(player.x,player.y,'#ff5266',12);particle(player.x,player.y,'#fff0d2',4);if(player.hp<=0){updateHud();endGame();return}}
+  if(d<e.r+player.r&&player.inv<=0){if(artifact==='phoenix'&&!player.phoenixUsed&&player.hp<=1){player.phoenixUsed=true;player.hp=Math.min(player.maxhp,2);player.inv=2;particle(player.x,player.y,'#ff9d48',28);toast('ПЕПЕЛ ФЕНИКСА СПАС ТЕБЯ!');continue}const taken=Math.max(.5,1-armor*.25);player.hp-=taken;damageNumbers.push({x:player.x+rand(-5,5),y:player.y-18,v:rand(24,38),value:Math.ceil(taken),life:.9,maxLife:.9,color:'#ff5266'});player.inv=.9;shake=7;screenFlash=.16;particle(player.x,player.y,'#ff5266',12);particle(player.x,player.y,'#fff0d2',4);if(player.hp<=0){updateHud();endGame();return}}
  }
- for(let b of bullets){b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;for(let e of enemies){if(e.hp>0&&Math.hypot(e.x-b.x,e.y-b.y)<e.r+b.r){let dmg=b.damage*(artifact==='ember'?1.12:1);e.hp-=dmg;if(b.critical){for(let k=0;k<18;k++){const a=Math.random()*Math.PI*2,sp=rand(30,145);particles.push({x:e.x,y:e.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:rand(.22,.65),color:k%3===0?'#ffb4b4':k%3===1?'#d91f3d':'#8f102b'});}bloodStains.push({x:e.x,y:e.y,r:rand(9,16),life:14,maxLife:14,seed:Math.random()});shake=Math.max(shake,5);}damageNumbers.push({x:e.x+rand(-4,4),y:e.y-e.r-4,v:rand(20,34),value:Math.ceil(dmg),life:.8,maxLife:.8,color:b.damage>player.damage?'#ffe16b':'#ffffff'});if(artifact==='frost')e.speed=Math.max(8,e.speed*.94);if(e.type==='boss'&&boss){boss.hp=e.hp;boss.x=e.x;boss.y=e.y;}b.pierce=b.pierce||0;particle(b.x,b.y,b.color||'#ffe06a',3);if(b.pierce>0){b.pierce--;b.damage*=.82}else b.life=0;if(e.hp<=0)killEnemy(e);else{particle(e.x,e.y,'#fff0a6',2);screenFlash=Math.max(screenFlash,.025)}break}}}
+ for(let b of bullets){b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;for(let e of enemies){if(e.hp>0&&Math.hypot(e.x-b.x,e.y-b.y)<e.r+b.r){let dmg=b.damage*(artifact==='ember'?1.12:1);e.hp-=dmg;if(b.critical){for(let k=0;k<18;k++){const a=Math.random()*Math.PI*2,sp=rand(30,145);particles.push({x:e.x,y:e.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:rand(.22,.65),color:k%3===0?'#ffb4b4':k%3===1?'#d91f3d':'#8f102b'});}bloodStains.push({x:e.x,y:e.y,r:rand(9,16),life:14,maxLife:14,seed:Math.random()});shake=Math.max(shake,5);}damageNumbers.push({x:e.x+rand(-4,4),y:e.y-e.r-4,v:rand(20,34),value:Math.ceil(dmg),life:.8,maxLife:.8,color:b.damage>player.damage?'#ffe16b':'#ffffff'});if(artifact==='frost')e.speed=Math.max(8,e.speed*.94);if(artifact==='gravity')e.speed=Math.max(7,e.speed*.72);if(artifact==='plague')e.poison=3;if(artifact==='thunder'&&Math.random()<.22){for(const other of enemies){if(other!==e&&other.hp>0&&Math.hypot(other.x-e.x,other.y-e.y)<78){other.hp-=Math.max(2,player.damage*2);particle(other.x,other.y,'#7cecff',7);if(other.hp<=0)killEnemy(other);break}}}if(e.type==='boss'&&boss){boss.hp=e.hp;boss.x=e.x;boss.y=e.y;}b.pierce=b.pierce||0;particle(b.x,b.y,b.color||'#ffe06a',3);if(b.pierce>0){b.pierce--;b.damage*=.82}else b.life=0;if(e.hp<=0)killEnemy(e);else{particle(e.x,e.y,'#fff0a6',2);screenFlash=Math.max(screenFlash,.025)}break}}}
  bullets=bullets.filter(b=>b.life>0&&b.x>-10&&b.x<W+10&&b.y>-10&&b.y<H+10);
  for(let b of ebullets){b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;if(Math.hypot(b.x-player.x,b.y-player.y)<player.r+b.r&&player.inv<=0){const taken=Math.max(.5,1-armor*.25);player.hp-=taken;damageNumbers.push({x:player.x+rand(-5,5),y:player.y-18,v:rand(24,38),value:Math.ceil(taken),life:.9,maxLife:.9,color:'#ff5266'});player.inv=.9;b.life=0;shake=7;screenFlash=.16;particle(player.x,player.y,'#ff5266',10);if(player.hp<=0){endGame();return}}}
  ebullets=ebullets.filter(b=>b.life>0&&b.x>-20&&b.x<W+20&&b.y>-20&&b.y<H+20);

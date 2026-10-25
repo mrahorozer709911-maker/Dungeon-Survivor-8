@@ -495,7 +495,8 @@ function draw(dt=0){
  // Minimap removed for continuous survival arena.
  // Enemy death animation: brief squash, fade and outward blood flecks.
  for(const d of deathFx){const t=1-d.life/d.maxLife;ctx.globalAlpha=Math.max(0,d.life/d.maxLife);ctx.fillStyle=d.color;ctx.beginPath();ctx.ellipse(d.x,d.y,d.r*(.45+t*1.1),Math.max(2,d.r*(.7-t*.4)),0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
- // Animated player sprite: shadow, two-frame legs, outline, armor highlights, weapon recoil and dash afterimages.
+ // Animated player sprite: scaled up slightly and layered with extra armor details.
+ ctx.save();ctx.translate(player.x,player.y);ctx.scale(1.2,1.2);ctx.translate(-player.x,-player.y);
  const moving=Math.hypot(joy.x,joy.y)>.08||keys.ArrowLeft||keys.ArrowRight||keys.ArrowUp||keys.ArrowDown||keys.a||keys.d||keys.w||keys.s;
  const leg=Math.sin(walkFrame)* (moving?3:0.8), bob=Math.abs(Math.sin(walkFrame))*(moving?1.5:.4);
  ctx.fillStyle='#03060dbb';ctx.beginPath();ctx.ellipse(player.x+1,player.y+10,10,4,0,0,Math.PI*2);ctx.fill();rect(player.x-6,player.y-3,14,15,'#090e19');rect(player.x-7,player.y+7,14,4,'#050711aa');
@@ -510,11 +511,15 @@ function draw(dt=0){
  rect(player.x-7,player.y-7-bob,14,14,'#0a101c');
  const skin=SKINS.find(sk=>sk.id===meta.equippedSkins?.[activeHero.id]);if(skin&&skin.rarity==='legendary'){ctx.globalAlpha=.25+.12*Math.sin(runTime*5);ctx.fillStyle=skin.color;ctx.beginPath();ctx.arc(player.x,player.y,15+Math.sin(runTime*4)*2,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}rect(player.x-5,player.y-6-bob+3,10,12,'#0a101c');rect(player.x-5,player.y-6-bob,10,12,skin?.color||activeHero.color||'#e5a56d');
  rect(player.x-4,player.y-5-bob,8,3,'#f5d1a1');
- rect(player.x-4,player.y-1-bob,8,4,'#25344f');
+ // Helmet rim, faceplate, segmented chest armor and shoulder plates add readable pixel detail.
+ rect(player.x-5,player.y-7-bob,10,2,'#d7e8f5');rect(player.x-3,player.y-6-bob,6,1,'#fff4cf');
+ rect(player.x-4,player.y-2-bob,8,3,'#25344f');rect(player.x-3,player.y-1-bob,6,1,skin?.color||'#e5a56d');
+ rect(player.x-3,player.y+2-bob,6,2,'#627fa5');rect(player.x-2,player.y+2-bob,4,1,'#c8e6f6');
+ rect(player.x-3,player.y+5-bob,2,3,'#9cb8d8');rect(player.x+1,player.y+5-bob,2,3,'#9cb8d8');
  rect(player.x-3,player.y-4-bob,2,2,'#f8ffff');rect(player.x+2,player.y-4-bob,2,2,'#f8ffff');
  rect(player.x-4,player.y-4-bob,1,1,'#18243b');rect(player.x+3,player.y-4-bob,1,1,'#18243b');
  // shoulder armor and animated muzzle flash
- rect(player.x-7,player.y-1-bob,3,4,'#9cb8d8');rect(player.x+4,player.y-1-bob,3,4,'#9cb8d8');
+ rect(player.x-8,player.y-1-bob,4,5,'#526b91');rect(player.x+4,player.y-1-bob,4,5,'#526b91');rect(player.x-7,player.y-1-bob,3,3,'#c4e8ff');rect(player.x+5,player.y-1-bob,3,3,'#c4e8ff');
  const recoil=attackAnim>0?3:0;
  rect(player.x+5,player.y-1-bob,8+recoil,3,'#26344e');rect(player.x+10+recoil,player.y-2-bob,4,5,'#ffc85d');
  if(attackAnim>0){rect(player.x+14+recoil,player.y-3-bob,5,7,activeWeapon.id==='laser'?'#9effff':activeWeapon.id==='shotgun'?'#ffb178':'#fff0a1');rect(player.x+18+recoil,player.y-1-bob,3,3,activeWeapon.id==='laser'?'#48eaff':'#ff9b45');if(activeWeapon.id==='laser'){rect(player.x+20+recoil,player.y,8,1,'#9effff');}else if(activeWeapon.id==='shotgun'){rect(player.x+19+recoil,player.y-4,4,2,'#ffdfb0');}}
@@ -522,6 +527,8 @@ function draw(dt=0){
  if(player.inv>0){rect(player.x-9,player.y-10-bob,18,1,'#9beaff');rect(player.x-9,player.y+10-bob,18,1,'#9beaff')}
  if(screenFlash>0){ctx.fillStyle=`rgba(255,55,80,${Math.min(.18,screenFlash)})`;ctx.fillRect(0,0,W,H)}
 
+ // End character-only scale so combat text and screen-space effects stay crisp.
+ ctx.restore();
  // Floating damage numbers with dark outlines for contrast.
  for(const n of damageNumbers){ctx.globalAlpha=Math.max(0,n.life/n.maxLife);ctx.font='bold 12px ui-monospace, monospace';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='#080b13';ctx.strokeText(String(n.value),n.x,n.y);ctx.fillStyle=n.color;ctx.fillText(String(n.value),n.x,n.y);ctx.globalAlpha=1;}
  // Extra sparks around active projectiles and particles fade smoothly.

@@ -300,7 +300,7 @@ function killEnemy(e){
  particle(e.x,e.y,e.type==='boss'?'#ff3c60':'#8dfb75',e.type==='boss'?16:7);
  bloodStains.push({x:e.x,y:e.y,r:e.type==='boss'?15:rand(5,9),life:10,maxLife:10,seed:Math.random()});
  deathFx.push({x:e.x,y:e.y,r:e.r,life:.62,maxLife:.62,color:e.type==='boss'?'#ff405e':'#9de6a0'});
- if(e.type==='boss'){boss=null;floor++;gold+=10;meta.bosses++;saveMeta();toast('БОСС ПОВЕРЖЕН! +10 МОНЕТ');loot.push({x:e.x,y:e.y,type:'chest',life:18});}
+ if(e.type==='boss'){boss=null;gold+=10;meta.bosses++;saveMeta();if(finalBoss){victory();return;}toast('БОСС ЛОКАЦИИ ПОВЕРЖЕН! +10 МОНЕТ');loot.push({x:e.x,y:e.y,type:'artifact',life:30});}
  else if(Math.random()<.11)loot.push({x:e.x,y:e.y,type:'gear',life:22});
  else if(Math.random()<.055)loot.push({x:e.x,y:e.y,type:'artifact',life:22});
  else if(Math.random()<.17)coins.push({x:e.x,y:e.y,r:5});
@@ -414,27 +414,7 @@ function draw(dt=0){
   if(e.type==='boss'){rect(e.x-5,e.y+2,10,4,'#32142b');rect(e.x-13,e.y- e.r-3,6,4,'#ffbd51');rect(e.x+7,e.y-e.r-3,6,4,'#ffbd51')}
  }
 
- // Expedition minimap: current room, explored path, secret rooms, and exit.
- ctx.save();
- const mx= W-82, my=78, mw=70, mh=88;
- rect(mx-4,my-4,mw+8,mh+8,'#050914cc');
- rect(mx-3,my-3,mw+6,mh+6,'#657a9a');
- rect(mx,my,mw,mh,'#0b1325');
- ctx.fillStyle='#1c2b46';
- for(let rr=Math.max(1,roomIndex-5);rr<=roomIndex;rr++){
-   const px=mx+10+((rr-1)%4)*15, py=my+mh-12-Math.floor((rr-1)/4)*15;
-   ctx.fillRect(px,py,9,9);
-   if(rr<roomIndex){ctx.fillStyle='#6c89ad';ctx.fillRect(px+8,py+3,7,3);ctx.fillStyle='#1c2b46';}
- }
- const cx=mx+10+((roomIndex-1)%4)*15, cy=my+mh-12-Math.floor((roomIndex-1)/4)*15;
- rect(cx,cy,9,9,'#ffc83d');
- if(roomDoorOpen)rect(cx+2,cy-5,5,4,'#8fffb2');
- if(!secretFound)rect(mx+4,my+4,5,5,'#bd8aff');
- rect(mx+mw-15,my+5,9,9,boss?'#ff4057':'#52617a');
- ctx.fillStyle='#eaf1ff';ctx.font='8px monospace';ctx.fillText('КАРТА',mx+8,my-7);
- ctx.restore();
-
-
+ // Minimap removed for continuous survival arena.
  // Enemy death animation: brief squash, fade and outward blood flecks.
  for(const d of deathFx){const t=1-d.life/d.maxLife;ctx.globalAlpha=Math.max(0,d.life/d.maxLife);ctx.fillStyle=d.color;ctx.beginPath();ctx.ellipse(d.x,d.y,d.r*(.45+t*1.1),Math.max(2,d.r*(.7-t*.4)),0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
  // Animated player sprite: shadow, two-frame legs, outline, armor highlights, weapon recoil and dash afterimages.
@@ -538,11 +518,11 @@ $('settingsClose').onclick=()=>{saveControlLayout();$('settings').style.display=
 $('layoutReset').onclick=()=>{localStorage.removeItem('ds_control_layout');applyControlLayout({});renderControlPreview()};
 let settingsReturn='menu';
 function applyControlLayout(layout){for(const id of ['stick','shootBtn','dashBtn']){const el=$(id);if(!el)continue;const p=layout[id]||{};if(p.x!=null)el.style.setProperty(id==='stick'?'--stick-x':id==='shootBtn'?'--shoot-x':'--dash-x',p.x+'px');if(p.y!=null)el.style.setProperty(id==='stick'?'--stick-y':id==='shootBtn'?'--shoot-y':'--dash-y',p.y+'px');}}
-function readControlLayout(){const o={};for(const id of ['stick','shootBtn','dashBtn']){const el=$(id),r=el.getBoundingClientRect();o[id]={x:Math.max(0,Math.round(innerWidth-r.right)),y:Math.max(0,Math.round(innerHeight-r.bottom))};}return o}
+function readControlLayout(){const o={};for(const id of ['stick','shootBtn','dashBtn']){const el=$(id),r=el.getBoundingClientRect();o[id]={x:Math.round(id==='stick'?r.left:innerWidth-r.right),y:Math.round(innerHeight-r.bottom)};}return o}
 function saveControlLayout(){try{localStorage.setItem('ds_control_layout',JSON.stringify(readControlLayout()))}catch(e){}}
 function renderControlPreview(){const preview=$('layoutPreview');const saved=JSON.parse(localStorage.getItem('ds_control_layout')||'{}');for(const el of preview.querySelectorAll('.dragControl')){const p=saved[el.dataset.control]||{};el.style.left=(p.x!=null?Math.max(8,Math.min(92,100-p.x/innerWidth*100)):({stick:16,shootBtn:84,dashBtn:75}[el.dataset.control]))+'%';el.style.top=(p.y!=null?Math.max(12,Math.min(88,100-p.y/innerHeight*100)):({stick:65,shootBtn:65,dashBtn:28}[el.dataset.control]))+'%';}}
 function openControlSettings(from){settingsReturn=from;$('menu').style.display='none';$('pause').style.display='none';$('settings').style.display='flex';renderControlPreview();}
-(function initControlSettings(){try{applyControlLayout(JSON.parse(localStorage.getItem('ds_control_layout')||'{}'))}catch(e){}const preview=$('layoutPreview');let drag=null;preview.querySelectorAll('.dragControl').forEach(el=>{el.addEventListener('pointerdown',e=>{drag={el,p:preview.getBoundingClientRect()};el.setPointerCapture(e.pointerId);e.preventDefault()});el.addEventListener('pointermove',e=>{if(!drag||drag.el!==el)return;const r=preview.getBoundingClientRect();el.style.left=Math.max(8,Math.min(92,(e.clientX-r.left)/r.width*100))+'%';el.style.top=Math.max(12,Math.min(88,(e.clientY-r.top)/r.height*100))+'%';});el.addEventListener('pointerup',()=>{if(!drag||drag.el!==el)return;const x=parseFloat(el.style.left)/100,y=parseFloat(el.style.top)/100;const id=el.dataset.control;const map={};try{Object.assign(map,JSON.parse(localStorage.getItem('ds_control_layout')||'{}'))}catch(e){}map[id]={x:Math.round((1-x)*innerWidth-45),y:Math.round((1-y)*innerHeight-27)};localStorage.setItem('ds_control_layout',JSON.stringify(map));applyControlLayout(map);drag=null});});})();
+(function initControlSettings(){try{applyControlLayout(JSON.parse(localStorage.getItem('ds_control_layout')||'{}'))}catch(e){}const preview=$('layoutPreview');let drag=null;preview.querySelectorAll('.dragControl').forEach(el=>{el.addEventListener('pointerdown',e=>{drag={el,p:preview.getBoundingClientRect()};el.setPointerCapture(e.pointerId);e.preventDefault()});el.addEventListener('pointermove',e=>{if(!drag||drag.el!==el)return;const r=preview.getBoundingClientRect();el.style.left=Math.max(8,Math.min(92,(e.clientX-r.left)/r.width*100))+'%';el.style.top=Math.max(12,Math.min(88,(e.clientY-r.top)/r.height*100))+'%';});el.addEventListener('pointerup',()=>{if(!drag||drag.el!==el)return;const x=parseFloat(el.style.left)/100,y=parseFloat(el.style.top)/100;const id=el.dataset.control;const map={};try{Object.assign(map,JSON.parse(localStorage.getItem('ds_control_layout')||'{}'))}catch(e){}map[id]={x:Math.round((id==='stick'?x*innerWidth:(1-x)*innerWidth)-45),y:Math.round((1-y)*innerHeight-27)};localStorage.setItem('ds_control_layout',JSON.stringify(map));applyControlLayout(map);drag=null});});})();
 $('armoryOpen').onclick=()=>{renderArmory();$('menu').style.display='none';$('armory').style.display='flex'};
 $('armoryBack').onclick=()=>{$('armory').style.display='none';$('menu').style.display='flex'};
 $('armoryStart').onclick=()=>{ $('armory').style.display='none';reset(); };

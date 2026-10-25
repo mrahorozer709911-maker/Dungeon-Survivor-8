@@ -526,6 +526,15 @@ function draw(dt=0){
  rect(player.x-4,player.y-4-bob,1,1,'#18243b');rect(player.x+3,player.y-4-bob,1,1,'#18243b');
  // shoulder armor and animated muzzle flash
  rect(player.x-7,player.y-1-bob,3,4,'#9cb8d8');rect(player.x+4,player.y-1-bob,3,4,'#9cb8d8');
+ // Extra layered hero armor: helmet crest, visor, chest plate, belt, gauntlets and boot shine.
+ const armorPulse=.5+.5*Math.sin(runTime*4.5);
+ rect(player.x-5,player.y-8-bob,10,3,'#657f9f');rect(player.x-4,player.y-9-bob,8,2,'#a9c9eb');rect(player.x-2,player.y-12-bob,4,4,'#ffc85d');rect(player.x-1,player.y-13-bob,2,2,'#fff0a1');
+ rect(player.x-5,player.y-3-bob,10,2,'#19283e');rect(player.x-4,player.y-3-bob,3,1,'#a8f2ff');rect(player.x+2,player.y-3-bob,3,1,'#a8f2ff');
+ rect(player.x-3,player.y-1-bob,6,4,'#3c5272');rect(player.x-2,player.y-bob,4,2,'#6d8fb4');rect(player.x-1,player.y+1-bob,2,2,armorPulse>.5?'#ffe08a':'#d8a63c');
+ rect(player.x-5,player.y+3-bob,3,2,'#91aacb');rect(player.x+2,player.y+3-bob,3,2,'#91aacb');rect(player.x-4,player.y+5-bob,2,2,'#fff0b4');rect(player.x+3,player.y+5-bob,2,2,'#fff0b4');
+ rect(player.x-5,player.y+7+leg,4,2,'#8ba6c8');rect(player.x+2,player.y+7-leg,4,2,'#8ba6c8');
+ // A tiny animated rune makes the hero silhouette easier to read at phone size.
+ ctx.save();ctx.globalAlpha=.55+.35*armorPulse;ctx.fillStyle=activeHero.color||'#66e7ff';ctx.fillRect(player.x-1,player.y+2-bob,2,2);ctx.restore();
  const recoil=attackAnim>0?3:0;
  rect(player.x+5,player.y-1-bob,8+recoil,3,'#26344e');rect(player.x+10+recoil,player.y-2-bob,4,5,'#ffc85d');
  if(attackAnim>0){rect(player.x+14+recoil,player.y-3-bob,5,7,activeWeapon.id==='laser'?'#9effff':activeWeapon.id==='shotgun'?'#ffb178':'#fff0a1');rect(player.x+18+recoil,player.y-1-bob,3,3,activeWeapon.id==='laser'?'#48eaff':'#ff9b45');if(activeWeapon.id==='laser'){rect(player.x+20+recoil,player.y,8,1,'#9effff');}else if(activeWeapon.id==='shotgun'){rect(player.x+19+recoil,player.y-4,4,2,'#ffdfb0');}}

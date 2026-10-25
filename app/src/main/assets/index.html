@@ -207,7 +207,7 @@ function saveRun(){
  if(state!=='play'&&state!=='upgrade')return;
  try{
   const snap={v:1,chosenHero,chosenWeapon,player:{x:player.x,y:player.y,hp:player.hp,maxhp:player.maxhp,speed:player.speed,damage:player.damage,fireRate:player.fireRate},
-   runTime,level,xp,xpNeed,gold,kills,floor,roomIndex,roomKills,roomGoal,secretFound,roomDoorOpen,armor,artifact,upgrades,weapon,
+   runTime,level,xp,xpNeed,gold,kills,floor,roomIndex,roomKills,roomGoal,secretFound,roomDoorOpen,armor,artifact,upgrades,weapon,critChance,pierce,orbitTimer,
    dashCooldown,activeHeroId:activeHero.id,activeWeaponId:activeWeapon.id};
   localStorage.setItem('ds_run7',JSON.stringify(snap));
   const b=$('continueRun');if(b)b.style.display='block';
@@ -223,7 +223,7 @@ function resumeRun(){
  player={...snap.player,r:8,inv:1};
  runTime=snap.runTime||0;level=snap.level||1;xp=snap.xp||0;xpNeed=snap.xpNeed||6;gold=snap.gold||0;kills=snap.kills||0;floor=snap.floor||1;
  roomIndex=snap.roomIndex||1;roomKills=snap.roomKills||0;roomGoal=snap.roomGoal||6;secretFound=!!snap.secretFound;roomDoorOpen=!!snap.roomDoorOpen;
- armor=snap.armor||0;artifact=snap.artifact||null;upgrades=snap.upgrades||{damage:1,rate:1,speed:1,maxhp:3,magnet:1};weapon=snap.weapon||activeWeapon.name;
+ armor=snap.armor||0;artifact=snap.artifact||null;critChance=snap.critChance||.08;pierce=snap.pierce||0;orbitTimer=snap.orbitTimer||0;upgrades=snap.upgrades||{damage:1,rate:1,speed:1,maxhp:3,magnet:1};weapon=snap.weapon||activeWeapon.name;
  enemies=[];bullets=[];ebullets=[];coins=[];particles=[];loot=[];boss=null;spawn=.7;shoot=0;dashCooldown=snap.dashCooldown||0;dashTime=0;dashRequested=false;checkpointTimer=0;
  makeRoomProps();updateHud();
  $('menu').style.display='none';$('armory').style.display='none';$('pause').style.display='none';$('shop').style.display='none';$('quests').style.display='none';$('upgrade').style.display='none';$('end').style.display='none';$('hud').style.display='block';$('stick').style.display='block';
@@ -302,7 +302,7 @@ function endGame(){
  meta.coins+=gold;meta.best=Math.max(meta.best,kills);saveMeta();
 }
 function update(dt){
- if(state!=='play')return;runTime+=dt;checkpointTimer+=dt;if(checkpointTimer>=5){checkpointTimer=0;saveRun()}streakTimer=Math.max(0,streakTimer-dt);if(streakTimer<=0)killStreak=0;if(streakTimer>0)player.fireRate=Math.max(.12,activeWeapon.rate*.75);player.inv=Math.max(0,player.inv-dt);dashCooldown=Math.max(0,dashCooldown-dt);dashTime=Math.max(0,dashTime-dt);spawn-=dt;shoot-=dt;
+ if(state!=='play')return;runTime+=dt;checkpointTimer+=dt;if(checkpointTimer>=5){checkpointTimer=0;saveRun()}streakTimer=Math.max(0,streakTimer-dt);if(streakTimer<=0)killStreak=0;player.inv=Math.max(0,player.inv-dt);dashCooldown=Math.max(0,dashCooldown-dt);dashTime=Math.max(0,dashTime-dt);spawn-=dt;shoot-=dt;
  if(dashRequested&&dashCooldown<=0){let mx=joy.x,my=joy.y;if(keys.ArrowLeft||keys.a)mx-=1;if(keys.ArrowRight||keys.d)mx+=1;if(keys.ArrowUp||keys.w)my-=1;if(keys.ArrowDown||keys.s)my+=1;let mm=Math.hypot(mx,my);if(mm>.1)dashDir={x:mx/mm,y:my/mm};dashTime=.18;dashCooldown=2.6;player.inv=Math.max(player.inv,.38);particle(player.x,player.y,'#c38aff',16);particle(player.x-dashDir.x*8,player.y-dashDir.y*8,'#8cecff',7);sfx('dash');}dashRequested=false;
  if(spawn<=0){addEnemy();spawn=Math.max(.27,1.1-floor*.045);}
  if(runTime>0&&Math.floor(runTime/35)+1>floor&&!boss){floor=Math.floor(runTime/35)+1;spawnBoss()}
@@ -319,7 +319,7 @@ function update(dt){
  if(keys.ArrowLeft||keys.a)dx-=1;if(keys.ArrowRight||keys.d)dx+=1;if(keys.ArrowUp||keys.w)dy-=1;if(keys.ArrowDown||keys.s)dy+=1;
  let mag=Math.hypot(dx,dy);if(mag>1){dx/=mag;dy/=mag}
  if(dashTime>0){dx=dashDir.x;dy=dashDir.y;mag=1;}player.x=clamp(player.x+dx*player.speed*(dashTime>0?3.2:1)*dt,12,W-12);player.y=clamp(player.y+dy*player.speed*(dashTime>0?3.2:1)*dt,35,H-15);
- if(shoot<=0){let e=nearest();if(e&&Math.hypot(e.x-player.x,e.y-player.y)<270){shootAt(e);shoot=player.fireRate;attackAnim=.08}}attackAnim=Math.max(0,attackAnim-dt);
+ if(shoot<=0){let e=nearest();if(e&&Math.hypot(e.x-player.x,e.y-player.y)<270){shootAt(e);shoot=player.fireRate*(streakTimer>0?.75:1);attackAnim=.08}}attackAnim=Math.max(0,attackAnim-dt);
  for(let e of enemies){
   let vx=player.x-e.x,vy=player.y-e.y,d=Math.hypot(vx,vy)||1;
   if(e.type==='boss'){e.x+=Math.sin(runTime*1.5)*e.speed*.45*dt;e.y+=Math.sign(player.y-e.y)*e.speed*.3*dt;if(boss){boss.x=e.x;boss.y=e.y;boss.hp=e.hp;}}

@@ -137,7 +137,7 @@ canvas{width:100vw;height:100dvh;object-fit:fill;image-rendering:pixelated}
 (()=>{
 const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
 ctx.imageSmoothingEnabled=false;
-const W=640,H=360;
+const W=1200,H=700,VIEW_W=640,VIEW_H=360;
 const $=id=>document.getElementById(id);
 let state='menu',player,enemies=[],bullets=[],ebullets=[],coins=[],particles=[],keys={},joy={x:0,y:0},joyActive=false;
 let bloodStains=[],deathFx=[],damageNumbers=[],manualFire=false;
@@ -377,10 +377,12 @@ function update(dt){
 function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))}
 function draw(dt=0){
  ctx.save();if(shake>0){ctx.translate(rand(-shake,shake),rand(-shake,shake));shake=Math.max(0,shake-.5)}
+ const cameraX=clamp(player.x-VIEW_W/2,0,W-VIEW_W),cameraY=clamp(player.y-VIEW_H/2,0,H-VIEW_H);
+ ctx.translate(-cameraX,-cameraY);
  const biomeColor=['#182438','#35251e','#12313a','#282044','#160f27'][Math.min(4,landscapePhase)];
  rect(0,0,W,H,biomeColor);
  // stone tile dungeon
- for(let y=0;y<H;y+=24)for(let x=0;x<W;x+=24){
+ for(let y=Math.max(0,Math.floor(cameraY/24)*24);y<Math.min(H,cameraY+VIEW_H+24);y+=24)for(let x=Math.max(0,Math.floor(cameraX/24)*24);x<Math.min(W,cameraX+VIEW_W+24);x+=24){
   let n=(Math.floor(x/24)*17+Math.floor(y/24)*31)%7;
   rect(x+1,y+1,22,22,landscapePhase===0?(n===0?'#293b52':n===1?'#213047':'#1a283d'):landscapePhase===1?(n===0?'#62402d':n===1?'#492d25':'#34231f'):landscapePhase===2?(n===0?'#24505a':n===1?'#1b414b':'#16343e'):landscapePhase===3?(n===0?'#48376a':n===1?'#352653':'#291e43'):(n===0?'#3e254f':n===1?'#2b1a3c':'#20152f'));
   rect(x+2,y+2,20,1,'#2b3a51');rect(x+2,y+21,20,1,'#0d1524');
@@ -399,7 +401,7 @@ function draw(dt=0){
  // Floating dust / magic motes animate slowly through the dungeon.
  for(const m of ambient){const yy=(m.y-runTime*m.speed% (H-40)+H-40)%(H-40)+35;const pulse=.35+.35*(Math.sin(runTime*2+m.phase)+1)/2;rect(m.x+Math.sin(runTime+m.phase)*3,yy,m.size,m.size,pulse>.55?'#9beaff':'#536d91')}
  // Soft edge vignette for more depth while keeping pixel-art crisp.
- const vg=ctx.createRadialGradient(W/2,H/2,90,W/2,H/2,390);vg.addColorStop(0,'#00000000');vg.addColorStop(1,'#02040bb8');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
+ const vg=ctx.createRadialGradient(cameraX+VIEW_W/2,cameraY+VIEW_H/2,70,cameraX+VIEW_W/2,cameraY+VIEW_H/2,390);vg.addColorStop(0,'#00000000');vg.addColorStop(1,'#02040bb8');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
  // Landscape changes are visual only; the arena remains continuous.
  for(let l of loot){ctx.save();ctx.shadowBlur=12;ctx.shadowColor=l.type==='chest'?'#ffc83d':l.type==='artifact'?'#c79aff':'#8fffe0';ctx.fillStyle='#050914';ctx.beginPath();ctx.arc(l.x,l.y,12,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle=l.type==='chest'?'#ffe9a0':l.type==='artifact'?'#ead9ff':'#c5fff0';ctx.lineWidth=2;ctx.beginPath();ctx.arc(l.x,l.y,10,0,Math.PI*2);ctx.stroke();if(l.type==='chest'){rect(l.x-8,l.y-6,16,12,'#a66a32');rect(l.x-8,l.y-6,16,4,'#ffc45b');rect(l.x-2,l.y-2,4,5,'#fff0a1')}else if(l.type==='artifact'){rect(l.x-6,l.y-7,12,14,'#8c62d9');rect(l.x-3,l.y-4,6,8,'#d9c5ff');rect(l.x-1,l.y-2,2,4,'#ffffff')}else{rect(l.x-5,l.y-5,10,10,'#8fffe0');rect(l.x-2,l.y-2,4,4,'#f4ffff')}ctx.restore();}
  for(let c of coins){const bob=Math.sin(runTime*7+c.x)*2;ctx.save();ctx.shadowColor='#ffc83d';ctx.shadowBlur=12;ctx.fillStyle='#080b13';ctx.beginPath();ctx.arc(c.x,c.y+bob,9,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle='#fff0a1';ctx.lineWidth=2;ctx.beginPath();ctx.arc(c.x,c.y+bob,7,0,Math.PI*2);ctx.stroke();rect(c.x-5,c.y-3+bob,10,7,'#7d4c13');rect(c.x-4,c.y-5+bob,8,8,'#ffca45');rect(c.x-2,c.y-3+bob,4,4,'#fff0a1');rect(c.x-1,c.y-4+bob,2,2,'#ffffff');ctx.restore();}

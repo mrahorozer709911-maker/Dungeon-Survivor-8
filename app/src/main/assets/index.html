@@ -25,7 +25,7 @@ button:active{transform:translateY(2px);filter:brightness(1.15)}
 #hud{position:absolute;inset:0;pointer-events:none;z-index:2;display:none}
 .hudtop{position:absolute;top:max(10px,env(safe-area-inset-top));left:12px;right:12px;display:flex;justify-content:space-between;align-items:flex-start;text-shadow:2px 2px #000;font-weight:bold;font-size:13px}
 .hudbox{background:#07101dcc;border:2px solid #415675;padding:7px 9px;min-width:90px}
-#hp{color:#ff586b;font-size:16px;letter-spacing:2px}
+#hp{color:#fff;font-size:12px;letter-spacing:0;min-width:48px}.hp-line{display:flex;align-items:center;gap:6px;white-space:nowrap}.hp-track{height:8px;width:min(26vw,180px);background:#291521;border:1px solid #8e4559;overflow:hidden;margin-top:4px}.hp-fill{height:100%;width:100%;background:linear-gradient(90deg,#e8344e,#ff8c6c);transition:width .15s}
 #xpOuter{height:7px;background:#111c30;border:1px solid #62738f;margin-top:5px;width:min(42vw,220px)}
 #xp{height:100%;width:0;background:#63e6ff}
 #bossbar{display:none;position:absolute;top:56px;left:20%;width:60%;height:10px;background:#270f22;border:2px solid #ff7080}
@@ -126,7 +126,7 @@ button{min-height:42px;font-size:clamp(12px,3.2vw,14px);padding:11px 12px}
 <div id="wrap"><canvas id="game" width="640" height="360" aria-label="Игровое поле"></canvas></div>
 <div id="hud">
  <div class="hudtop">
-  <div class="hudbox"><div id="hp">♥ ♥ ♥</div><div id="coins">◉ 0</div><div id="xpOuter"><div id="xp"></div></div></div>
+  <div class="hudbox"><div class="hp-line"><span>HP</span><div class="hp-track"><div id="hpFill" class="hp-fill"></div></div><span id="hp">30/30</span></div><div id="coins">◉ 0</div><div id="xpOuter"><div id="xp"></div></div></div>
   <div class="hudbox" style="text-align:right"><div id="stage">ЭТАЖ 1</div><div id="biome">КАТАКОМБЫ</div><div id="kills">УБИЙСТВА: 0</div><div id="weapon">ПИСТОЛЕТ</div><div id="heroName">РАЗВЕДЧИК</div></div>
  </div>
  <div id="bossbar"><div id="bossfill"></div></div>
@@ -314,7 +314,7 @@ function reset(){
  updateHud();state='play';$('menu').style.display='none';$('armory').style.display='none';$('pause').style.display='none';$('shop').style.display='none';$('quests').style.display='none';$('upgrade').style.display='none';$('end').style.display='none';$('hud').style.display='block';$('stick').style.display='block';joy={x:0,y:0};joyActive=false;knob.style.left='32px';knob.style.top='32px';
 }
 function updateHud(){
- $('hp').textContent='♥ '.repeat(Math.max(0,player?.hp||0))+'♡ '.repeat(Math.max(0,(player?.maxhp||3)-(player?.hp||0)));
+ const hpNow=Math.max(0,Math.ceil((player?.hp||0)*10)),hpMax=Math.max(10,Math.ceil((player?.maxhp||3)*10));$('hp').textContent=hpNow+'/'+hpMax;const hpFill=$('hpFill');if(hpFill){hpFill.style.width=clamp(hpNow/hpMax*100,0,100)+'%';hpFill.style.background=hpNow/hpMax<.25?'linear-gradient(90deg,#9d1834,#ff536a)':hpNow/hpMax<.55?'linear-gradient(90deg,#c77728,#ffd15c)':'linear-gradient(90deg,#e8344e,#ff8c6c)'}
  $('coins').textContent='◉ '+gold;$('stage').textContent='ВЫЖИВАНИЕ '+Math.floor(runTime/60)+':'+String(Math.floor(runTime%60)).padStart(2,'0');$('kills').textContent='УБИЙСТВА: '+kills;$('weapon').textContent=weapon;
  $('biome').textContent=['ЗАБРОШЕННЫЕ РУИНЫ','ПЕПЕЛЬНЫЕ ПУСТОШИ','ЗАТОПЛЕННЫЙ ХРАМ','КРИСТАЛЬНАЯ БУРЯ','ЦАРСТВО БЕЗДНЫ'][Math.min(4,landscapePhase)];
  $('heroName').textContent=(activeHero?.name||'РАЗВЕДЧИК')+(armor?' · БРОНЯ '+armor:'')+(artifact?' · '+artifact.toUpperCase():'');
@@ -329,7 +329,7 @@ function addEnemy(){
  const phase=Math.min(4,Math.floor(runTime/180)),scale=1+phase*.42;
  let hp=(type==='fast'?5:type==='brute'?17:type==='charger'?12:type==='spitter'?10:type==='ranged'?9:8.5)*scale*(1+phase*.30);
  const radius={fast:6,brute:11,charger:9,spitter:8,ranged:8,grunt:8}[type];
- enemies.push({id:enemyId++,x,y,r:radius,hp,maxhp:hp,speed:(type==='fast'?rand(48,66):type==='brute'?rand(18,26):type==='charger'?rand(22,30):type==='spitter'?rand(18,25):type==='ranged'?rand(20,30):rand(25,42))+phase*2.2,damage:1+phase*.18,flash:0,type,fire:rand(.8,1.8),attack:rand(.7,1.5),windup:0,chargeX:0,chargeY:0,anim:rand(0,6.28)});
+ enemies.push({id:enemyId++,x,y,r:radius,hp,maxhp:hp,speed:(type==='fast'?rand(48,66):type==='brute'?rand(18,26):type==='charger'?rand(22,30):type==='spitter'?rand(18,25):type==='ranged'?rand(20,30):rand(25,42))+phase*2.2,damage:(type==='fast'?.65:type==='brute'?1.6:type==='charger'?1.8:type==='spitter'?.7:type==='ranged'?.8:1)*(1+phase*.18),flash:0,type,fire:rand(.8,1.8),attack:rand(.7,1.5),windup:0,chargeX:0,chargeY:0,anim:rand(0,6.28)});
  }
 function spawnBoss(isFinal=false){
  finalBoss=isFinal;const phase=Math.min(5,Math.floor(runTime/180));const hp=isFinal?2050:440+phase*320;
@@ -414,7 +414,7 @@ function update(dt){
     if(e.windup>0){particle(e.x,e.y,'#ff8c59',1)}else if(e.attack>1.75){e.x+=e.chargeX*e.speed*3.2*dt;e.y+=e.chargeY*e.speed*3.2*dt}else{e.x+=vx/d*e.speed*dt;e.y+=vy/d*e.speed*dt}
    }else{e.x+=vx/d*e.speed*dt;e.y+=vy/d*e.speed*dt}
   }
-  if(d<e.r+player.r&&player.inv<=0){if(artifact==='phoenix'&&!player.phoenixUsed&&player.hp<=1){player.phoenixUsed=true;player.hp=Math.min(player.maxhp,2);player.inv=2;particle(player.x,player.y,'#ff9d48',28);toast('ПЕПЕЛ ФЕНИКСА СПАС ТЕБЯ!');continue}const taken=Math.max(.5,1-armor*.25);player.hp-=taken;damageNumbers.push({x:player.x+rand(-5,5),y:player.y-18,v:rand(24,38),value:Math.ceil(taken),life:.9,maxLife:.9,color:'#ff5266'});player.inv=.9;shake=7;screenFlash=.16;particle(player.x,player.y,'#ff5266',12);particle(player.x,player.y,'#fff0d2',4);if(player.hp<=0){updateHud();endGame();return}}
+  if(d<e.r+player.r&&player.inv<=0){if(artifact==='phoenix'&&!player.phoenixUsed&&player.hp<=1){player.phoenixUsed=true;player.hp=Math.min(player.maxhp,2);player.inv=2;particle(player.x,player.y,'#ff9d48',28);toast('ПЕПЕЛ ФЕНИКСА СПАС ТЕБЯ!');continue}const dmgScale={fast:.65,grunt:1,ranged:.8,spitter:.7,brute:1.6,charger:1.8,boss:2.5};const taken=Math.max(.35,(dmgScale[e.type]||1)*(e.damage||1)*(1-armor*.25));player.hp-=taken;damageNumbers.push({x:player.x+rand(-5,5),y:player.y-18,v:rand(24,38),value:Math.ceil(taken*10)+' HP',life:.9,maxLife:.9,color:'#ff5266'});player.inv=.9;shake=7;screenFlash=.16;particle(player.x,player.y,'#ff5266',12);particle(player.x,player.y,'#fff0d2',4);if(player.hp<=0){updateHud();endGame();return}}
  }
  for(let b of bullets){b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;for(let e of enemies){if(!e.adminDummy&&e.hp>0&&Math.hypot(e.x-b.x,e.y-b.y)<e.r+b.r){let dmg=b.damage*(artifact==='ember'?1.12:1);e.hp-=dmg;if(b.area){for(const other of enemies){if(!other.adminDummy&&other!==e&&other.hp>0&&Math.hypot(other.x-e.x,other.y-e.y)<b.area){other.hp-=dmg*.55;particle(other.x,other.y,'#ffb77b',3);if(other.hp<=0)killEnemy(other)}}}if(b.type==='bolt'){e.stun=Math.max(e.stun||0,.22);for(let k=0;k<6;k++)particle(e.x,e.y,'#d7b78c',1)}if(b.critical){for(let k=0;k<18;k++){const a=Math.random()*Math.PI*2,sp=rand(30,145);particles.push({x:e.x,y:e.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:rand(.22,.65),color:k%3===0?'#ffb4b4':k%3===1?'#d91f3d':'#8f102b'});}bloodStains.push({x:e.x,y:e.y,r:rand(9,16),life:14,maxLife:14,seed:Math.random()});shake=Math.max(shake,5);}damageNumbers.push({x:e.x+rand(-4,4),y:e.y-e.r-4,v:rand(20,34),value:Math.ceil(dmg),life:.8,maxLife:.8,color:b.damage>player.damage?'#ffe16b':'#ffffff'});if(artifact==='frost')e.speed=Math.max(8,e.speed*.94);if(artifact==='gravity')e.speed=Math.max(7,e.speed*.72);if(artifact==='plague')e.poison=3;if(artifact==='thunder'&&Math.random()<.22){for(const other of enemies){if(!other.adminDummy&&other!==e&&other.hp>0&&Math.hypot(other.x-e.x,other.y-e.y)<78){other.hp-=Math.max(2,player.damage*2);particle(other.x,other.y,'#7cecff',7);if(other.hp<=0)killEnemy(other);break}}}if(e.type==='boss'&&boss){boss.hp=e.hp;boss.x=e.x;boss.y=e.y;}b.pierce=b.pierce||0;particle(b.x,b.y,b.color||'#ffe06a',3);if(b.pierce>0){b.pierce--;b.damage*=.82}else b.life=0;if(!e.adminDummy&&e.hp<=0)killEnemy(e);else{particle(e.x,e.y,'#fff0a6',2);screenFlash=Math.max(screenFlash,.025)}break}}}
  bullets=bullets.filter(b=>b.life>0&&b.x>-10&&b.x<W+10&&b.y>-10&&b.y<H+10);
@@ -477,7 +477,7 @@ function draw(dt=0){
   const eyeY=e.y-2+bob+(e.windup>0?1:0);rect(e.x-e.r+2,eyeY,3,3,'#f6f5d0');rect(e.x+e.r-5,eyeY,3,3,'#f6f5d0');rect(e.x-e.r+3,e.y+3+bob,e.r*2-6,2,'#173026');
   if(e.type==='charger'){rect(e.x-e.r-3,e.y-2+bob,5,3,'#ffbd79');rect(e.x+e.r-2,e.y-2+bob,5,3,'#ffbd79')}
   if(e.type==='spitter'){rect(e.x-2,e.y+2+bob,4,4,'#d9ff8b');}
-  rect(e.x-e.r,e.y-e.r-5,e.r*2,3,'#391b2c');rect(e.x-e.r,e.y-e.r-5,e.r*2*e.hp/e.maxhp,3,'#ff536a');
+  rect(e.x-e.r,e.y-e.r-5,e.r*2,3,'#391b2c');rect(e.x-e.r,e.y-e.r-5,e.r*2*clamp(e.hp/e.maxhp,0,1),3,'#ff536a');ctx.save();ctx.font='7px monospace';ctx.textAlign='center';ctx.fillStyle='#fff';ctx.shadowColor='#000';ctx.shadowBlur=2;ctx.fillText((e.adminDummy?'∞':Math.max(0,Math.ceil(e.hp*10)))+' HP',e.x,e.y-e.r-8);ctx.restore();
   if(e.type==='boss'){rect(e.x-5,e.y+2,10,4,'#32142b');rect(e.x-13,e.y- e.r-3,6,4,'#ffbd51');rect(e.x+7,e.y-e.r-3,6,4,'#ffbd51')}if(e.adminDummy){ctx.save();ctx.font='bold 9px monospace';ctx.textAlign='center';ctx.fillStyle='#e6c7ff';ctx.shadowColor='#9c5bff';ctx.shadowBlur=5;ctx.fillText(({grunt:'ОБЫЧНЫЙ',fast:'БЫСТРЫЙ',ranged:'СТРЕЛОК',brute:'ТЯЖЁЛЫЙ',charger:'РЫВОК',spitter:'ЯДОВИТЫЙ',boss:'БОСС'})[e.type]||e.type,e.x,e.y+e.r+13);ctx.fillStyle='#d9a8ff';ctx.fillText('∞ HP',e.x,e.y-e.r-9);ctx.restore();}
  }
 

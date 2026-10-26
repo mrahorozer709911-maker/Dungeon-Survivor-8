@@ -707,7 +707,7 @@ function loop(t){let dt=Math.min(.033,(t-last)/1000||0);last=t;if(state!=='pause
 requestAnimationFrame(loop);
 loadMeta();
 $('start').onclick=()=>{adminArena=false;reset()};
-$('adminOpen').onclick=()=>{$('menu').style.display='none';$('adminPanel').style.display='flex'};
+if($('adminOpen'))$('adminOpen').onclick=()=>{$('menu').style.display='none';$('adminPanel').style.display='flex'};
 $('adminBack').onclick=()=>{$('adminPanel').style.display='none';$('menu').style.display='flex';renderMeta()};
 $('adminAddGold').onclick=()=>{const n=Math.max(1,Math.min(1000000,Math.floor(Number($('adminGold').value)||0)));meta.coins+=n;saveMeta();$('adminGold').value=String(n);toast('Добавлено золота: '+n);sfx('coin')};
 $('adminUnlock').onclick=()=>{meta.ownedHeroes=HEROES.map(h=>h.id);meta.ownedWeapons=WEAPONS.map(w=>w.id);meta.skins=SKINS.map(sk=>sk.id);meta.pets=PETS.map(p=>p.id);meta.weaponLevels=meta.weaponLevels||{};WEAPONS.forEach(w=>meta.weaponLevels[w.id]=Math.max(0,meta.weaponLevels[w.id]||0));if(PETS.length)meta.equippedPet=PETS[0].id;meta.skins=[...new Set([...(meta.skins||[]),...SKINS.map(x=>x.id),...WEAPON_SKINS.map(x=>x.id),...PET_SKINS.map(x=>x.id)])];saveMeta();renderArmory();toast('Всё разблокировано!');sfx('upgrade')};

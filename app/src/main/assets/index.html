@@ -395,7 +395,7 @@ function showUpgrades(){
   crossbow:[['АРБАЛЕТ · ВЗРЫВНЫЕ БОЛТЫ','Увеличивает радиус взрыва и пробитие. На 5-м уровне — апокалиптические болты.',()=>{weaponUpgrades.trait=Math.min(5,weaponUpgrades.trait+1)}]]
  };
  const weaponOpts=[
-  ['УСИЛЕННЫЙ БОЕПРИПАС','Урон текущего оружия +14%.',()=>{weaponUpgrades.power=Math.min(6,weaponUpgrades.power+1)}],
+  ['УСИЛЕННЫЙ БОЕПРИПАС','Урон текущего оружия +14%.',()=>{weaponUpgrades.power=Math.min(5,weaponUpgrades.power+1)}],
   ['БЫСТРАЯ ПЕРЕЗАРЯДКА','Текущее оружие стреляет быстрее на 6%.',()=>{weaponUpgrades.tempo=Math.min(5,weaponUpgrades.tempo+1)}],
   ...(specific[activeWeapon.id]||specific.pistol)
  ];
@@ -576,7 +576,7 @@ function draw(dt=0){
  rect(player.x-7,player.y+7,14,4,'#050711aa');
  if(dashTime>0){for(let i=1;i<=3;i++){rect(player.x-dashDir.x*i*5-4,player.y-dashDir.y*i*5-5,8,10,i===1?'#7deaff88':'#7deaff44')}}
  // Companion pet follows the hero and bobs in a small orbit.
- const pet=PETS.find(p=>p.id===meta.equippedPet);if(pet){const pa=runTime*2.2,px=player.x+Math.cos(pa)*17,py=player.y+Math.sin(pa)*10-12+Math.sin(runTime*7)*2;const pc=pet.id==='fox'?'#ff9b45':pet.id==='raven'?'#9f8bcf':pet.id==='slime'?'#82e879':pet.id==='orb'?'#bb87ff':pet.id==='drone'?'#83d9ff':'#fff0a0';ctx.fillStyle=pc;ctx.beginPath();ctx.arc(px,py,pet.id==='drone'?4:3.5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffffff';ctx.fillRect(px-1,py-1,2,2);if(pet.id==='fox'){ctx.globalAlpha=.55;ctx.fillStyle='#ff8b35';ctx.beginPath();ctx.arc(px-5,py+3,2,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}}
+ const pet=PETS.find(p=>p.id===meta.equippedPet);if(pet){const pa=runTime*2.2,px=player.x+Math.cos(pa)*17,py=player.y+Math.sin(pa)*10-12+Math.sin(runTime*7)*2;const pskin=PET_SKINS.find(sk=>sk.id===meta.equippedPetSkins?.[pet.id]);const pc=pskin?.color||pet.color|| (pet.id==='fox'?'#ff9b45':pet.id==='raven'?'#9f8bcf':pet.id==='slime'?'#82e879':pet.id==='orb'?'#bb87ff':pet.id==='drone'?'#83d9ff':'#fff0a0');ctx.fillStyle=pc;ctx.beginPath();ctx.arc(px,py,pet.id==='drone'?4:3.5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffffff';ctx.fillRect(px-1,py-1,2,2);if(pet.id==='fox'){ctx.globalAlpha=.55;ctx.fillStyle='#ff8b35';ctx.beginPath();ctx.arc(px-5,py+3,2,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}}
  // Orbiting energy drones.
  for(let oi=0;oi<orbitTimer;oi++){const ox=player.x+Math.cos(orbitAngle+oi*Math.PI*2/orbitTimer)*23,oy=player.y+Math.sin(orbitAngle+oi*Math.PI*2/orbitTimer)*23;rect(ox-5,oy-5,10,10,'#513c91');rect(ox-3,oy-3,6,6,'#d5baff');rect(ox-1,oy-1,2,2,'#ffffff')}
  // Outline and legs
@@ -589,7 +589,7 @@ function draw(dt=0){
  rect(player.x-3,player.y-4-bob,2,2,'#f8ffff');rect(player.x+2,player.y-4-bob,2,2,'#f8ffff');
  rect(player.x-4,player.y-4-bob,1,1,'#18243b');rect(player.x+3,player.y-4-bob,1,1,'#18243b');
  // shoulder armor and animated muzzle flash
- rect(player.x-7,player.y-1-bob,3,4,'#9cb8d8');rect(player.x+4,player.y-1-bob,3,4,'#9cb8d8');
+ rect(player.x-7,player.y-1-bob,3,4,'#9cb8d8');rect(player.x+4,player.y-1-bob,3,4,'#9cb8d8');rect(player.x+7,player.y+1-bob,7,3,weaponSkin?.color||'#dceaff');rect(player.x+13,player.y+1-bob,3,2,weaponSkin?.color||'#9bb4d2');
  // Extra layered hero armor: helmet crest, visor, chest plate, belt, gauntlets and boot shine.
  const armorPulse=.5+.5*Math.sin(runTime*4.5);
  rect(player.x-5,player.y-8-bob,10,3,'#657f9f');rect(player.x-4,player.y-9-bob,8,2,'#a9c9eb');rect(player.x-2,player.y-12-bob,4,4,'#ffc85d');rect(player.x-1,player.y-13-bob,2,2,'#fff0a1');

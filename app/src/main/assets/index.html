@@ -768,6 +768,8 @@ function draw(dt=0){
  for(let b of ebullets){ctx.save();const ba=Math.atan2(b.vy,b.vx),trail=Math.min(20,Math.hypot(b.vx,b.vy)*.09);ctx.globalAlpha=.7;ctx.strokeStyle='#ff4767';ctx.shadowColor='#ff315d';ctx.shadowBlur=10;ctx.lineWidth=4;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(b.x-Math.cos(ba)*trail,b.y-Math.sin(ba)*trail);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.globalAlpha=1;ctx.shadowBlur=5;ctx.fillStyle='#ff4767';ctx.beginPath();ctx.arc(b.x,b.y,4.5,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#fff0f4';ctx.beginPath();ctx.arc(b.x-1,b.y-1,1.8,0,Math.PI*2);ctx.fill();ctx.restore()}
  for(let e of enemies){
   const bob=e.adminDummy?0:Math.sin(runTime*8+(e.anim||0))*1.8+Math.sin(runTime*3+(e.anim||0))*.7;
+  // Brief pixel hit-confirmation sparks follow the existing hit timestamp; gameplay and hitboxes are unchanged.
+  const hitFlashAge=runTime-(e.hitAt||-99);if(!e.adminDummy&&hitFlashAge>=0&&hitFlashAge<.13){const hitFlashFactor=1-hitFlashAge/.13,hr=e.r+3+(1-hitFlashFactor)*5;ctx.save();ctx.globalAlpha=hitFlashFactor;ctx.imageSmoothingEnabled=false;ctx.strokeStyle='#fff6cf';ctx.lineWidth=1.5;ctx.shadowColor='#ff6b83';ctx.shadowBlur=5;ctx.beginPath();ctx.arc(e.x,e.y+bob,hr,runTime*2,runTime*2+Math.PI*1.45);ctx.stroke();ctx.shadowBlur=0;for(let hq=0;hq<4;hq++){const ha=runTime*3+hq*Math.PI/2,hx=Math.round(e.x+Math.cos(ha)*hr),hy=Math.round(e.y+bob+Math.sin(ha)*hr);ctx.fillStyle=hq%2?'#ff9eaf':'#fff6cf';ctx.fillRect(hx-1,hy-1,3,3);ctx.fillRect(hx+Math.round(Math.cos(ha)*3),hy+Math.round(Math.sin(ha)*3),2,1);}ctx.restore();}
   // Readable enemy animation cues: charge-up, ranged muzzle flashes, and stun feedback.
   if(!e.adminDummy){
    if(e.type==='charger'&&e.windup>0){

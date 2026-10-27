@@ -326,7 +326,15 @@ function applyGameIcons(){
 function safeText(v){return String(v??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]))}
 
 
-applyGameIcons();
+try {
+ applyGameIcons();
+} catch(iconError) {
+ console.error('Game icon initialization failed:', iconError);
+ const fallbackLabels={start:'▶ НОВЫЙ ЗАБЕГ',continueRun:'↻ ПРОДОЛЖИТЬ',armoryOpen:'⚔ ГЕРОИ И ОРУЖИЕ',caseShopOpen:'▣ СУНДУКИ',settingsOpen:'⚙ УПРАВЛЕНИЕ',questOpen:'★ ЗАДАНИЯ',shopOpen:'✦ АРТЕФАКТЫ',minigamesOpen:'◆ МИНИ-ИГРЫ',adminOpen:'⚒ АДМИН',how:'? КАК ИГРАТЬ'};
+ Object.entries(fallbackLabels).forEach(([id,label])=>{const el=document.getElementById(id);if(el){el.textContent=label;el.style.fontSize='11px';el.style.letterSpacing='0';}});
+ const art=document.querySelector('.menu-art');
+ if(art){const dragon=art.querySelector('.dragon'),hero=art.querySelector('.hero'),slash=art.querySelector('.slash');if(dragon)dragon.textContent='🐉';if(hero)hero.textContent='🛡️';if(slash)slash.textContent='⚔';}
+}
 
 const ARTIFACTS=[
  {id:'ember',name:'Сердце угля',desc:'Поджигает цели и взрывает горящих врагов при смерти. С дробовиком огонь перекидывается между соседями.',color:'#ff7948'},

@@ -34,7 +34,7 @@ button:active{transform:translateY(2px);filter:brightness(1.15)}
 #knob{position:absolute;width:44px;height:44px;left:32px;top:32px;border-radius:50%;background:#b7cfff88;border:2px solid #e7efff}
 #shootHint{position:absolute;right:18px;bottom:max(24px,env(safe-area-inset-bottom));padding:12px;border:2px solid #c4d6ff77;border-radius:50%;background:#0c183d99;color:#e8f2ff;font-size:11px;text-align:center}
 #dashBtn{position:absolute;right:25px;bottom:max(105px,calc(env(safe-area-inset-bottom) + 105px));width:72px;height:72px;border-radius:50%;padding:5px;margin:0;background:#39285dcc;border:2px solid #d6a5ff;color:#fff;font-size:11px;line-height:1.2;text-align:center;pointer-events:auto}#dashBtn.ready{box-shadow:0 0 12px #bd7aff88}#dashBtn.cooling{opacity:.55}
-#toast{position:absolute;top:25%;left:10%;width:80%;text-align:center;font-weight:bold;font-size:20px;color:#ffe18a;text-shadow:3px 3px #000;display:none}
+#toast{position:absolute;top:calc(env(safe-area-inset-top,0px) + 78px);left:50%;transform:translateX(-50%);width:max-content;max-width:min(82vw,520px);padding:7px 11px;border:1px solid #8ba7c7aa;border-radius:9px;background:#08101ee8;box-shadow:0 3px 12px #0008;text-align:center;font-weight:800;font-size:clamp(11px,2.7vw,14px);line-height:1.25;color:#ffe18a;text-shadow:1px 1px #000;overflow-wrap:anywhere;pointer-events:none;z-index:4;display:none}
 #choices{display:grid;grid-template-columns:1fr;gap:7px;margin:12px 0}
 .choice{font-size:13px;text-align:left;padding:12px}
 .choice b{color:#ffda69;display:block;margin-bottom:5px}
@@ -369,7 +369,7 @@ function updateHud(){
  const ds=$('dashStatus'),db=$('dashBtn');if(ds&&db){ds.textContent=dashCooldown<=0?'ГОТОВ':dashCooldown.toFixed(1)+'с';db.className=dashCooldown<=0?'ready':'cooling';}
  $('xp').style.width=(xp/xpNeed*100)+'%';$('bossbar').style.display=boss?'block':'none';if(boss)$('bossfill').style.width=(boss.hp/boss.maxhp*100)+'%';
 }
-function toast(t){if(/РЫВОК|УКЛОНИСЬ|АТАКА/i.test(t))return;$('toast').textContent=t;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',1100)}
+let toastTimer=null;function toast(t){if(/РЫВОК|УКЛОНИСЬ|АТАКА/i.test(t))return;const el=$('toast');el.textContent=t;el.style.display='block';if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.style.display='none';toastTimer=null},1450)}
 function addEnemy(){
  let side=Math.floor(rand(0,4)),x=side===0?-10:side===1?W+10:rand(0,W),y=side===2?-10:side===3?H+10:rand(0,H);
  if(Math.hypot(x-player.x,y-player.y)<145){x=x<W/2?W+10:-10;y=rand(30,H-30)}

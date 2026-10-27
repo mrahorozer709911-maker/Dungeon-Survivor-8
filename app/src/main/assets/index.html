@@ -955,18 +955,6 @@ function draw(dt=0){
    const muzzle=activeWeapon.id==='laser'?'#6ff6ff':activeWeapon.id==='railgun'?'#b8cfff':'#ffd078';ctx.fillStyle=muzzle;ctx.shadowColor=muzzle;ctx.shadowBlur=activeWeapon.id==='laser'?9:4;ctx.fillRect(player.x+14-kick,player.y-1-bobY,3,2);ctx.shadowBlur=0;
    if(activeWeapon.id==='laser'){ctx.globalAlpha=.5+.45*pulse;ctx.strokeStyle='#9dffff';ctx.shadowColor='#43efff';ctx.shadowBlur=7;ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(player.x+15-kick,player.y);ctx.lineTo(player.x+20-kick,player.y);ctx.stroke();ctx.shadowBlur=0;ctx.globalAlpha=1;}
    if(attackAnim>0){ctx.globalAlpha=Math.min(1,attackAnim*20);ctx.fillStyle=activeWeapon.id==='laser'?'#9effff':'#fff0a4';ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=10;ctx.beginPath();ctx.moveTo(player.x+16-kick,player.y-3-bobY);ctx.lineTo(player.x+22-kick,player.y-bobY);ctx.lineTo(player.x+17-kick,player.y+2-bobY);ctx.closePath();ctx.fill();ctx.shadowBlur=0;ctx.globalAlpha=1;}
-   // Draw the rifle as an independently aimed articulated layer, matching the auto-fire target angle.
-   ctx.save();ctx.translate(player.x,player.y-bobY);ctx.rotate(player.aimAngle??0);
-   const rw=activeWeapon.id==='laser'?'#72f7ff':activeWeapon.id==='railgun'?'#c5d8ff':metal;
-   ctx.fillStyle='#081321';ctx.beginPath();ctx.roundRect(1,-2.5,12,5,1.2);ctx.fill();
-   ctx.fillStyle='#263f59';ctx.fillRect(3,1,4,3);
-   ctx.fillStyle=rw;ctx.fillRect(4,-1.5,8,2);
-   ctx.fillStyle='#9ef7ff';ctx.fillRect(8,-3.5,3,1.5);
-   ctx.fillStyle='#10243a';ctx.fillRect(6,2,2,2);
-   ctx.fillStyle=rw;ctx.shadowColor=rw;ctx.shadowBlur=activeWeapon.id==='laser'?8:3;ctx.fillRect(12,-1,2.5,2);ctx.shadowBlur=0;
-   if(activeWeapon.id==='laser'){ctx.globalAlpha=.55+.35*pulse;ctx.strokeStyle='#9dffff';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(14,-.1);ctx.lineTo(18, -.1);ctx.stroke();ctx.globalAlpha=1;}
-   if(attackAnim>0){ctx.globalAlpha=Math.min(1,attackAnim*20);ctx.fillStyle=rw;ctx.shadowColor=rw;ctx.shadowBlur=10;ctx.beginPath();ctx.moveTo(14,-3);ctx.lineTo(19,0);ctx.lineTo(14,3);ctx.closePath();ctx.fill();ctx.shadowBlur=0;ctx.globalAlpha=1;}
-   ctx.restore();
    if(player.inv>0){ctx.globalAlpha=.6+.35*Math.sin(runTime*24);ctx.strokeStyle='#a3efff';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(player.x,player.y,12,15,0,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;}
    }else{
     // Detailed front/back Scout pose: silhouette, armor plates, backpack and centered rifle.

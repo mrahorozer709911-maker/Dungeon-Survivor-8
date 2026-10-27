@@ -716,7 +716,7 @@ function drawPixelActor(kind,x,y,size,frame=0,movingState=false){
  if(isHero&&heroAtlasReady){
   const idx=heroAtlasIndex[heroId];
   if(idx!==undefined){
-   const cellW=48,cellH=56,row=(frame%2),dw=Math.round(size),dh=Math.round(size*1.12);
+   const cellW=48,cellH=56,row=0,dw=Math.round(size),dh=Math.round(size*1.12);
    // Tiny squash on landing/impact and a readable lean during movement or firing.
    const movingHero=!!movingState;
    const gait=movingHero?Math.sin(runTime*18):Math.sin(runTime*2.8)*.035;
@@ -727,14 +727,10 @@ function drawPixelActor(kind,x,y,size,frame=0,movingState=false){
    ctx.rotate(lean);
    ctx.translate(0,Math.round(-lift));
    ctx.globalAlpha=1;
-   if(hurt>0){ctx.shadowColor='#ff536f';ctx.shadowBlur=10*hurt;}
+   if(hu   // This atlas has one populated row per hero. Avoid sampling the empty row.
+   // Do not use source-atop for the dash tint: it can colour the whole canvas red.
    ctx.drawImage(heroAtlas,idx*cellW,row*cellH,cellW,cellH,Math.round(-dw/2),Math.round(-dh/2),dw,Math.round(dh*(1-squash)));
-   ctx.shadowBlur=0;
-   if(hurt>0){
-    ctx.globalAlpha=.28+.45*hurt;ctx.fillStyle='#ff4b67';ctx.globalCompositeOperation='source-atop';
-    ctx.fillRect(-dw/2,-dh/2,dw,dh);ctx.globalCompositeOperation='source-over';
-   }
-   if(isAttacking){
+Attacking){
     const pulse=.5+.5*Math.sin(runTime*45);
     ctx.globalAlpha=.55+pulse*.35;ctx.strokeStyle=heroId==='tech'?'#76fff1':heroId==='phantom'?'#d6baff':'#ffe7a0';
     ctx.lineWidth=1.5;ctx.shadowColor=ctx.strokeStyle;ctx.shadowBlur=5;

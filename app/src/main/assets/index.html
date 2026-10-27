@@ -610,9 +610,36 @@ function update(dt){
    else if(hid==='scout'){player.inv=Math.max(player.inv,.95);toast('УЛЬТА РАЗВЕДЧИКА: ЗАЛП ОХОТНИКА');}
    else if(hid==='tech'){toast('УЛЬТА ТЕХНИКА: ЦЕПНАЯ МОЛНИЯ');}
    else {toast('УЛЬТА ИНЖЕНЕРА: КАТАСТРОФА');}
-   const targets=[...enemies].filter(en=>!en.adminDummy&&en.hp>0&&Math.hypot(en.x-player.x,en.y-player.y)<=radius).sort((a,b)=>Math.hypot(a.x-player.x,a.y-player.y)-Math.hypot(b.x-player.x,b.y-player.y));
-   for(let ti=0;ti<targets.length;ti++){const en=targets[ti];let mult=hid==='engineer'?5.5:hid==='tech'?3.5:hid==='tank'?2.8:hid==='scout'?3.25:hid==='phantom'?3.5:2.25;if(hid==='tech')mult*=Math.max(.55,1-ti*.12);if(hid==='scout'&&ti>=5)continue;if(hid==='medic'&&Math.hypot(en.x-player.x,en.y-player.y)>radius*.72)continue;if(boss&&en===boss)mult*=1.4;en.hp-=player.damage*mult*(1+rank*.1);if(hid==='tank')en.stun=Math.max(en.stun||0,2.4);else if(hid==='tech')en.stun=Math.max(en.stun||0,1.35);else if(hid==='medic'){}else if(hid==='phantom')en.stun=Math.max(en.stun||0,.45);particle(en.x,en.y,col,hid==='engineer'?18:hid==='tech'?13:10);if(en.hp<=0)killEnemy(en);}
-   if(hid==='engineer'){for(let q=0;q<18;q++){const a=Math.PI*2*q/18;particle(player.x+Math.cos(a)*radius*.7,player.y+Math.sin(a)*radius*.7,'#ff9a42',3);}}
+   const distToPlayer=en=>Math.hypot(en.x-player.x,en.y-player.y);
+   const targets=[...enemies].filter(en=>!en.adminDummy&&en.hp>0&&distToPlayer(en)<=radius).sort((a,b)=>distToPlayer(a)-distToPlayer(b));
+   const hurt=(en,mult,stun=0,color=col)=>{if(!en||en.hp<=0)return;en.hp-=player.damage*mult*(1+rank*.1);if(stun)en.stun=Math.max(en.stun||0,stun);particle(en.x,en.y,color,12);if(en.hp<=0)killEnemy(en);};
+   if(hid==='scout'){
+    // Precision hunt: mark up to five closest targets with golden tracer shots.
+    const marks=targets.slice(0,5);
+    for(const en of marks){deathFx.push({x:en.x,y:en.y,r:30,life:.55,maxLife:.55,color:'#ffe08a',kind:'ultScout'});hurt(en,4.4,0,'#ffe08a');}
+    toast('УЛЬТА РАЗВЕДЧИКА: ПЯТЬ МЕТКИХ ВЫСТРЕЛОВ');
+   }else if(hid==='tank'){
+    // Defensive shockwave: broad control, lower damage, strong stun and knockback.
+    for(const en of targets){hurt(en,1.7,2.5,'#b9d9ff');const dx=en.x-player.x,dy=en.y-player.y,dd=Math.max(1,Math.hypot(dx,dy));en.x+=dx/dd*48;en.y+=dy/dd*48;}
+    deathFx.push({x:player.x,y:player.y,r:radius*1.22,life:1.9,maxLife:1.9,color:'#b9d9ff',kind:'ultTank'});
+   }else if(hid==='tech'){
+    // Chain lightning jumps from the closest enemy to the next nearest targets.
+    let current=targets[0],remaining=targets.slice(1,7),chain=0;
+    while(current&&chain<7){deathFx.push({x:current.x,y:current.y,r:42,life:.7,maxLife:.7,color:'#70f4ff',kind:'ultTech'});hurt(current,Math.max(1.25,3.8-chain*.38),1.25,'#70f4ff');if(!remaining.length)break;remaining.sort((a,b)=>Math.hypot(a.x-current.x,a.y-current.y)-Math.hypot(b.x-current.x,b.y-current.y));current=remaining.shift();chain++;}
+   }else if(hid==='medic'){
+    // Medic is a support ultimate: heal and shield, no damage dealt to enemies.
+    for(const en of targets){en.stun=Math.max(en.stun||0,.75);particle(en.x,en.y,'#8dffb0',6);}
+    deathFx.push({x:player.x,y:player.y,r:radius*.75,life:1.2,maxLife:1.2,color:'#8dffb0',kind:'ultMedic'});
+   }else if(hid==='phantom'){
+    // Phase burst: short-range strike, then escape window.
+    for(const en of targets.filter(en=>distToPlayer(en)<radius*.62)){hurt(en,4.1,.65,'#c49aff');}
+    deathFx.push({x:player.x,y:player.y,r:radius*.72,life:1.15,maxLife:1.15,color:'#c49aff',kind:'ultPhantom'});
+   }else if(hid==='engineer'){
+    // Cataclysm: large-radius high damage explosion.
+    for(const en of targets){hurt(en,6.1,1.05,'#ffc56b');}
+    deathFx.push({x:player.x,y:player.y,r:radius*1.28,life:2.1,maxLife:2.1,color:'#ffc56b',kind:'ultEngineer'});
+    for(let q=0;q<32;q++){const a=Math.PI*2*q/32;particle(player.x+Math.cos(a)*radius*.78,player.y+Math.sin(a)*radius*.78,'#ff9a42',3);}
+   }
    sfx('boss');screenFlash=Math.max(screenFlash,hid==='tech'?.28:.16);
   }else if(ultRequested){toast('УЛЬТА ПЕРЕЗАРЯЖАЕТСЯ');}ultRequested=false;
  if(!adminArena&&!boss&&spawn<=0){const phaseCount=Math.min(4,Math.floor(runTime/180));const basePack=2*(1+(phaseCount>=1?1:0)+(phaseCount>=2&&Math.random()<.65?1:0)+(phaseCount>=3&&Math.random()<.35?1:0));const pack=Math.max(1,Math.round(basePack*(runTime<360?.5:1)));for(let si=0;si<pack;si++)addEnemy();spawn=Math.max(.18,(1.12-landscapePhase*.13)/(1+phaseCount*.12)*(hordeEventLeft>0?.68:1));}

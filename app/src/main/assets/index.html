@@ -276,9 +276,12 @@ const ARTIFACTS=[
  {id:'phoenix',name:'Пепел феникса',desc:'Один раз за забег спасает от смертельного удара и выпускает огненную волну.',color:'#ff9d48'}
 ];
 function makeRoomProps(){
- ambient=Array.from({length:90},()=>({x:rand(8,W-8),y:rand(35,H-8),phase:rand(0,6.28),speed:rand(5,16),size:Math.random()<.7?1:2}));
+ ambient=Array.from({length:105},()=>({x:rand(8,W-8),y:rand(35,H-8),phase:rand(0,6.28),speed:rand(5,16),size:Math.random()<.7?1:2}));
  roomProps=[];
  for(let i=0;i<18;i++){const x=28+((landscapePhase*71+i*97)%580),y=45+((landscapePhase*43+i*61)%270);if(Math.hypot(x-W/2,y-H/2)>42)roomProps.push({x,y,w:14+(i%3)*7,h:12+(i%4)*5,kind:(i+landscapePhase)%3});}
+ // Fixed, decorative-only scenery: each biome gets its own visual language.
+ const kinds=[[ 'pillar','rubble','banner','urn','rune' ],[ 'deadTree','bones','crater','emberRock','skull' ],[ 'coral','mushroom','shell','kelp','bubbleVent' ],[ 'crystal','obelisk','rune','shard','arcaneRing' ],[ 'voidRock','obelisk','rift','boneArch','voidFlower' ]][Math.min(4,landscapePhase)];
+ ambientDecor=Array.from({length:112},(_,i)=>({x:22+((i*137+landscapePhase*83)%1150),y:30+((i*89+landscapePhase*47)%635),type:kinds[(i*7+Math.floor(i/5))%kinds.length],scale:.65+(i%5)*.18,phase:(i*1.71)%6.28,rot:(i%8)*.785}));
  roomDoorOpen=false;
 }
 function showRoomToast(){
@@ -569,25 +572,60 @@ function draw(dt=0){
  ctx.translate(-cameraX,-cameraY);
  const biomeColor=['#182438','#35251e','#12313a','#282044','#160f27'][Math.min(4,landscapePhase)];
  rect(0,0,W,H,biomeColor);
- // stone tile dungeon
+ // Five distinct floor materials and biome-specific surface details.
+ const floors=[
+  ['#293b52','#213047','#182438'],['#69442e','#4b2d24','#30201d'],['#24545d','#1b414b','#102d35'],['#514077','#352653','#211a39'],['#492657','#2b1a3c','#160e25']
+ ][Math.min(4,landscapePhase)];
  for(let y=Math.max(0,Math.floor(cameraY/24)*24);y<Math.min(H,cameraY+VIEW_H+24);y+=24)for(let x=Math.max(0,Math.floor(cameraX/24)*24);x<Math.min(W,cameraX+VIEW_W+24);x+=24){
-  let n=(Math.floor(x/24)*17+Math.floor(y/24)*31)%7;
-  rect(x+1,y+1,22,22,landscapePhase===0?(n===0?'#293b52':n===1?'#213047':'#1a283d'):landscapePhase===1?(n===0?'#62402d':n===1?'#492d25':'#34231f'):landscapePhase===2?(n===0?'#24505a':n===1?'#1b414b':'#16343e'):landscapePhase===3?(n===0?'#48376a':n===1?'#352653':'#291e43'):(n===0?'#3e254f':n===1?'#2b1a3c':'#20152f'));
-  rect(x+2,y+2,20,1,'#2b3a51');rect(x+2,y+21,20,1,'#0d1524');
-  if(n===3){rect(x+7,y+8,2,2,'#314057');rect(x+14,y+15,3,2,'#111b2d')}
+  const n=(Math.floor(x/24)*17+Math.floor(y/24)*31)%7;
+  rect(x+1,y+1,22,22,n===0?floors[0]:n===1?floors[1]:floors[2]);
+  rect(x+2,y+2,20,1,landscapePhase===1?'#a46b3b':landscapePhase===2?'#39808a':landscapePhase===3?'#7560a0':'#2b3a51');rect(x+2,y+21,20,1,'#0b101d');
+  if(landscapePhase===0&&n===3){rect(x+7,y+8,2,2,'#71839a');rect(x+14,y+15,3,2,'#111b2d');}
+  if(landscapePhase===1&&n===2){ctx.strokeStyle='#ff7540';ctx.globalAlpha=.45;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x+4,y+5);ctx.lineTo(x+10,y+12);ctx.lineTo(x+8,y+19);ctx.stroke();ctx.globalAlpha=1;}
+  if(landscapePhase===2&&n===4){ctx.globalAlpha=.32;rect(x+5,y+6,13,1,'#77dfe0');rect(x+9,y+6,1,11,'#77dfe0');ctx.globalAlpha=1;}
+  if(landscapePhase===3&&n===5){ctx.strokeStyle='#a995ed';ctx.globalAlpha=.4;ctx.beginPath();ctx.moveTo(x+4,y+18);ctx.lineTo(x+12,y+4);ctx.lineTo(x+19,y+16);ctx.stroke();ctx.globalAlpha=1;}
+  if(landscapePhase===4&&n===1){ctx.globalAlpha=.5;rect(x+5,y+5,2,2,'#d35be9');rect(x+16,y+16,3,2,'#6d35a0');ctx.globalAlpha=1;}
  }
  // Blood remains on the dungeon floor for about 10 seconds.
  for(const b of bloodStains){const fade=Math.min(1,b.life/1.4);ctx.globalAlpha=.68*fade;ctx.fillStyle=b.seed>.5?'#741f35':'#9b263b';ctx.beginPath();ctx.ellipse(b.x,b.y,b.r*(1.2+b.seed*.45),b.r*.55,b.seed*2,0,Math.PI*2);ctx.fill();if(b.splatter){for(let k=0;k<8;k++){const a=k*Math.PI/4+b.seed;ctx.beginPath();ctx.ellipse(b.x+Math.cos(a)*b.r*1.05,b.y+Math.sin(a)*b.r*.6,Math.max(1,b.r*.13),Math.max(1,b.r*.34),a,0,Math.PI*2);ctx.fill();}}ctx.fillStyle='#4d1728';ctx.beginPath();ctx.ellipse(b.x-2,b.y-1,b.r*.55,b.r*.25,0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
- // Large open arena props; no doors, room markers or secret passages.
- for(const p of roomProps){const c=p.kind===0?'#34445a':p.kind===1?'#4a3c54':'#314c4f';rect(p.x-p.w/2,p.y-p.h/2,p.w,p.h,c);rect(p.x-p.w/2,p.y-p.h/2,p.w,3,'#65718a');rect(p.x-p.w/2,p.y+p.h/2-3,p.w,3,'#101827')}
- // Environmental lights shift with each three-minute biome.
+ // Scenery silhouettes are purely visual: no collision, pickups or gameplay effects.
+ for(const p of ambientDecor){
+  if(p.x<cameraX-36||p.x>cameraX+VIEW_W+36||p.y<cameraY-36||p.y>cameraY+VIEW_H+36)continue;
+  const x=p.x,y=p.y,z=p.scale,wig=Math.sin(runTime*1.6+p.phase)*2;
+  ctx.save();ctx.translate(x,y);ctx.rotate(p.rot*.08);ctx.scale(z,z);
+  if(p.type==='pillar'){rect(-7,1,14,18,'#34465b');rect(-9,-2,18,5,'#7b8795');rect(-6,4,3,12,'#172638');rect(-10,16,20,4,'#101927');}
+  else if(p.type==='rubble'||p.type==='emberRock'||p.type==='voidRock'){ctx.fillStyle=p.type==='emberRock'?'#7d3828':p.type==='voidRock'?'#392044':'#4b5967';ctx.beginPath();ctx.moveTo(-13,5);ctx.lineTo(-8,-5);ctx.lineTo(0,-8);ctx.lineTo(12,-2);ctx.lineTo(15,7);ctx.lineTo(3,11);ctx.closePath();ctx.fill();ctx.fillStyle=p.type==='emberRock'?'#ff7844':p.type==='voidRock'?'#a14ad0':'#8a9baa';ctx.fillRect(-4,-3,7,2);}
+  else if(p.type==='banner'){rect(-8,-15,2,29,'#8a6b4b');ctx.fillStyle='#b94e55';ctx.beginPath();ctx.moveTo(-6,-14);ctx.lineTo(9,-10);ctx.lineTo(5,0);ctx.lineTo(-6,-4);ctx.closePath();ctx.fill();rect(-3,-10,2,7,'#e9b96c');}
+  else if(p.type==='urn'){ctx.fillStyle='#596779';ctx.beginPath();ctx.moveTo(-5,-7);ctx.lineTo(5,-7);ctx.lineTo(8,5);ctx.lineTo(4,10);ctx.lineTo(-4,10);ctx.lineTo(-8,5);ctx.closePath();ctx.fill();rect(-7,-8,14,3,'#9ba8b6');}
+  else if(p.type==='rune'){ctx.globalAlpha=.65+.25*Math.sin(runTime*2+p.phase);ctx.strokeStyle='#91cfff';ctx.shadowColor='#64bfff';ctx.shadowBlur=8;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(0,0,8+Math.sin(runTime+p.phase),0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(0,-5);ctx.lineTo(4,3);ctx.lineTo(-4,3);ctx.closePath();ctx.stroke();}
+  else if(p.type==='deadTree'){ctx.strokeStyle='#5e4034';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(0,10);ctx.lineTo(1,-9);ctx.lineTo(-7,-16);ctx.moveTo(1,-4);ctx.lineTo(9,-12);ctx.moveTo(0,1);ctx.lineTo(-9,-4);ctx.stroke();ctx.fillStyle='#a94c32';ctx.fillRect(-2,-10,4,4);}
+  else if(p.type==='bones'||p.type==='skull'){ctx.strokeStyle='#c3b49a';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-12,0);ctx.lineTo(12,0);ctx.stroke();for(let q=-9;q<=9;q+=6){ctx.beginPath();ctx.moveTo(q,-3);ctx.lineTo(q+2,4);ctx.stroke();}if(p.type==='skull'){ctx.fillStyle='#d9c7a8';ctx.beginPath();ctx.arc(0,-6,6,0,Math.PI*2);ctx.fill();rect(-3,-7,2,3,'#31201c');rect(2,-7,2,3,'#31201c');}
+  }else if(p.type==='crater'){ctx.fillStyle='#241a1b';ctx.beginPath();ctx.ellipse(0,3,15,7,.1,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#a75a3a';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,3,11,4,.1,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=.55+.25*Math.sin(runTime*3+p.phase);ctx.fillStyle='#ff6b38';ctx.fillRect(-3,1,6,2);}
+  else if(p.type==='coral'||p.type==='kelp'){ctx.strokeStyle=p.type==='coral'?'#3e9d9b':'#398a75';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(0,10);ctx.quadraticCurveTo(wig,-1,-4,-10);ctx.moveTo(0,4);ctx.quadraticCurveTo(-wig,-2,7,-7);ctx.stroke();ctx.fillStyle='#77d9c9';ctx.fillRect(-5,-12,3,3);}
+  else if(p.type==='mushroom'){ctx.fillStyle='#6ac6b4';ctx.fillRect(-2,-2,4,10);ctx.fillStyle='#65e4db';ctx.shadowColor='#55f5e8';ctx.shadowBlur=8;ctx.beginPath();ctx.ellipse(0,-3,8,4,0,Math.PI,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#d9fff1';ctx.fillRect(-3,-5,2,2);}
+  else if(p.type==='shell'){ctx.strokeStyle='#79c7d1';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,2,8,Math.PI,Math.PI*2);ctx.stroke();for(let q=-5;q<=5;q+=5){ctx.beginPath();ctx.moveTo(q,2);ctx.lineTo(q*1.4,-5);ctx.stroke();}}
+  else if(p.type==='bubbleVent'){ctx.globalAlpha=.45+.3*Math.sin(runTime*2+p.phase);ctx.strokeStyle='#73e9f0';ctx.beginPath();ctx.arc(0,-8-Math.abs(wig),3,0,Math.PI*2);ctx.arc(5,-14-Math.abs(wig),2,0,Math.PI*2);ctx.stroke();}
+  else if(p.type==='crystal'||p.type==='shard'){ctx.fillStyle=p.type==='crystal'?'#7d70df':'#b9a5ff';ctx.shadowColor='#8c7cff';ctx.shadowBlur=10;ctx.beginPath();ctx.moveTo(0,-16);ctx.lineTo(7,-3);ctx.lineTo(4,10);ctx.lineTo(-5,8);ctx.lineTo(-7,-4);ctx.closePath();ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle='#e2dcff';ctx.beginPath();ctx.moveTo(0,-13);ctx.lineTo(1,4);ctx.stroke();}
+  else if(p.type==='obelisk'||p.type==='boneArch'){ctx.fillStyle=p.type==='obelisk'?'#4d3c77':'#a99b88';ctx.beginPath();ctx.moveTo(-8,12);ctx.lineTo(-6,-11);ctx.lineTo(0,-18);ctx.lineTo(6,-11);ctx.lineTo(8,12);ctx.closePath();ctx.fill();ctx.strokeStyle=p.type==='obelisk'?'#d2a4ff':'#e8d9b8';ctx.stroke();rect(-2,-4,4,8,p.type==='obelisk'?'#d9aaff':'#625344');}
+  else if(p.type==='arcaneRing'||p.type==='rift'||p.type==='voidFlower'){const pulse=.5+.5*Math.sin(runTime*2.4+p.phase);ctx.globalAlpha=.45+.3*pulse;ctx.strokeStyle=p.type==='rift'?'#f16bff':'#b78cff';ctx.shadowColor=ctx.strokeStyle;ctx.shadowBlur=12;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,0,8+pulse*3,13+pulse*3,runTime*.25,0,Math.PI*2);ctx.stroke();if(p.type==='voidFlower'){ctx.fillStyle='#eea8ff';ctx.fillRect(-2,-2,4,4);}}
+  ctx.restore();
+ }
+ // Warm torch light flickers in the ruins; later biomes use their own glowing sources.
  for(let x of [24,W-24])for(let y of [70,180,290]){
   const flick=Math.sin(runTime*17+x+y)*2;
   rect(x-2,y-5,4,10,'#80533b');rect(x-3,y-9-flick*.25,6,5,'#ff9e38');rect(x-5-flick*.2,y-12-flick*.3,10+flick*.4,3,'#ffcf5b');
-  rect(x-7,y-15,14,2,'#ff663b');
  }
  // Decorative crystals, mushrooms, runes and fireflies; visual only, no collision or gameplay effects.
  for(let i=0;i<34;i++){const x=18+(i*173%1160),y=28+(i*97%640),pulse=.5+.5*Math.sin(runTime*2.4+i*1.7),kind=i%4;ctx.save();ctx.globalAlpha=.28+.28*pulse;if(kind===0){ctx.fillStyle=landscapePhase===2?'#73f4e4':landscapePhase===3?'#bb8cff':'#66c7ed';ctx.beginPath();ctx.moveTo(x,y-7-pulse*2);ctx.lineTo(x+4,y);ctx.lineTo(x,y+7);ctx.lineTo(x-4,y);ctx.closePath();ctx.fill();ctx.strokeStyle='#d7ffff';ctx.stroke()}else if(kind===1){ctx.fillStyle=landscapePhase===1?'#ff7848':'#74d8a0';ctx.fillRect(x-4,y,8,2);ctx.fillRect(x-2,y-4,4,5);ctx.fillStyle='#f8f4c4';ctx.fillRect(x-1,y-3,2,2)}else if(kind===2){ctx.strokeStyle='#8fa9d4';ctx.lineWidth=1;ctx.beginPath();ctx.arc(x,y,5+pulse*2,runTime+i,runTime+i+Math.PI*1.4);ctx.stroke();ctx.fillStyle='#b5d9ff';ctx.fillRect(x-1,y-1,2,2)}else{ctx.fillStyle='#fff0a0';ctx.shadowColor='#8beaff';ctx.shadowBlur=8;ctx.beginPath();ctx.arc(x+Math.sin(runTime*1.4+i)*4,y+Math.cos(runTime*1.8+i)*3,1+pulse,0,Math.PI*2);ctx.fill()}ctx.restore();}
+ // Layered, localized light pools give every biome a different atmosphere.
+ const lightSources=[
+  landscapePhase===0?{x:W*.18,y:H*.22,c:'#7fc7ff',r:145}:{x:W*.2,y:H*.2,c:landscapePhase===1?'#ff6330':landscapePhase===2?'#46d9d5':landscapePhase===3?'#9b78ff':'#d74bff',r:155},
+  {x:W*.78,y:H*.72,c:landscapePhase===0?'#4d9dff':landscapePhase===1?'#ff8a36':landscapePhase===2?'#37c5d7':landscapePhase===3?'#c27cff':'#8c31d7',r:180},
+  {x:W*.52,y:H*.48,c:landscapePhase===0?'#ffd38a':landscapePhase===1?'#ff4b25':landscapePhase===2?'#5cefe1':landscapePhase===3?'#b8a4ff':'#fa64ff',r:115}
+ ];
+ for(const l of lightSources){const pulse=.88+.12*Math.sin(runTime*2.3+l.x);const g=ctx.createRadialGradient(l.x,l.y,2,l.x,l.y,l.r*pulse);g.addColorStop(0,l.c+'55');g.addColorStop(.42,l.c+'22');g.addColorStop(1,'#00000000');ctx.fillStyle=g;ctx.fillRect(l.x-l.r,l.y-l.r,l.r*2,l.r*2);}
+ // Atmospheric color grade, stronger in the frozen and abyssal zones.
+ ctx.fillStyle=landscapePhase===1?'#ff4b1710':landscapePhase===2?'#19d9d510':landscapePhase===3?'#8866ff12':landscapePhase===4?'#a000e518':'#3478b808';ctx.fillRect(cameraX,cameraY,VIEW_W,VIEW_H);
  // Floating dust / magic motes animate slowly through the dungeon.
  for(const m of ambient){const yy=(m.y-runTime*m.speed% (H-40)+H-40)%(H-40)+35;const pulse=.35+.35*(Math.sin(runTime*2+m.phase)+1)/2;rect(m.x+Math.sin(runTime+m.phase)*3,yy,m.size,m.size,pulse>.55?'#9beaff':'#536d91')}
  // Biome-specific ambient animation: decorative only, no gameplay or collision changes.

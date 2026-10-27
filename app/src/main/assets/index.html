@@ -184,7 +184,19 @@ button{min-height:42px;font-size:clamp(12px,3.2vw,14px);padding:11px 12px}
 @media(max-height:540px) and (min-width:561px){#menu .menu-art{min-height:88dvh}#menu .menu-layout>.card{max-height:94dvh;padding:8px 12px}#menu .logo{font-size:27px}#menu .subtitle{margin:5px 0}#menu .menu-actions{gap:4px;margin:5px 0}#menu .menu-actions .menu-icon{min-height:49px}#menu .menu-actions .menu-icon:after{font-size:8px}}
 @media(prefers-reduced-motion:reduce){#menu .menu-art *,#menu .logo{animation:none!important;transition:none!important}}
 
-</style>
+/* Cinematic menu ambience: drifting embers, magic motes, and impact pulse */
+#menu .menu-art{overflow:hidden;isolation:isolate}
+#menu .menu-art .dragon,#menu .menu-art .hero,#menu .menu-art .slash{z-index:2}
+#menu .menu-art .slash{animation:menuImpact .82s steps(2,end) infinite;transform-origin:50% 60%}
+#menu .menu-art .menu-ember-particle,#menu .menu-art .menu-magic-particle{position:absolute;display:block;pointer-events:none;z-index:1;left:var(--x);top:var(--y);opacity:0;will-change:transform,opacity}
+#menu .menu-art .menu-ember-particle{width:var(--size);height:calc(var(--size)*1.7);background:#ffb45d;box-shadow:0 0 5px #ff7138,0 0 12px #ff6a2a;animation:emberDrift var(--duration) linear var(--delay) infinite}
+#menu .menu-art .menu-magic-particle{width:var(--size);height:var(--size);background:#9ffbff;box-shadow:0 0 5px #70efff,0 0 12px #62bfff;transform:rotate(45deg);animation:magicDrift var(--duration) ease-in-out var(--delay) infinite}
+#menu .menu-art .menu-embers-glow{position:absolute;z-index:0;left:45%;bottom:8%;width:26%;height:20%;border-radius:50%;background:#ff6b2a33;filter:blur(25px);animation:emberGlow 2.4s ease-in-out infinite;pointer-events:none}
+@keyframes emberDrift{0%{opacity:0;transform:translate3d(0,24px,0) scale(.65)}12%{opacity:.9}75%{opacity:.65}100%{opacity:0;transform:translate3d(var(--drift),-180px,0) scale(1.2)}}
+@keyframes magicDrift{0%,100%{opacity:0;transform:translate3d(0,8px,0) rotate(45deg) scale(.5)}35%,65%{opacity:.9;transform:translate3d(var(--drift),-12px,0) rotate(135deg) scale(1.15)}}
+@keyframes menuImpact{0%,100%{opacity:.68;transform:scale(.9) rotate(-5deg);filter:drop-shadow(0 0 5px #fff3a6)}45%{opacity:1;transform:scale(1.12) rotate(4deg);filter:drop-shadow(0 0 18px #fff3a6) drop-shadow(0 0 26px #ff8d52)}}
+@keyframes emberGlow{0%,100%{opacity:.45;transform:scale(.85)}50%{opacity:.9;transform:scale(1.18)}}
+@media(prefers-reduced-motion:reduce){#menu .menu-art .menu-ember-particle,#menu .menu-art .menu-magic-particle,#menu .menu-art .menu-embers-glow{display:none!important}#menu .menu-art .slash{animation:none!important}}\n</style>
 </head>
 <body>
 <div id="wrap"><canvas id="game" width="640" height="360" aria-label="Игровое поле"></canvas></div>
@@ -359,6 +371,26 @@ function safeText(v){return String(v??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<
 
 
 applyGameIcons();
+// Decorative particles are isolated to the title screen; gameplay and saves remain untouched.
+(function initMenuAtmosphere(){
+ const scene=document.querySelector('#menu .menu-art');
+ if(!scene||scene.dataset.atmosphereReady)return;
+ scene.dataset.atmosphereReady='1';
+ const glow=document.createElement('span');glow.className='menu-embers-glow';glow.setAttribute('aria-hidden','true');scene.appendChild(glow);
+ if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+ for(let i=0;i<25;i++){
+  const p=document.createElement('span');p.className='menu-ember-particle';p.setAttribute('aria-hidden','true');
+  p.style.setProperty('--x',(4+Math.random()*92)+'%');p.style.setProperty('--y',(38+Math.random()*58)+'%');
+  p.style.setProperty('--size',(2+Math.random()*3)+'px');p.style.setProperty('--duration',(3.8+Math.random()*5.5)+'s');
+  p.style.setProperty('--delay',(-Math.random()*8)+'s');p.style.setProperty('--drift',(-30+Math.random()*60)+'px');scene.appendChild(p);
+ }
+ for(let i=0;i<12;i++){
+  const p=document.createElement('span');p.className='menu-magic-particle';p.setAttribute('aria-hidden','true');
+  p.style.setProperty('--x',(18+Math.random()*65)+'%');p.style.setProperty('--y',(28+Math.random()*58)+'%');
+  p.style.setProperty('--size',(2+Math.random()*3)+'px');p.style.setProperty('--duration',(2.2+Math.random()*3.8)+'s');
+  p.style.setProperty('--delay',(-Math.random()*6)+'s');p.style.setProperty('--drift',(-15+Math.random()*30)+'px');scene.appendChild(p);
+ }
+})();
 // Артефакты временно отключены: скрываем магазин и не применяем эффекты в новых забегах.
 const artifactShopButton=$('shopOpen');if(artifactShopButton){artifactShopButton.style.display='none';artifactShopButton.disabled=true;}
 

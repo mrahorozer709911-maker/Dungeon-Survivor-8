@@ -737,6 +737,29 @@ function draw(dt=0){
  for(let b of ebullets){ctx.save();const ba=Math.atan2(b.vy,b.vx),trail=Math.min(20,Math.hypot(b.vx,b.vy)*.09);ctx.globalAlpha=.7;ctx.strokeStyle='#ff4767';ctx.shadowColor='#ff315d';ctx.shadowBlur=10;ctx.lineWidth=4;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(b.x-Math.cos(ba)*trail,b.y-Math.sin(ba)*trail);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.globalAlpha=1;ctx.shadowBlur=5;ctx.fillStyle='#ff4767';ctx.beginPath();ctx.arc(b.x,b.y,4.5,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#fff0f4';ctx.beginPath();ctx.arc(b.x-1,b.y-1,1.8,0,Math.PI*2);ctx.fill();ctx.restore()}
  for(let e of enemies){
   const bob=e.adminDummy?0:Math.sin(runTime*8+(e.anim||0))*1.8+Math.sin(runTime*3+(e.anim||0))*.7;
+  // Readable enemy animation cues: charge-up, ranged muzzle flashes, and stun feedback.
+  if(!e.adminDummy){
+   if(e.type==='charger'&&e.windup>0){
+    const charge=Math.max(0,Math.min(1,1-e.windup/.55)),rr=e.r+8+charge*15;
+    ctx.save();ctx.globalAlpha=.25+.6*charge;ctx.strokeStyle='#ff7048';ctx.shadowColor='#ff482d';ctx.shadowBlur=7+charge*12;ctx.lineWidth=1.5+charge*2;
+    ctx.beginPath();ctx.ellipse(e.x,e.y+e.r*.35,rr*1.25,rr*.58,0,0,Math.PI*2);ctx.stroke();
+    ctx.globalAlpha=.45+.45*charge;ctx.beginPath();ctx.arc(e.x,e.y,rr*.72,-Math.PI/2,-Math.PI/2+Math.PI*2*charge);ctx.stroke();
+    for(let q=0;q<5;q++){const a=runTime*5+q*Math.PI*2/5;ctx.beginPath();ctx.moveTo(e.x+Math.cos(a)*(e.r+3),e.y+Math.sin(a)*(e.r+3));ctx.lineTo(e.x+Math.cos(a)*(rr+5),e.y+Math.sin(a)*(rr+5));ctx.stroke();}
+    ctx.restore();
+   }
+   if((e.type==='ranged'||e.type==='spitter')&&e.attack>0){
+    const f=Math.min(1,e.attack/.22),col=e.type==='spitter'?'#a5ff68':'#ffc16e';
+    ctx.save();ctx.globalAlpha=f*.85;ctx.strokeStyle=col;ctx.fillStyle=col;ctx.shadowColor=col;ctx.shadowBlur=10;
+    ctx.lineWidth=2;ctx.beginPath();ctx.arc(e.x,e.y+e.r*.15,e.r*.48+f*5,0,Math.PI*2);ctx.stroke();
+    for(let q=0;q<4;q++){const a=runTime*5+q*Math.PI/2;ctx.beginPath();ctx.moveTo(e.x+Math.cos(a)*(e.r*.35),e.y+Math.sin(a)*(e.r*.35));ctx.lineTo(e.x+Math.cos(a)*(e.r*.8+f*5),e.y+Math.sin(a)*(e.r*.8+f*5));ctx.stroke();}
+    ctx.restore();
+   }
+   if(e.stun>0){
+    ctx.save();ctx.globalAlpha=.65;ctx.strokeStyle='#a9f6ff';ctx.fillStyle='#e2ffff';ctx.shadowColor='#58dfff';ctx.shadowBlur=8;ctx.lineWidth=1.5;
+    for(let q=0;q<3;q++){const a=runTime*5+q*Math.PI*2/3,rr=e.r+5+Math.sin(runTime*12+q)*2;const sx=e.x+Math.cos(a)*rr,sy=e.y-e.r*.65+Math.sin(a)*rr*.35;ctx.beginPath();ctx.moveTo(sx,sy-3);ctx.lineTo(sx+2,sy);ctx.lineTo(sx,sy+3);ctx.lineTo(sx-2,sy);ctx.closePath();ctx.fill();ctx.stroke();}
+    ctx.restore();
+   }
+  }
   if(e.type==='boss'){
     // Clear visual telegraph before each boss volley; visuals only.
    if(boss&&boss.fire<.42){const tele=Math.max(0,Math.min(1,1-boss.fire/.42)),tr=e.r+15+tele*28;ctx.save();ctx.globalAlpha=.28+.62*tele;ctx.strokeStyle=(boss.kind==='frost')?'#72eaff':(boss.kind==='hunter')?'#ffb45d':finalBoss?'#ff4c91':'#ff654f';ctx.shadowColor=(boss.kind==='frost')?'#36bfff':(boss.kind==='hunter')?'#ff663d':finalBoss?'#ff247e':'#ff4538';ctx.shadowBlur=8+tele*12;ctx.lineWidth=1.5+tele*2;ctx.beginPath();ctx.ellipse(e.x,e.y+e.r*.45,tr*1.5,tr*.58,0,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=.35+.55*tele;ctx.lineWidth=2;ctx.beginPath();ctx.arc(e.x,e.y+e.r*.45,tr*.9,-Math.PI/2,-Math.PI/2+Math.PI*2*tele);ctx.stroke();for(let q=0;q<8;q++){const a=q*Math.PI/4+runTime*.5,ri=tr*.72,ro=tr*(.88+.12*tele);ctx.beginPath();ctx.moveTo(e.x+Math.cos(a)*ri,e.y+e.r*.45+Math.sin(a)*ri*.58);ctx.lineTo(e.x+Math.cos(a)*ro,e.y+e.r*.45+Math.sin(a)*ro*.58);ctx.stroke();}ctx.restore();}

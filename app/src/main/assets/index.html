@@ -949,12 +949,22 @@ function draw(dt=0){
    ctx.fillStyle='#081526';ctx.beginPath();ctx.moveTo(player.x-3,player.y-8-bobY);ctx.lineTo(player.x-2,player.y-13-bobY);ctx.lineTo(player.x+1,player.y-16-bobY);ctx.lineTo(player.x+5,player.y-14-bobY);ctx.lineTo(player.x+7,player.y-10-bobY);ctx.lineTo(player.x+5,player.y-7-bobY);ctx.lineTo(player.x,player.y-6-bobY);ctx.closePath();ctx.fill();
    const helm=ctx.createLinearGradient(player.x-2,player.y-15-bobY,player.x+6,player.y-7-bobY);helm.addColorStop(0,'#f0fbff');helm.addColorStop(.35,'#91b8d9');helm.addColorStop(.72,'#3b6288');helm.addColorStop(1,'#172d48');ctx.fillStyle=helm;ctx.beginPath();ctx.moveTo(player.x-1,player.y-9-bobY);ctx.lineTo(player.x,player.y-13-bobY);ctx.lineTo(player.x+2,player.y-15-bobY);ctx.lineTo(player.x+5,player.y-13-bobY);ctx.lineTo(player.x+6,player.y-10-bobY);ctx.lineTo(player.x+4,player.y-8-bobY);ctx.lineTo(player.x,player.y-7-bobY);ctx.closePath();ctx.fill();
    ctx.fillStyle='#10243a';ctx.fillRect(player.x+1,player.y-11-bobY,6,2);ctx.fillStyle='#66edff';ctx.shadowColor='#52eaff';ctx.shadowBlur=5;ctx.fillRect(player.x+2,player.y-10-bobY,4,1);ctx.shadowBlur=0;ctx.fillStyle='#fff';ctx.fillRect(player.x+4,player.y-10-bobY,1,1);ctx.fillStyle='#e4b957';ctx.beginPath();ctx.moveTo(player.x+1,player.y-15-bobY);ctx.lineTo(player.x+3,player.y-18-bobY);ctx.lineTo(player.x+4,player.y-14-bobY);ctx.closePath();ctx.fill();
-   // Distinct rifle receiver, sight rail, cooling fins and weapon-specific muzzle.
-   ctx.fillStyle='#0b1525';ctx.beginPath();ctx.moveTo(player.x+5-kick,player.y-3-bobY);ctx.lineTo(player.x+12-kick,player.y-3-bobY);ctx.lineTo(player.x+15-kick,player.y-1-bobY);ctx.lineTo(player.x+14-kick,player.y+2-bobY);ctx.lineTo(player.x+6-kick,player.y+2-bobY);ctx.closePath();ctx.fill();ctx.fillStyle=metal;ctx.fillRect(player.x+7-kick,player.y-2-bobY,6,1);ctx.fillStyle='#526f8e';ctx.fillRect(player.x+8-kick,player.y+1-bobY,4,1);ctx.fillStyle='#284563';ctx.fillRect(player.x+9-kick,player.y-5-bobY,4,2);ctx.fillStyle='#d9f3ff';ctx.fillRect(player.x+10-kick,player.y-5-bobY,2,1);
-   for(let fin=0;fin<3;fin++){ctx.fillStyle=fin===1?'#8bb9d9':'#354f6d';ctx.fillRect(player.x+8+fin*2-kick,player.y+2-bobY,1,2);}
-   const muzzle=activeWeapon.id==='laser'?'#6ff6ff':activeWeapon.id==='railgun'?'#b8cfff':'#ffd078';ctx.fillStyle=muzzle;ctx.shadowColor=muzzle;ctx.shadowBlur=activeWeapon.id==='laser'?9:4;ctx.fillRect(player.x+14-kick,player.y-1-bobY,3,2);ctx.shadowBlur=0;
-   if(activeWeapon.id==='laser'){ctx.globalAlpha=.5+.45*pulse;ctx.strokeStyle='#9dffff';ctx.shadowColor='#43efff';ctx.shadowBlur=7;ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(player.x+15-kick,player.y);ctx.lineTo(player.x+20-kick,player.y);ctx.stroke();ctx.shadowBlur=0;ctx.globalAlpha=1;}
-   if(attackAnim>0){ctx.globalAlpha=Math.min(1,attackAnim*20);ctx.fillStyle=activeWeapon.id==='laser'?'#9effff':'#fff0a4';ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=10;ctx.beginPath();ctx.moveTo(player.x+16-kick,player.y-3-bobY);ctx.lineTo(player.x+22-kick,player.y-bobY);ctx.lineTo(player.x+17-kick,player.y+2-bobY);ctx.closePath();ctx.fill();ctx.shadowBlur=0;ctx.globalAlpha=1;}
+   // One integrated rifle only: rotate the existing weapon drawing toward the current aim angle.
+   ctx.save();
+   ctx.translate(player.x+1,player.y-1-bobY);
+   const rifleAngle=player.aimAngle??0;
+   ctx.rotate(Math.cos(rifleAngle)<0 ? rifleAngle+Math.PI : rifleAngle);
+   const muzzle=activeWeapon.id==='laser'?'#6ff6ff':activeWeapon.id==='railgun'?'#b8cfff':'#ffd078';
+   ctx.fillStyle='#0b1525';ctx.beginPath();ctx.roundRect(0,-2.5,13,5,1.2);ctx.fill();
+   ctx.fillStyle='#203c59';ctx.fillRect(2,1,5,3);
+   ctx.fillStyle=metal;ctx.fillRect(3,-1.5,8,2);
+   ctx.fillStyle='#284563';ctx.fillRect(5,-4,4,2);
+   ctx.fillStyle='#d9f3ff';ctx.fillRect(6,-4,2,1);
+   for(let fin=0;fin<3;fin++){ctx.fillStyle=fin===1?'#8bb9d9':'#354f6d';ctx.fillRect(7+fin*1.5,2,1,2);}
+   ctx.fillStyle=muzzle;ctx.shadowColor=muzzle;ctx.shadowBlur=activeWeapon.id==='laser'?8:4;ctx.fillRect(12,-1,3,2);ctx.shadowBlur=0;
+   if(activeWeapon.id==='laser'){ctx.globalAlpha=.6+.35*pulse;ctx.strokeStyle='#9dffff';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(14,0);ctx.lineTo(19,0);ctx.stroke();ctx.globalAlpha=1;}
+   if(attackAnim>0){ctx.globalAlpha=Math.min(1,attackAnim*20);ctx.fillStyle=muzzle;ctx.shadowColor=muzzle;ctx.shadowBlur=9;ctx.beginPath();ctx.moveTo(15,-3);ctx.lineTo(21,0);ctx.lineTo(15,3);ctx.closePath();ctx.fill();ctx.shadowBlur=0;ctx.globalAlpha=1;}
+   ctx.restore();
    if(player.inv>0){ctx.globalAlpha=.6+.35*Math.sin(runTime*24);ctx.strokeStyle='#a3efff';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(player.x,player.y,12,15,0,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;}
    }else{
     // Detailed front/back Scout pose: silhouette, armor plates, backpack and centered rifle.

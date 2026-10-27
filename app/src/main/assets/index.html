@@ -244,7 +244,7 @@ function iconFor(kind,id){
  items:{iron:'<path d="M6 3h12l3 9-3 9H6l-3-9z"/><circle cx="12" cy="12" r="4" fill="#071322"/>',scope:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3" fill="#071322"/><path d="M12 1v5M12 18v5M1 12h5M18 12h5"/>',boots:'<path d="M7 3h6v9l7 3v5H4v-5l3-3z"/>',charm:'<path d="M12 2 15 8l7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/>'},
  rarity:{common:'<path d="M12 3 21 12 12 21 3 12z"/>',rare:'<path d="M12 2 21 8v8l-9 6-9-6V8z"/><path d="m7 12 3 3 7-7" stroke="#071322" stroke-width="1.8"/>',epic:'<path d="M12 2 22 20H2z"/><path d="M12 8v5m0 3v.5" stroke="#071322" stroke-width="2"/>',legendary:'<path d="m12 2 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/>'}
  };
- let n=key.match(/skin_(\d+)$/); if(kind==='skins'){const variants=['heroes','weapons','pets'];kind=variants[(Number(n?.[1]||0))%3];}
+ let n=key.match(/skin_(\d+)$/); if(kind==='skins'){const ix=Number(n?.[1]||0),groups=[['heroes',['scout','tank','tech','medic','phantom','engineer']],['weapons',['pistol','shotgun','rifle','laser','burst','rail','grenade','crossbow']],['pets',['wisp','drone','slime','raven','fox','orb']]];const group=groups[ix%groups.length];kind=group[0];key=group[1][Math.floor(ix/3)%group[1].length];}
  let d=shapes[kind]?.[key]||shapes[kind]?.default||shapes.artifacts.void;
  return '<svg class="game-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><defs><linearGradient id="g'+kind+key.replace(/[^a-z0-9]/gi,'')+'" x1="0" y1="0" x2="1" y2="1"><stop stop-color="'+b+'"/><stop offset="1" stop-color="'+a+'"/></linearGradient></defs><g fill="url(#g'+kind+key.replace(/[^a-z0-9]/gi,'')+')" stroke="'+a+'" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round">'+d+'</g></svg>';
 }

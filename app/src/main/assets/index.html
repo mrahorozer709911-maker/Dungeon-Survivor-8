@@ -959,7 +959,7 @@ function draw(dt=0){
  const moving=Math.hypot(joy.x,joy.y)>.08||keys.ArrowLeft||keys.ArrowRight||keys.ArrowUp||keys.ArrowDown||keys.a||keys.d||keys.w||keys.s;
  const leg=Math.sin(walkFrame)* (moving?3:0.8), bob=Math.abs(Math.sin(walkFrame))*(moving?1.5:.4);
  rect(player.x-7,player.y+7,14,4,'#050711aa');
- if(dashTime>0){for(let i=1;i<=3;i++){rect(player.x-dashDir.x*i*5-4,player.y-dashDir.y*i*5-5,8,10,i===1?'#7deaff88':'#7deaff44')}}
+ if(dashTime>0){ctx.save();for(let i=1;i<=4;i++){const a=1-i/5,tx=player.x-dashDir.x*i*5,ty=player.y-dashDir.y*i*5;ctx.globalAlpha=a*.42;ctx.fillStyle=i%2?'#7deaff':'#c38aff';ctx.beginPath();ctx.arc(tx,ty,Math.max(1,3-i*.45),0,Math.PI*2);ctx.fill();ctx.fillRect(Math.round(tx-1),Math.round(ty-1),2,2)}ctx.restore()}
  // Companion pet follows the hero and bobs in a small orbit.
  const pet=PETS.find(p=>p.id===meta.equippedPet);if(pet){const pa=runTime*2.2,px=player.x+Math.cos(pa)*17,py=player.y+Math.sin(pa)*10-12+Math.sin(runTime*7)*2,pskin=PET_SKINS.find(sk=>sk.id===meta.equippedPetSkins?.[pet.id]),pc=pskin?.color||pet.color||'#fff0a0';ctx.save();ctx.translate(px,py);ctx.fillStyle=pc;ctx.strokeStyle=pc;ctx.shadowColor=pc;ctx.shadowBlur=pskin?9:4;if(pet.id==='wisp'){ctx.beginPath();for(let q=0;q<8;q++){const a=-Math.PI/2+q*Math.PI/4,r=q%2?3:7;ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r)}ctx.closePath();ctx.fill();ctx.globalAlpha=.55;ctx.beginPath();ctx.arc(0,0,10+Math.sin(runTime*6)*2,0,Math.PI*2);ctx.stroke()}else if(pet.id==='drone'){ctx.fillRect(-5,-3,10,6);ctx.fillRect(-9,-1,4,2);ctx.fillRect(5,-1,4,2);ctx.fillRect(-2,-6,4,3);ctx.fillStyle='#f4ffff';ctx.fillRect(-2,-1,4,2)}else if(pet.id==='slime'){ctx.beginPath();ctx.ellipse(0,1,6,5,0,Math.PI,Math.PI*2);ctx.lineTo(6,2);ctx.quadraticCurveTo(0,8,-6,2);ctx.closePath();ctx.fill();ctx.fillStyle='#142b28';ctx.fillRect(-3,0,2,2);ctx.fillRect(2,0,2,2)}else if(pet.id==='raven'){ctx.beginPath();ctx.moveTo(-2,-2);ctx.lineTo(-9,-6+Math.sin(runTime*9)*2);ctx.lineTo(-6,2);ctx.lineTo(0,4);ctx.lineTo(7,-5+Math.sin(runTime*9)*2);ctx.lineTo(4,2);ctx.closePath();ctx.fill();ctx.fillStyle='#ffe08a';ctx.fillRect(2,-1,3,2)}else if(pet.id==='fox'){ctx.beginPath();ctx.moveTo(-5,-2);ctx.lineTo(-5,-8);ctx.lineTo(-1,-4);ctx.lineTo(2,-8);ctx.lineTo(5,-2);ctx.lineTo(5,4);ctx.lineTo(0,7);ctx.lineTo(-5,4);ctx.closePath();ctx.fill();ctx.fillStyle='#fff0d8';ctx.fillRect(-2,2,4,2);ctx.fillStyle=pc;ctx.beginPath();ctx.moveTo(4,3);ctx.lineTo(10,1);ctx.lineTo(7,6);ctx.closePath();ctx.fill()}else{ctx.beginPath();ctx.arc(0,0,6,0,Math.PI*2);ctx.fill();ctx.globalAlpha=.8;ctx.strokeStyle='#f4eaff';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(0,0,9,4,runTime,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;ctx.fillStyle='#fff';ctx.fillRect(-1,-2,2,4)}
  // Individual pet animation accents: wing beats, tail swishes, blinking eyes and orbit sparks.
@@ -974,37 +974,10 @@ function draw(dt=0){
  ctx.restore();ctx.restore();}
  // Orbiting energy drones.
  for(let oi=0;oi<orbitTimer;oi++){const ox=player.x+Math.cos(orbitAngle+oi*Math.PI*2/orbitTimer)*23,oy=player.y+Math.sin(orbitAngle+oi*Math.PI*2/orbitTimer)*23;rect(ox-5,oy-5,10,10,'#513c91');rect(ox-3,oy-3,6,6,'#d5baff');rect(ox-1,oy-1,2,2,'#ffffff')}
- // Outline and legs
- rect(player.x-6,player.y+1+leg,5,7,'#101523');rect(player.x+1,player.y+1-leg,5,7,'#101523');
- rect(player.x-5,player.y+2+leg,3,5,'#d9e5f8');rect(player.x+2,player.y+2-leg,3,5,'#a9c4e7');
- rect(player.x-7,player.y-7-bob,14,14,'#0a101c');
- const skin=SKINS.find(sk=>sk.id===meta.equippedSkins?.[activeHero.id]),weaponSkin=WEAPON_SKINS.find(sk=>sk.id===meta.equippedWeaponSkins?.[activeWeapon.id]);if(skin&&skin.rarity==='legendary'){ctx.globalAlpha=.25+.12*Math.sin(runTime*5);ctx.fillStyle=skin.color;ctx.beginPath();ctx.arc(player.x,player.y,15+Math.sin(runTime*4)*2,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}rect(player.x-5,player.y-6-bob,10,12,skin?.color||activeHero.color||'#e5a56d');
- const skinVariant=skin?parseInt(skin.id.slice(skin.id.lastIndexOf('_skin_')+6),10)||0:0;
- if(skin&&(skin.rarity==='legendary'||skin.rarity==='epic')){ctx.globalAlpha=(skin.rarity==='legendary' ? .27 : .14)+.07*Math.sin(runTime*5);ctx.fillStyle=skin.color;ctx.beginPath();ctx.arc(player.x,player.y,15+Math.sin(runTime*4)*2,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
- if(skin){if(skinVariant===1||skinVariant===4){rect(player.x-6,player.y-2-bob,12,3,skin.color);rect(player.x-4,player.y+3-bob,8,2,'#fff0f4')}else if(skinVariant===2||skinVariant===5){ctx.save();ctx.globalAlpha=.65;ctx.strokeStyle=skin.color;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(player.x,player.y-1-bob,9+Math.sin(runTime*6),0,Math.PI*2);ctx.stroke();ctx.restore()}else if(skinVariant===3||skinVariant===7){rect(player.x-6,player.y-9-bob,12,3,skin.color);rect(player.x-2,player.y-12-bob,4,3,'#fff0c2')}else if(skinVariant===6||skinVariant===8){rect(player.x-7,player.y-4-bob,3,7,skin.color);rect(player.x+4,player.y-4-bob,3,7,skin.color)}else if(skinVariant===9){rect(player.x-5,player.y-11-bob,10,3,'#fff0a1');rect(player.x-8,player.y-3-bob,3,6,skin.color);rect(player.x+5,player.y-3-bob,3,6,skin.color)}}
- rect(player.x-4,player.y-5-bob,8,3,'#f5d1a1');
- rect(player.x-4,player.y-1-bob,8,4,'#25344f');
- rect(player.x-3,player.y-4-bob,2,2,'#f8ffff');rect(player.x+2,player.y-4-bob,2,2,'#f8ffff');
- rect(player.x-4,player.y-4-bob,1,1,'#18243b');rect(player.x+3,player.y-4-bob,1,1,'#18243b');
- // shoulder armor and animated muzzle flash
- rect(player.x-7,player.y-1-bob,3,4,'#9cb8d8');rect(player.x+4,player.y-1-bob,3,4,'#9cb8d8');rect(player.x+7,player.y+1-bob,7,3,weaponSkin?.color||'#dceaff');rect(player.x+13,player.y+1-bob,3,2,weaponSkin?.color||'#9bb4d2');
- // Extra layered hero armor: helmet crest, visor, chest plate, belt, gauntlets and boot shine.
- const armorPulse=.5+.5*Math.sin(runTime*4.5);
- rect(player.x-5,player.y-8-bob,10,3,'#657f9f');rect(player.x-4,player.y-9-bob,8,2,'#a9c9eb');rect(player.x-2,player.y-12-bob,4,4,'#ffc85d');rect(player.x-1,player.y-13-bob,2,2,'#fff0a1');
- rect(player.x-5,player.y-3-bob,10,2,'#19283e');rect(player.x-4,player.y-3-bob,3,1,'#a8f2ff');rect(player.x+2,player.y-3-bob,3,1,'#a8f2ff');
- rect(player.x-3,player.y-1-bob,6,4,'#3c5272');rect(player.x-2,player.y-bob,4,2,'#6d8fb4');rect(player.x-1,player.y+1-bob,2,2,armorPulse>.5?'#ffe08a':'#d8a63c');
- rect(player.x-5,player.y+3-bob,3,2,'#91aacb');rect(player.x+2,player.y+3-bob,3,2,'#91aacb');rect(player.x-4,player.y+5-bob,2,2,'#fff0b4');rect(player.x+3,player.y+5-bob,2,2,'#fff0b4');
- rect(player.x-5,player.y+7+leg,4,2,'#8ba6c8');rect(player.x+2,player.y+7-leg,4,2,'#8ba6c8');
- // A tiny animated rune makes the hero silhouette easier to read at phone size.
- ctx.save();ctx.globalAlpha=.55+.35*armorPulse;ctx.fillStyle=activeHero.color||'#66e7ff';ctx.fillRect(player.x-1,player.y+2-bob,2,2);ctx.restore();
- // Hand-painted hero texture: brushed metal, tiny scratches, leather seams and animated rune glints.
- ctx.save();ctx.lineCap='round';ctx.globalAlpha=.72;ctx.strokeStyle='#d9eaff';ctx.lineWidth=1;
- ctx.beginPath();ctx.moveTo(player.x-4,player.y-7-bob);ctx.lineTo(player.x-1,player.y-5-bob);ctx.lineTo(player.x+2,player.y-6-bob);ctx.stroke();
- ctx.strokeStyle='#6d89ac';ctx.beginPath();ctx.moveTo(player.x-4,player.y+1-bob);ctx.lineTo(player.x-2,player.y+2-bob);ctx.lineTo(player.x+3,player.y+1-bob);ctx.stroke();
- ctx.globalAlpha=.55+.35*Math.sin(runTime*8);ctx.fillStyle=activeHero.color||'#66e7ff';ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=5;ctx.fillRect(player.x-1,player.y-1-bob,2,2);
- ctx.globalAlpha=.7;ctx.strokeStyle='#ffc85d';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(player.x-5,player.y+4-bob);ctx.lineTo(player.x-3,player.y+5-bob);ctx.moveTo(player.x+3,player.y+4-bob);ctx.lineTo(player.x+5,player.y+5-bob);ctx.stroke();ctx.restore();
- const recoil=attackAnim>0?3+Math.sin(runTime*55)*.7:0;
- rect(player.x+5,player.y-1-bob,8+recoil,3,'#26344e');rect(player.x+10+recoil,player.y-2-bob,4,5,'#ffc85d');
+ // Removed legacy hand-drawn hero body; the atlas sprite is the sole player body.
+ const skin=SKINS.find(sk=>sk.id===meta.equippedSkins?.[activeHero.id]);
+ const weaponSkin=WEAPON_SKINS.find(sk=>sk.id===meta.equippedWeaponSkins?.[activeWeapon.id]);
+ if(skin&&skin.rarity==='legendary'){ctx.save();ctx.globalAlpha=.18+.08*Math.sin(runTime*5);ctx.strokeStyle=skin.color;ctx.lineWidth=2;ctx.beginPath();ctx.arc(player.x,player.y,15+Math.sin(runTime*4)*2,0,Math.PI*2);ctx.stroke();ctx.restore();}
  // Pixel-art player sprite overlay; frame changes while moving and idles when standing still.
  // Hero atlas animation: movement bob, recoil lean and brief damage tint are handled by drawPixelActor.
  drawPixelActor('hero_'+(activeHero?.id||'scout'),player.x,player.y-1+bob,42,moving?Math.floor(walkFrame/1.5):0,moving);

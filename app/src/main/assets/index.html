@@ -605,7 +605,7 @@ function update(dt){
    deathFx.push({x:player.x,y:player.y,r:radius,life:1.65,maxLife:1.65,color:col,kind:'ult'+hid.charAt(0).toUpperCase()+hid.slice(1)});
    particle(player.x,player.y,col,hid==='engineer'?72:hid==='tech'?58:44);particle(player.x,player.y,'#ffffff',18);
    if(hid==='medic'){player.hp=Math.min(player.maxhp,player.hp+Math.min(player.maxhp*.42,2.2+rank*.25));player.inv=Math.max(player.inv,1.25);for(const en of enemies){if(!en.adminDummy&&en.hp>0&&Math.hypot(en.x-player.x,en.y-player.y)<radius*.72)en.stun=Math.max(en.stun||0,1.1);}toast('УЛЬТА МЕДИКА: СВЕТ ЖИЗНИ');}
-   else if(hid==='phantom'){player.inv=Math.max(player.inv,2.1);player.speed=Math.max(player.speed,activeHero.speed*1.4);toast('УЛЬТА ФАНТОМА: ФАЗОВЫЙ СДВИГ');}
+   else if(hid==='phantom'){player.inv=Math.max(player.inv,2.1);player.speed=Math.max(player.speed,activeHero.speed*1.4);setTimeout(()=>{if(player&&state==='play')player.speed=activeHero.speed;},2100);toast('УЛЬТА ФАНТОМА: ФАЗОВЫЙ СДВИГ');}
    else if(hid==='tank'){player.inv=Math.max(player.inv,1.65);armor=Math.min(3,(armor||0)+1);toast('УЛЬТА ТАНКА: НЕПРОБИВАЕМАЯ СТЕНА');}
    else if(hid==='scout'){player.inv=Math.max(player.inv,.95);toast('УЛЬТА РАЗВЕДЧИКА: ЗАЛП ОХОТНИКА');}
    else if(hid==='tech'){toast('УЛЬТА ТЕХНИКА: ЦЕПНАЯ МОЛНИЯ');}

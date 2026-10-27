@@ -949,6 +949,14 @@ function draw(dt=0){
    ctx.fillStyle='#081526';ctx.beginPath();ctx.moveTo(player.x-3,player.y-8-bobY);ctx.lineTo(player.x-2,player.y-13-bobY);ctx.lineTo(player.x+1,player.y-16-bobY);ctx.lineTo(player.x+5,player.y-14-bobY);ctx.lineTo(player.x+7,player.y-10-bobY);ctx.lineTo(player.x+5,player.y-7-bobY);ctx.lineTo(player.x,player.y-6-bobY);ctx.closePath();ctx.fill();
    const helm=ctx.createLinearGradient(player.x-2,player.y-15-bobY,player.x+6,player.y-7-bobY);helm.addColorStop(0,'#f0fbff');helm.addColorStop(.35,'#91b8d9');helm.addColorStop(.72,'#3b6288');helm.addColorStop(1,'#172d48');ctx.fillStyle=helm;ctx.beginPath();ctx.moveTo(player.x-1,player.y-9-bobY);ctx.lineTo(player.x,player.y-13-bobY);ctx.lineTo(player.x+2,player.y-15-bobY);ctx.lineTo(player.x+5,player.y-13-bobY);ctx.lineTo(player.x+6,player.y-10-bobY);ctx.lineTo(player.x+4,player.y-8-bobY);ctx.lineTo(player.x,player.y-7-bobY);ctx.closePath();ctx.fill();
    ctx.fillStyle='#10243a';ctx.fillRect(player.x+1,player.y-11-bobY,6,2);ctx.fillStyle='#66edff';ctx.shadowColor='#52eaff';ctx.shadowBlur=5;ctx.fillRect(player.x+2,player.y-10-bobY,4,1);ctx.shadowBlur=0;ctx.fillStyle='#fff';ctx.fillRect(player.x+4,player.y-10-bobY,1,1);ctx.fillStyle='#e4b957';ctx.beginPath();ctx.moveTo(player.x+1,player.y-15-bobY);ctx.lineTo(player.x+3,player.y-18-bobY);ctx.lineTo(player.x+4,player.y-14-bobY);ctx.closePath();ctx.fill();
+   // Articulated forearms follow the same aim pivot and sit behind the rifle, so it reads as held rather than floating.
+   ctx.save();ctx.translate(player.x+1,player.y-1-bobY);
+   const armAngle=player.aimAngle??0;
+   ctx.rotate(Math.cos(armAngle)<0?armAngle+Math.PI:armAngle);
+   ctx.lineCap='round';ctx.lineWidth=3.6;ctx.strokeStyle='#0a1525';ctx.beginPath();ctx.moveTo(1,1);ctx.lineTo(5,1);ctx.stroke();
+   ctx.lineWidth=2.2;ctx.strokeStyle='#416b8f';ctx.beginPath();ctx.moveTo(1,.2);ctx.lineTo(5,.2);ctx.stroke();
+   ctx.fillStyle='#b9e7ff';ctx.fillRect(3,-.8,2,1.2);
+   ctx.restore();
    // One integrated rifle only: rotate the existing weapon drawing toward the current aim angle.
    ctx.save();
    ctx.translate(player.x+1,player.y-1-bobY);

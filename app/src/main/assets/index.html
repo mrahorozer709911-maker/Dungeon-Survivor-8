@@ -196,7 +196,27 @@ button{min-height:42px;font-size:clamp(12px,3.2vw,14px);padding:11px 12px}
 @keyframes magicDrift{0%,100%{opacity:0;transform:translate3d(0,8px,0) rotate(45deg) scale(.5)}35%,65%{opacity:.9;transform:translate3d(var(--drift),-12px,0) rotate(135deg) scale(1.15)}}
 @keyframes menuImpact{0%,100%{opacity:.68;transform:scale(.9) rotate(-5deg);filter:drop-shadow(0 0 5px #fff3a6)}45%{opacity:1;transform:scale(1.12) rotate(4deg);filter:drop-shadow(0 0 18px #fff3a6) drop-shadow(0 0 26px #ff8d52)}}
 @keyframes emberGlow{0%,100%{opacity:.45;transform:scale(.85)}50%{opacity:.9;transform:scale(1.18)}}
-@media(prefers-reduced-motion:reduce){#menu .menu-art .menu-ember-particle,#menu .menu-art .menu-magic-particle,#menu .menu-art .menu-embers-glow{display:none!important}#menu .menu-art .slash{animation:none!important}}\n</style>
+@media(prefers-reduced-motion:reduce){#menu .menu-art .menu-ember-particle,#menu .menu-art .menu-magic-particle,#menu .menu-art .menu-embers-glow{display:none!important}#menu .menu-art .slash{animation:none!important}}\n
+/* Extra polish pass: wing beats, ancient runes, and a subtle layered parallax */
+#menu .menu-art{background-position:calc(50% + var(--menu-parallax-x,0px)) calc(50% + var(--menu-parallax-y,0px));transition:background-position .18s ease-out}
+#menu .menu-art:before{background-position:calc(50% - var(--menu-parallax-x,0px)*.55) calc(50% - var(--menu-parallax-y,0px)*.55),0 0,0 0}
+#menu .menu-art .dragon svg.pixel-dragon g>path:nth-child(2){transform-box:fill-box;transform-origin:100% 100%;animation:dragonWingBeat 1.15s steps(2,end) infinite}
+#menu .menu-art .dragon svg.pixel-dragon g>path:nth-child(3){transform-box:fill-box;transform-origin:0 100%;animation:dragonWingBeatReverse 1.15s steps(2,end) infinite}
+#menu .menu-art .menu-rune{position:absolute;z-index:1;display:grid;place-items:center;width:28px;height:28px;color:#80f1ef;font-size:21px;text-shadow:0 0 8px #55e7ff,0 0 18px #2ac8ff;opacity:.4;pointer-events:none;animation:runePulse 3.6s ease-in-out infinite}
+#menu .menu-art .menu-rune.rune-one{left:8%;top:15%;animation-delay:-1.3s}
+#menu .menu-art .menu-rune.rune-two{left:46%;top:20%;color:#ffd17c;text-shadow:0 0 8px #ffc15b,0 0 18px #ff8d3d;animation-delay:-2.2s}
+#menu .menu-art .menu-rune.rune-three{right:8%;bottom:27%;animation-delay:-.6s}
+#menu .menu-actions .menu-icon.primary{overflow:hidden}
+#menu .menu-actions .menu-icon.primary:before{content:"";position:absolute;z-index:1;top:-30%;bottom:-30%;left:-65%;width:35%;border:0;background:linear-gradient(90deg,transparent,#fff9,transparent);transform:skewX(-22deg);animation:menuButtonShine 4.8s ease-in-out infinite}
+#menu .menu-actions .menu-icon.primary:after{z-index:2}
+@keyframes dragonWingBeat{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.78) translateY(2px)}}
+@keyframes dragonWingBeatReverse{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.84) translateY(-2px)}}
+@keyframes runePulse{0%,100%{opacity:.16;transform:scale(.82) rotate(-8deg)}50%{opacity:.82;transform:scale(1.12) rotate(8deg)}}
+@keyframes menuButtonShine{0%,72%,100%{left:-65%;opacity:0}78%{opacity:.9}92%{left:135%;opacity:0}}
+@media(max-width:560px){#menu .menu-art .menu-rune{font-size:15px;width:20px;height:20px}#menu .menu-art .menu-rune.rune-one{top:7%}#menu .menu-art .menu-rune.rune-two{top:12%}#menu .menu-art .menu-rune.rune-three{bottom:25%}}
+@media(prefers-reduced-motion:reduce){#menu .menu-art .dragon svg.pixel-dragon g>path:nth-child(2),#menu .menu-art .dragon svg.pixel-dragon g>path:nth-child(3),#menu .menu-art .menu-rune,#menu .menu-actions .menu-icon.primary:before{animation:none!important}}
+
+</style>
 </head>
 <body>
 <div id="wrap"><canvas id="game" width="640" height="360" aria-label="Игровое поле"></canvas></div>
@@ -377,6 +397,13 @@ applyGameIcons();
  if(!scene||scene.dataset.atmosphereReady)return;
  scene.dataset.atmosphereReady='1';
  const glow=document.createElement('span');glow.className='menu-embers-glow';glow.setAttribute('aria-hidden','true');scene.appendChild(glow);
+ const runeSymbols=['ᚱ','✧','ᛟ'];
+ ['rune-one','rune-two','rune-three'].forEach((cls,i)=>{const rune=document.createElement('span');rune.className='menu-rune '+cls;rune.textContent=runeSymbols[i];rune.setAttribute('aria-hidden','true');scene.appendChild(rune);});
+ const parallaxAllowed=!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+ if(parallaxAllowed&&window.matchMedia&&window.matchMedia('(hover: hover) and (pointer: fine)').matches){
+  scene.addEventListener('pointermove',e=>{const r=scene.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-.5;const y=(e.clientY-r.top)/r.height-.5;scene.style.setProperty('--menu-parallax-x',(x*9).toFixed(1)+'px');scene.style.setProperty('--menu-parallax-y',(y*7).toFixed(1)+'px');},{passive:true});
+  scene.addEventListener('pointerleave',()=>{scene.style.setProperty('--menu-parallax-x','0px');scene.style.setProperty('--menu-parallax-y','0px');},{passive:true});
+ }
  if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
  for(let i=0;i<25;i++){
   const p=document.createElement('span');p.className='menu-ember-particle';p.setAttribute('aria-hidden','true');

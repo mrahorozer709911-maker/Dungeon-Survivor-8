@@ -672,7 +672,16 @@ function pixelSprite(kind,frame=0){
   // Weapon is attached to the character sprite, with bright pixel edge highlights.
   px(12,7,3,2,p[3]);px(14,5,1,4,p[2]);px(12,9,3,1,p[0]);
  }
- else {px(2,7,3,4,p[1]);px(11,7,3,4,p[1]);px(4,4,8,9,p[0]);px(5,3,6,10,p[1]);px(5,5,6,5,p[2]);px(5,6,2,2,p[3]);px(9,6,2,2,p[3]);px(6,9,4,2,p[0]);px(6,11,4,1,p[3]);if(kind==='charger'){px(3,3,3,2,p[3]);px(10,3,3,2,p[3]);}if(kind==='spitter'){px(6,10,4,2,'#baff65');px(7,12,2,1,'#e7ff99');}if(kind==='brute'){px(1,6,3,6,p[0]);px(12,6,3,6,p[0]);}}
+ else {
+  // Monster silhouettes use deliberately different poses in alternating pixel frames.
+  const stride=step?1:0,bodyY=step?0:1;
+  if(kind==='fast'){px(2+stride,7,3,4,p[1]);px(11-stride,7,3,4,p[1]);px(4,4+bodyY,8,8,p[0]);px(5,3+bodyY,6,9,p[1]);px(5,5+bodyY,6,4,p[2]);px(5,6+bodyY,2,2,p[3]);px(9,6+bodyY,2,2,p[3]);px(6,9+bodyY,4,2,p[0]);px(3+stride,3,3,2,p[3]);px(10-stride,3,3,2,p[3]);}
+  else if(kind==='ranged'){px(2,8-stride,3,3,p[1]);px(11,8+stride,3,3,p[1]);px(4,4,8,9,p[0]);px(5,3,6,10,p[1]);px(5,5,6,5,p[2]);px(5,6,2,2,p[3]);px(9,6,2,2,p[3]);px(6,10,4,2,p[0]);px(11,9,4,2,p[2]);px(13,8,2,1,p[3]);}
+  else if(kind==='charger'){px(1+stride,6,4,5,p[1]);px(11-stride,6,4,5,p[1]);px(4,4,8,9,p[0]);px(5,3,6,10,p[1]);px(5,5,6,5,p[2]);px(5,6,2,2,p[3]);px(9,6,2,2,p[3]);px(3,3,3,2,p[3]);px(10,3,3,2,p[3]);px(6,10,4,2,p[0]);}
+  else if(kind==='spitter'){px(2,8,3,4,p[1]);px(11,8,3,4,p[1]);px(4,5+bodyY,8,8,p[0]);px(5,3+bodyY,6,9,p[1]);px(5,5+bodyY,6,5,p[2]);px(5,6+bodyY,2,2,p[3]);px(9,6+bodyY,2,2,p[3]);px(6,10+bodyY,4,2,'#baff65');px(7,12+bodyY,2,1,'#e7ff99');px(6+stride,2,4,2,p[3]);}
+  else if(kind==='brute'){px(1+stride,6,4,7,p[0]);px(11-stride,6,4,7,p[0]);px(3,4+bodyY,10,9,p[0]);px(4,3+bodyY,8,10,p[1]);px(5,5+bodyY,6,5,p[2]);px(5,6+bodyY,2,2,p[3]);px(9,6+bodyY,2,2,p[3]);px(6,10+bodyY,4,2,p[0]);px(2,5,3,3,p[2]);px(11,5,3,3,p[2]);}
+  else {px(2+stride,7,3,4,p[1]);px(11-stride,7,3,4,p[1]);px(4,4+bodyY,8,9,p[0]);px(5,3+bodyY,6,10,p[1]);px(5,5+bodyY,6,5,p[2]);px(5,6+bodyY,2,2,p[3]);px(9,6+bodyY,2,2,p[3]);px(6,9+bodyY,4,2,p[0]);px(6,11+bodyY,4,1,p[3]);}
+ }
  
  // Extra handcrafted pixels give each existing class a clearer silhouette at phone scale.
  if(kind.startsWith('hero_')){

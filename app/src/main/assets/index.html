@@ -688,17 +688,17 @@ heroAtlas.onload=()=>{heroAtlasReady=true;};
 heroAtlas.onerror=()=>{heroAtlasReady=false;};
 heroAtlas.src='hero_sprites.svg';
 const heroAtlasIndex={scout:0,tank:1,tech:2,medic:3,phantom:4,engineer:5};
-function drawPixelActor(kind,x,y,size,frame=0){
+function drawPixelActor(kind,x,y,size,frame=0,movingState=false){
  ctx.save();
  const isHero=kind.startsWith('hero_'),heroId=isHero?kind.slice(5):'';
- const hurt=isHero&&player.hurtTimer>0?clamp(player.hurtTimer/.24,0,1):0;
+ const hurt=isHero&&player.inv>0?clamp(player.inv/.38,0,1):0;
  const isAttacking=isHero&&attackAnim>0;
  if(isHero&&heroAtlasReady){
   const idx=heroAtlasIndex[heroId];
   if(idx!==undefined){
    const cellW=48,cellH=56,row=(frame%2),dw=Math.round(size),dh=Math.round(size*1.12);
    // Tiny squash on landing/impact and a readable lean during movement or firing.
-   const movingHero=!!(typeof moving!=='undefined'&&moving);
+   const movingHero=!!movingState;
    const gait=movingHero?Math.sin(runTime*18):Math.sin(runTime*2.8)*.035;
    const squash=hurt>0?.09*hurt:(isAttacking?.035:0);
    const lean=movingHero?gait*.09:(isAttacking?-.075:0);
@@ -987,7 +987,7 @@ function draw(dt=0){
  rect(player.x+5,player.y-1-bob,8+recoil,3,'#26344e');rect(player.x+10+recoil,player.y-2-bob,4,5,'#ffc85d');
  // Pixel-art player sprite overlay; frame changes while moving and idles when standing still.
  // Hero atlas animation: movement bob, recoil lean and brief damage tint are handled by drawPixelActor.
- drawPixelActor('hero_'+(activeHero?.id||'scout'),player.x,player.y-1+bob,42, moving?Math.floor(walkFrame/1.5):0);
+ drawPixelActor('hero_'+(activeHero?.id||'scout'),player.x,player.y-1+bob,42,moving?Math.floor(walkFrame/1.5):0,moving);
  // Pixel-art companion and weapon overlays use crisp nearest-neighbour sprites.
  if(pet){const petKind=pet.id==='fox'?'petfox':pet.id==='raven'?'petraven':pet.id==='drone'?'petdrone':pet.id==='slime'?'petslime':pet.id==='wisp'?'petwisp':'petorb';drawPixelActor(petKind,player.x+Math.cos(runTime*2.2)*17,player.y+Math.sin(runTime*2.2)*10-12+Math.sin(runTime*7)*2,22,Math.floor(runTime*7));}
  const weaponPixel=activeWeapon.id==='laser'?'#6ef7ff':activeWeapon.id==='railgun'?'#b9caff':activeWeapon.id==='shotgun'?'#ffb178':'#f5d58b';

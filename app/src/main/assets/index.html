@@ -754,6 +754,19 @@ function draw(dt=0){
   if(e.type==='charger'&&e.windup>0){ctx.globalAlpha=.5+Math.sin(runTime*30)*.35;ctx.strokeStyle='#ff754d';ctx.lineWidth=2;ctx.beginPath();ctx.arc(e.x,e.y,e.r+7+Math.sin(runTime*18)*2,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;}
   if(e.burn>0){ctx.save();ctx.globalAlpha=.55+Math.sin(runTime*24)*.25;ctx.fillStyle='#ff642b';ctx.beginPath();ctx.arc(e.x,e.y,e.r+4+Math.sin(runTime*18)*2,0,Math.PI*2);ctx.fill();ctx.restore();}if(e.poison>0){ctx.save();ctx.globalAlpha=.6;ctx.strokeStyle='#a6ff61';ctx.lineWidth=2;ctx.beginPath();ctx.arc(e.x,e.y,e.r+5+Math.sin(runTime*8)*2,0,Math.PI*2);ctx.stroke();ctx.restore();}if(e.type==='spitter'&&e.attack>.05){ctx.globalAlpha=.7;ctx.fillStyle='#c4ff78';ctx.beginPath();ctx.arc(e.x,e.y,e.r+4,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
   rect(e.x-er+3,e.y+er-2+bob,Math.max(3,er*.42),5,'#111827');rect(e.x+er*.12,e.y+er-2+bob,Math.max(3,er*.42),5,'#111827');rect(e.x-er-3,e.y-er*.15+bob,5,Math.max(4,er*.65),color);rect(e.x+er-2,e.y-er*.15+bob,5,Math.max(4,er*.65),color);rect(e.x-er,e.y-er+bob,er*2,er*2,color);rect(e.x-er+2,e.y-er+2+bob,er*2-4,e.r-2,e.type==='boss'?'#d94364':e.type==='ranged'?'#ffd08b':e.type==='brute'?'#e18bab':e.type==='charger'?'#ffac73':e.type==='spitter'?'#d2f58a':'#73e88e');
+  // Hand-painted material pass: irregular highlights, pores, armor seams and chipped edges.
+  ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+  const texSeed=(Math.abs(Math.floor((e.anim||0)*97))+e.type.length*13)%7;
+  ctx.globalAlpha=.48;ctx.strokeStyle=e.type==='boss'?'#ffd5e5':e.type==='spitter'?'#f0ffb0':e.type==='brute'?'#ffd0e2':'#e7ffe1';ctx.lineWidth=Math.max(1,e.r*.055);
+  ctx.beginPath();ctx.moveTo(e.x-er*.52,e.y-er*.48+bob);ctx.lineTo(e.x-er*.18,e.y-er*.62+bob);ctx.lineTo(e.x+er*.08,e.y-er*.52+bob);ctx.stroke();
+  ctx.globalAlpha=.38;ctx.strokeStyle=e.type==='boss'?'#641b3b':'#183126';ctx.lineWidth=Math.max(1,e.r*.07);
+  ctx.beginPath();ctx.moveTo(e.x-er*.55,e.y+er*.16+bob);ctx.lineTo(e.x-er*.2,e.y+er*.28+bob);ctx.lineTo(e.x+er*.12,e.y+er*.18+bob);ctx.stroke();
+  for(let ti=0;ti<3;ti++){const tx=e.x+((ti*17+texSeed*5)%Math.max(3,Math.floor(er*1.2)))-er*.55,ty=e.y+((ti*11+texSeed*3)%Math.max(3,Math.floor(er*1.1)))-er*.48+bob;ctx.globalAlpha=.28+(ti%2)*.12;ctx.fillStyle=ti===1?'#fff0c4':(e.type==='boss'?'#6c1b40':'#1c3c30');ctx.fillRect(tx,ty,Math.max(1,er*.09),Math.max(1,er*.07));}
+  // Each creature type gets a distinct animated accent.
+  if(e.type==='fast'){ctx.globalAlpha=.7;ctx.strokeStyle='#d9ffe1';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(e.x-er*.4,e.y-er*.2+bob);ctx.lineTo(e.x+er*.35,e.y+er*.1+bob);ctx.stroke();}
+  if(e.type==='ranged'){ctx.globalAlpha=.65;ctx.fillStyle='#fff0b0';ctx.beginPath();ctx.arc(e.x,e.y+er*.22+bob,Math.max(1,er*.12),0,Math.PI*2);ctx.fill();}
+  if(e.type==='boss'){ctx.globalAlpha=.65+.25*Math.sin(runTime*7+(e.anim||0));ctx.strokeStyle='#fff0a1';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(e.x-er*.25,e.y-er*.3+bob);ctx.lineTo(e.x,e.y-er*.05+bob);ctx.lineTo(e.x+er*.25,e.y-er*.3+bob);ctx.stroke();}
+  ctx.restore();
   // Tiny armor plates, brows and a glint make each pixel creature read more like a sprite.
   rect(e.x-er+3,e.y-er+3+bob,Math.max(2,er*.45),2,e.type==='boss'?'#ff91b0':e.type==='brute'?'#f7b3d0':'#f1ffd1');rect(e.x+er*.08,e.y-er+3+bob,Math.max(2,er*.45),2,e.type==='boss'?'#ff91b0':e.type==='brute'?'#f7b3d0':'#f1ffd1');
   if(e.type==='boss'){rect(e.x-er*.72,e.y-er-3+bob,4,7,'#ffbd51');rect(e.x-er*.2,e.y-er-5+bob,4,9,'#fff0a1');rect(e.x+er*.4,e.y-er-3+bob,4,7,'#ffbd51');rect(e.x-er*.65,e.y+er*.25+bob,er*1.3,3,'#641b3b');rect(e.x-er*.42,e.y+er*.35+bob,3,3,'#ffbd51');rect(e.x+er*.2,e.y+er*.35+bob,3,3,'#ffbd51');}
@@ -805,8 +818,17 @@ function draw(dt=0){
  rect(player.x-5,player.y+7+leg,4,2,'#8ba6c8');rect(player.x+2,player.y+7-leg,4,2,'#8ba6c8');
  // A tiny animated rune makes the hero silhouette easier to read at phone size.
  ctx.save();ctx.globalAlpha=.55+.35*armorPulse;ctx.fillStyle=activeHero.color||'#66e7ff';ctx.fillRect(player.x-1,player.y+2-bob,2,2);ctx.restore();
- const recoil=attackAnim>0?3:0;
+ // Hand-painted hero texture: brushed metal, tiny scratches, leather seams and animated rune glints.
+ ctx.save();ctx.lineCap='round';ctx.globalAlpha=.72;ctx.strokeStyle='#d9eaff';ctx.lineWidth=1;
+ ctx.beginPath();ctx.moveTo(player.x-4,player.y-7-bob);ctx.lineTo(player.x-1,player.y-5-bob);ctx.lineTo(player.x+2,player.y-6-bob);ctx.stroke();
+ ctx.strokeStyle='#6d89ac';ctx.beginPath();ctx.moveTo(player.x-4,player.y+1-bob);ctx.lineTo(player.x-2,player.y+2-bob);ctx.lineTo(player.x+3,player.y+1-bob);ctx.stroke();
+ ctx.globalAlpha=.55+.35*Math.sin(runTime*8);ctx.fillStyle=activeHero.color||'#66e7ff';ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=5;ctx.fillRect(player.x-1,player.y-1-bob,2,2);
+ ctx.globalAlpha=.7;ctx.strokeStyle='#ffc85d';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(player.x-5,player.y+4-bob);ctx.lineTo(player.x-3,player.y+5-bob);ctx.moveTo(player.x+3,player.y+4-bob);ctx.lineTo(player.x+5,player.y+5-bob);ctx.stroke();ctx.restore();
+ const recoil=attackAnim>0?3+Math.sin(runTime*55)*.7:0;
  rect(player.x+5,player.y-1-bob,8+recoil,3,'#26344e');rect(player.x+10+recoil,player.y-2-bob,4,5,'#ffc85d');
+ // Weapon-specific animated energy/core and painted surface glints.
+ if(activeWeapon.id==='laser'){ctx.save();ctx.globalAlpha=.55+.4*Math.sin(runTime*24);ctx.strokeStyle='#8ffaff';ctx.shadowColor='#42eaff';ctx.shadowBlur=8;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(player.x+8,player.y-3-bob);ctx.lineTo(player.x+15,player.y-3-bob);ctx.stroke();ctx.restore();}
+ else if(activeWeapon.id==='railgun'){ctx.save();ctx.globalAlpha=.5+.35*Math.sin(runTime*18);ctx.strokeStyle='#b9caff';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(player.x+8,player.y-2-bob);ctx.lineTo(player.x+14,player.y-2-bob);ctx.moveTo(player.x+8,player.y+2-bob);ctx.lineTo(player.x+14,player.y+2-bob);ctx.stroke();ctx.restore();}
  if(attackAnim>0){rect(player.x+14+recoil,player.y-3-bob,5,7,activeWeapon.id==='laser'?'#9effff':activeWeapon.id==='shotgun'?'#ffb178':'#fff0a1');rect(player.x+18+recoil,player.y-1-bob,3,3,activeWeapon.id==='laser'?'#48eaff':'#ff9b45');if(activeWeapon.id==='laser'){rect(player.x+20+recoil,player.y,8,1,'#9effff');}else if(activeWeapon.id==='shotgun'){rect(player.x+19+recoil,player.y-4,4,2,'#ffdfb0');}}
  // Brief invulnerability shimmer; never hides the player.
  if(player.inv>0){rect(player.x-9,player.y-10-bob,18,1,'#9beaff');rect(player.x-9,player.y+10-bob,18,1,'#9beaff')}

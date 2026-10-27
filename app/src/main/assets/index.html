@@ -449,7 +449,7 @@ function killEnemy(e,cause){
   for(let i=0;i<26;i++){const ang=i*Math.PI*2/26+Math.random()*.12,sp=rand(45,190);particles.push({x:e.x,y:e.y,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,life:rand(.55,1.25),color:['#ffd56b','#d89cff','#8df5ff','#fff1b2'][i%4],flame:true,scale:rand(2,5)});}
  }
  if(cause==='physical'||cause==='explosion'){bloodStains.push({x:e.x,y:e.y,r:e.type==='boss'?20:rand(8,15),life:16,maxLife:16,seed:Math.random(),splatter:true});for(let i=0;i<7;i++)bloodStains.push({x:e.x+rand(-e.r*2.6,e.r*2.6),y:e.y+rand(-e.r*2.2,e.r*2.2),r:rand(1.5,4),life:rand(7,15),maxLife:15,seed:Math.random()});}
- if(e.type==='boss'){boss=null;gold+=4;meta.bosses++;meta.chests=(meta.chests||0)+1;saveMeta();if(finalBoss){victory();return;}toast('БОСС ПОВЕРЖЕН! +10 МОНЕТ · СУНДУК В ИНВЕНТАРЕ');}
+ if(e.type==='boss'){boss=null;gold+=4;meta.bosses++;meta.chests=(meta.chests||0)+1;saveMeta();if(finalBoss){victory();return;}toast('БОСС ПОВЕРЖЕН! +4 МОНЕТЫ · СУНДУК В ИНВЕНТАРЕ');}
  else if(Math.random()<.012)loot.push({x:e.x,y:e.y,type:'gear',life:22});
  
  else if(Math.random()<.045)coins.push({x:e.x,y:e.y,r:5});

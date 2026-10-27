@@ -953,6 +953,7 @@ function draw(dt=0){
    ctx.save();ctx.translate(player.x+1,player.y-1-bobY);
    const armAngle=player.aimAngle??0;
    ctx.rotate(Math.cos(armAngle)<0?armAngle+Math.PI:armAngle);
+   ctx.translate(-kick*.45,0);
    ctx.lineCap='round';ctx.lineWidth=3.6;ctx.strokeStyle='#0a1525';ctx.beginPath();ctx.moveTo(1,1);ctx.lineTo(5,1);ctx.stroke();
    ctx.lineWidth=2.2;ctx.strokeStyle='#416b8f';ctx.beginPath();ctx.moveTo(1,.2);ctx.lineTo(5,.2);ctx.stroke();
    ctx.fillStyle='#b9e7ff';ctx.fillRect(3,-.8,2,1.2);
@@ -962,6 +963,7 @@ function draw(dt=0){
    ctx.translate(player.x+1,player.y-1-bobY);
    const rifleAngle=player.aimAngle??0;
    ctx.rotate(Math.cos(rifleAngle)<0 ? rifleAngle+Math.PI : rifleAngle);
+   ctx.translate(-kick,0);
    const muzzle=activeWeapon.id==='laser'?'#6ff6ff':activeWeapon.id==='railgun'?'#b8cfff':'#ffd078';
    ctx.fillStyle='#0b1525';ctx.beginPath();ctx.roundRect(0,-2.5,13,5,1.2);ctx.fill();
    ctx.fillStyle='#203c59';ctx.fillRect(2,1,5,3);

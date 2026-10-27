@@ -34,7 +34,8 @@ button:active{transform:translateY(2px);filter:brightness(1.15)}
 #knob{position:absolute;width:44px;height:44px;left:32px;top:32px;border-radius:50%;background:#b7cfff88;border:2px solid #e7efff}
 #shootHint{position:absolute;right:18px;bottom:max(24px,env(safe-area-inset-bottom));padding:12px;border:2px solid #c4d6ff77;border-radius:50%;background:#0c183d99;color:#e8f2ff;font-size:11px;text-align:center}
 #dashBtn{position:absolute;right:25px;bottom:max(105px,calc(env(safe-area-inset-bottom) + 105px));width:72px;height:72px;border-radius:50%;padding:5px;margin:0;background:#39285dcc;border:2px solid #d6a5ff;color:#fff;font-size:11px;line-height:1.2;text-align:center;pointer-events:auto}#dashBtn.ready{box-shadow:0 0 12px #bd7aff88}#dashBtn.cooling{opacity:.55}
-#toast{position:absolute;top:calc(env(safe-area-inset-top,0px) + 78px);left:50%;transform:translateX(-50%);width:max-content;max-width:min(82vw,520px);padding:7px 11px;border:1px solid #8ba7c7aa;border-radius:9px;background:#08101ee8;box-shadow:0 3px 12px #0008;text-align:center;font-weight:800;font-size:clamp(11px,2.7vw,14px);line-height:1.25;color:#ffe18a;text-shadow:1px 1px #000;overflow-wrap:anywhere;pointer-events:none;z-index:4;display:none}
+#toast{position:absolute;top:calc(env(safe-area-inset-top,0px) + 78px);left:50%;transform:translateX(-50%);width:max-content;max-width:min(82vw,520px);padding:6px 10px;border:1px solid #8ba7c7aa;border-radius:8px;background:#08101ee8;box-shadow:0 3px 12px #0008;text-align:center;font-weight:800;font-size:clamp(10px,2.5vw,13px);line-height:1.2;color:#ffe18a;text-shadow:1px 1px #000;overflow-wrap:anywhere;pointer-events:none;z-index:4;display:none}
+ #alertToast{position:absolute;top:calc(env(safe-area-inset-top,0px) + 82px);left:50%;transform:translateX(-50%);width:max-content;max-width:min(88vw,480px);padding:8px 13px;border:1px solid #ff7a86;border-radius:9px;background:linear-gradient(110deg,#310d20f2,#151025f2);box-shadow:0 0 14px #ff355566,0 3px 12px #0009;text-align:center;font-weight:900;font-size:clamp(11px,2.8vw,15px);line-height:1.2;color:#ffe4a6;text-shadow:1px 1px #000;overflow-wrap:anywhere;pointer-events:none;z-index:5;display:none}
 #choices{display:grid;grid-template-columns:1fr;gap:7px;margin:12px 0}
 .choice{font-size:13px;text-align:left;padding:12px}
 .choice b{color:#ffda69;display:block;margin-bottom:5px}
@@ -59,7 +60,7 @@ canvas{width:100vw;height:100dvh;object-fit:fill;image-rendering:pixelated}
 #dashBtn{right:max(26px,env(safe-area-inset-right));bottom:max(112px,calc(env(safe-area-inset-bottom) + 112px));width:62px;height:62px;font-size:9px;box-shadow:0 0 0 3px #160d24aa}
 #interactBtn{right:max(108px,calc(env(safe-area-inset-right) + 108px))!important;bottom:max(22px,env(safe-area-inset-bottom))!important;width:60px!important;height:60px!important;font-size:9px!important}
 #lootToast{top:28%!important}
-#toast{top:27%;font-size:16px}
+
 #hud button{min-height:0}
 @media (orientation:portrait){
  #hud:before{content:'ПОВЕРНИТЕ ТЕЛЕФОН ГОРИЗОНТАЛЬНО';position:absolute;z-index:10;left:50%;top:50%;transform:translate(-50%,-50%);width:min(80vw,340px);padding:14px;background:#081326ee;border:2px solid #ffc83d;color:#fff0b0;text-align:center;font-size:13px;line-height:1.5;box-shadow:0 0 0 100vmax #050916ee}
@@ -151,7 +152,7 @@ button{min-height:42px;font-size:clamp(12px,3.2vw,14px);padding:11px 12px}
  <div id="lootToast" style="position:absolute;top:34%;left:8%;width:84%;text-align:center;font-weight:bold;color:#8fffe0;text-shadow:2px 2px #000;display:none"></div>
  <button id="audioToggle" style="pointer-events:auto;position:absolute;top:105px;right:12px;width:auto;margin:0;padding:7px 9px;font-size:11px;background:#101b30">♫ ЗВУК: ВКЛ</button>
  <div id="stick"><div id="knob"></div></div>
- <button id="dashBtn" class="ready" aria-label="Рывок">⚡<br>РЫВОК<br><span id="dashStatus">ГОТОВ</span></button><button id="interactBtn" style="display:none;position:absolute;right:110px;bottom:max(30px,env(safe-area-inset-bottom));width:62px;height:62px;border-radius:50%;padding:3px;margin:0;background:#5b482dcc;border:2px solid #ffe18a;font-size:10px;line-height:1.2;pointer-events:auto">🔎<br>ОБЫСК</button><button id="shootBtn" aria-label="Стрелять"><span class="shootIcon">✦</span><span>ОГОНЬ</span></button><div id="toast"></div>
+ <button id="dashBtn" class="ready" aria-label="Рывок">⚡<br>РЫВОК<br><span id="dashStatus">ГОТОВ</span></button><button id="interactBtn" style="display:none;position:absolute;right:110px;bottom:max(30px,env(safe-area-inset-bottom));width:62px;height:62px;border-radius:50%;padding:3px;margin:0;background:#5b482dcc;border:2px solid #ffe18a;font-size:10px;line-height:1.2;pointer-events:auto">🔎<br>ОБЫСК</button><button id="shootBtn" aria-label="Стрелять"><span class="shootIcon">✦</span><span>ОГОНЬ</span></button><div id="toast" role="status" aria-live="polite"></div><div id="alertToast" role="alert" aria-live="assertive"></div>
 </div>
 <div id="menu" class="overlay">
  <div class="menu-layout"><div class="menu-art" aria-label="Герой сражается с драконом"><div class="dragon">🐉</div><div class="hero">🛡️</div><div class="slash">⚔️</div><div class="art-caption">⚔ ОХОТНИК ПРОТИВ ДРАКОНА · ПИКСЕЛЬНЫЙ МИР</div></div><div class="card">
@@ -369,7 +370,7 @@ function updateHud(){
  const ds=$('dashStatus'),db=$('dashBtn');if(ds&&db){ds.textContent=dashCooldown<=0?'ГОТОВ':dashCooldown.toFixed(1)+'с';db.className=dashCooldown<=0?'ready':'cooling';}
  $('xp').style.width=(xp/xpNeed*100)+'%';$('bossbar').style.display=boss?'block':'none';if(boss)$('bossfill').style.width=(boss.hp/boss.maxhp*100)+'%';
 }
-let toastTimer=null;function toast(t){if(/РЫВОК|УКЛОНИСЬ|АТАКА/i.test(t))return;const el=$('toast');el.textContent=t;el.style.display='block';if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.style.display='none';toastTimer=null},1450)}
+let toastTimer=null,alertToastTimer=null;function toast(t){if(/РЫВОК|УКЛОНИСЬ|АТАКА/i.test(t))return;const el=$('toast');el.textContent=t;el.style.display='block';if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.style.display='none';toastTimer=null},1450)}function alertToast(t){const el=$('alertToast');el.textContent=t;el.style.display='block';if(alertToastTimer)clearTimeout(alertToastTimer);alertToastTimer=setTimeout(()=>{el.style.display='none';alertToastTimer=null},2200)}
 function addEnemy(){
  let side=Math.floor(rand(0,4)),x=side===0?-10:side===1?W+10:rand(0,W),y=side===2?-10:side===3?H+10:rand(0,H);
  if(Math.hypot(x-player.x,y-player.y)<145){x=x<W/2?W+10:-10;y=rand(30,H-30)}
@@ -385,7 +386,7 @@ function spawnBoss(isFinal=false){
  const names={storm:'ГРОМОВЕРЖЕЦ',hunter:'КРОВАВЫЙ ОХОТНИК',frost:'ЛЕДЯНОЙ ЖНЕЦ',void:'ПОЖИРАТЕЛЬ БЕЗДНЫ'};
  boss={x:clamp(player.x+rand(-150,150),70,W-70),y:clamp(player.y+rand(-90,90),55,H-55),r:isFinal?30:23,hp,maxhp:hp,speed:isFinal?46:29+phase*5,fire:isFinal?.62:1.02,flash:0,phase,kind,name:names[kind],damage:isFinal?2.1:1+phase*.4};
  enemies.push({id:enemyId++,x:boss.x,y:boss.y,r:boss.r,hp:boss.hp,maxhp:boss.maxhp,speed:boss.speed,damage:boss.damage,flash:0,type:'boss',bossKind:kind,fire:boss.fire,anim:rand(0,6.28)});
- bossWarning=3;toast(isFinal?'⚠ '+names[kind]+' — ФИНАЛЬНЫЙ БОСС!':'⚠ '+names[kind]+' ВСТУПАЕТ В БОЙ!');sfx('boss');
+ bossWarning=3;alertToast(isFinal?'⚠ '+names[kind]+' · ФИНАЛЬНЫЙ БОСС':'⚠ '+names[kind]+' ВСТУПАЕТ В БОЙ');sfx('boss');
 }
 function victory(){clearRunSave();sfx('upgrade');state='end';$('hud').style.display='none';$('end').style.display='flex';$('endStats').innerHTML='ПОБЕДА!<br>Ты выжил 15 минут и победил главного босса.<br>Убийств: '+kills+'<br>Монет собрано: '+gold+'<br>Уровень героя: '+level+'<br><br><span style="color:#9effb4">Легенда арены!</span>';meta.coins+=gold;meta.best=Math.max(meta.best,kills);saveMeta();}
 function particle(x,y,color,n=5){for(let i=0;i<n;i++)particles.push({x,y,vx:rand(-55,55),vy:rand(-55,55),life:rand(.15,.45),color})}
@@ -466,7 +467,7 @@ function endGame(){
 }
 function update(dt){
  if(state!=='play')return;guardianCooldown=Math.max(0,guardianCooldown-dt);artifactPulse+=dt;if(artifact==='frost'&&artifactPulse>=Math.max(3.5,7.5-artifactLevel*.7)){artifactPulse=0;const rad=65+artifactLevel*12;particle(player.x,player.y,'#80eaff',18+artifactLevel*3);for(const near of enemies){if(!near.adminDummy&&near.hp>0&&Math.hypot(near.x-player.x,near.y-player.y)<rad){near.speed=Math.max(7,near.speed*(.55-artifactLevel*.025));near.stun=Math.max(near.stun||0,.18+.06*artifactLevel);near.hp-=player.damage*(.25+.12*artifactLevel);if(near.hp<=0)killEnemy(near);}}}if(!adminArena)runTime+=dt;if(!adminArena){checkpointTimer+=dt;bossWarning=Math.max(0,bossWarning-dt);if(runTime>=900&&finalBoss&&!boss){victory();return}if(checkpointTimer>=5){checkpointTimer=0;saveRun()}}streakTimer=Math.max(0,streakTimer-dt);if(streakTimer<=0)killStreak=0;player.inv=Math.max(0,player.inv-dt);dashCooldown=Math.max(0,dashCooldown-dt);dashTime=Math.max(0,dashTime-dt);spawn-=dt;shoot-=dt;petAttackTimer=Math.max(0,petAttackTimer-dt);
- if(!adminArena){if(hordeEventLeft>0){hordeEventLeft=Math.max(0,hordeEventLeft-dt);if(hordeEventLeft===0)toast('ОРДА БЕЗДНЫ ОТСТУПИЛА');}else if(runTime>=hordeEventTimer){hordeEventLeft=12;hordeEventTimer+=75;toast('⚠ ОРДА БЕЗДНЫ! ВРАГОВ БОЛЬШЕ, НАГРАДЫ ВЫШЕ!');sfx('boss');}}
+ if(!adminArena){if(hordeEventLeft>0){hordeEventLeft=Math.max(0,hordeEventLeft-dt);if(hordeEventLeft===0)alertToast('ОРДА БЕЗДНЫ ОТСТУПИЛА');}else if(runTime>=hordeEventTimer){hordeEventLeft=12;hordeEventTimer+=75;alertToast('⚠ ОРДА БЕЗДНЫ · ВРАГОВ БОЛЬШЕ, НАГРАДЫ ВЫШЕ');sfx('boss');}}
  if(dashRequested&&dashCooldown<=0){let mx=joy.x,my=joy.y;if(keys.ArrowLeft||keys.a)mx-=1;if(keys.ArrowRight||keys.d)mx+=1;if(keys.ArrowUp||keys.w)my-=1;if(keys.ArrowDown||keys.s)my+=1;let mm=Math.hypot(mx,my);if(mm>.1)dashDir={x:mx/mm,y:my/mm};dashTime=.18;dashCooldown=2.6;player.inv=Math.max(player.inv,.38);particle(player.x,player.y,'#c38aff',16);particle(player.x-dashDir.x*8,player.y-dashDir.y*8,'#8cecff',7);sfx('dash');}dashRequested=false;
  if(!adminArena&&spawn<=0){const phaseCount=Math.min(4,Math.floor(runTime/180));const pack=2*(1+(phaseCount>=1?1:0)+(phaseCount>=2&&Math.random()<.65?1:0)+(phaseCount>=3&&Math.random()<.35?1:0));for(let si=0;si<pack;si++)addEnemy();spawn=Math.max(.18,(1.12-landscapePhase*.13)/(1+phaseCount*.12)*(hordeEventLeft>0?.68:1));}
  const previousPhase=landscapePhase;landscapePhase=Math.min(4,Math.floor(runTime/180));floor=landscapePhase+1;if(landscapePhase!==previousPhase){makeRoomProps();if(runTime<900)toast('ЛАНДШАФТ ИЗМЕНИЛСЯ: '+['РУИНЫ','ПЕПЕЛЬНЫЕ ПУСТОШИ','ЗАТОПЛЕННЫЙ ХРАМ','КРИСТАЛЬНАЯ БУРЯ','ЦАРСТВО БЕЗДНЫ'][landscapePhase]);}if(!adminArena){if(runTime>=900&&!finalBoss&&!boss){spawnBoss(true);}else if(runTime>=nextBossTime&&runTime<900&&!boss){spawnBoss(false);nextBossTime+=180;}}

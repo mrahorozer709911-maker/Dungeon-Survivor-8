@@ -987,6 +987,7 @@ function draw(dt=0){
  // Weapon-specific animated energy/core and painted surface glints.
  if(activeWeapon.id==='laser'){ctx.save();ctx.globalAlpha=.55+.4*Math.sin(runTime*24);ctx.strokeStyle='#8ffaff';ctx.shadowColor='#42eaff';ctx.shadowBlur=8;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(player.x+8,player.y-3-bob);ctx.lineTo(player.x+15,player.y-3-bob);ctx.stroke();ctx.restore();}
  else if(activeWeapon.id==='railgun'){ctx.save();ctx.globalAlpha=.5+.35*Math.sin(runTime*18);ctx.strokeStyle='#b9caff';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(player.x+8,player.y-2-bob);ctx.lineTo(player.x+14,player.y-2-bob);ctx.moveTo(player.x+8,player.y+2-bob);ctx.lineTo(player.x+14,player.y+2-bob);ctx.stroke();ctx.restore();}
+ const recoil=attackAnim>0?3+Math.sin(runTime*55)*.7:0;
  if(attackAnim>0){rect(player.x+14+recoil,player.y-3-bob,5,7,activeWeapon.id==='laser'?'#9effff':activeWeapon.id==='shotgun'?'#ffb178':'#fff0a1');rect(player.x+18+recoil,player.y-1-bob,3,3,activeWeapon.id==='laser'?'#48eaff':'#ff9b45');if(activeWeapon.id==='laser'){rect(player.x+20+recoil,player.y,8,1,'#9effff');}else if(activeWeapon.id==='shotgun'){rect(player.x+19+recoil,player.y-4,4,2,'#ffdfb0');}}
  // Brief invulnerability shimmer remains visible without drawing a second body.
  if(player.inv>0){ctx.save();ctx.globalAlpha=.8;ctx.strokeStyle='#9beaff';ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(player.x,player.y,11,15,0,0,Math.PI*2);ctx.stroke();ctx.restore();}

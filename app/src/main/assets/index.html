@@ -915,6 +915,17 @@ function draw(dt=0){
  ctx.restore();ctx.restore();}
  // Orbiting energy drones.
  for(let oi=0;oi<orbitTimer;oi++){const ox=player.x+Math.cos(orbitAngle+oi*Math.PI*2/orbitTimer)*23,oy=player.y+Math.sin(orbitAngle+oi*Math.PI*2/orbitTimer)*23;rect(ox-5,oy-5,10,10,'#513c91');rect(ox-3,oy-3,6,6,'#d5baff');rect(ox-1,oy-1,2,2,'#ffffff')}
+  // Scout aim tracking: smoothly turns toward the target used by auto-fire.
+  if(activeHero.id==='scout'){
+   let aimTarget=null,aimDist=1e9;
+   for(const candidate of enemies){if(candidate.adminDummy||candidate.hp<=0)continue;const dd=Math.hypot(candidate.x-player.x,candidate.y-player.y);if(dd<aimDist){aimDist=dd;aimTarget=candidate;}}
+   let wanted=player.aimAngle??-Math.PI/2;
+   if(aimTarget)wanted=Math.atan2(aimTarget.y-player.y,aimTarget.x-player.x);
+   else if(Math.hypot(joy.x,joy.y)>.12)wanted=Math.atan2(joy.y,joy.x);
+   const current=player.aimAngle??-Math.PI/2,turn=Math.atan2(Math.sin(wanted-current),Math.cos(wanted-current));
+   player.aimAngle=current+turn*Math.min(1,dt*(aimTarget?18:7));
+   ctx.save();ctx.translate(player.x,player.y);ctx.rotate(player.aimAngle);ctx.translate(-player.x,-player.y);
+  }
  // Outline and legs
  rect(player.x-6,player.y+1+leg,5,7,'#101523');rect(player.x+1,player.y+1-leg,5,7,'#101523');
  rect(player.x-5,player.y+2+leg,3,5,'#d9e5f8');rect(player.x+2,player.y+2-leg,3,5,'#a9c4e7');
@@ -952,7 +963,7 @@ function draw(dt=0){
  if(attackAnim>0){rect(player.x+14+recoil,player.y-3-bob,5,7,activeWeapon.id==='laser'?'#9effff':activeWeapon.id==='shotgun'?'#ffb178':'#fff0a1');rect(player.x+18+recoil,player.y-1-bob,3,3,activeWeapon.id==='laser'?'#48eaff':'#ff9b45');if(activeWeapon.id==='laser'){rect(player.x+20+recoil,player.y,8,1,'#9effff');}else if(activeWeapon.id==='shotgun'){rect(player.x+19+recoil,player.y-4,4,2,'#ffdfb0');}}
  // Brief invulnerability shimmer; never hides the player.
  if(player.inv>0){rect(player.x-9,player.y-10-bob,18,1,'#9beaff');rect(player.x-9,player.y+10-bob,18,1,'#9beaff')}
- rect(player.x-3,player.y-1-bob,6,1,'#ffffffaa');rect(player.x-5,player.y+3-bob,3,2,'#d9eaff');rect(player.x+2,player.y+3-bob,3,2,'#d9eaff');rect(player.x-2,player.y+7,4,2,'#283955');ctx.restore();
+ rect(player.x-3,player.y-1-bob,6,1,'#ffffffaa');rect(player.x-5,player.y+3-bob,3,2,'#d9eaff');rect(player.x+2,player.y+3-bob,3,2,'#d9eaff');rect(player.x-2,player.y+7,4,2,'#283955');ctx.restore();ctx.restore();
  if(screenFlash>0){ctx.fillStyle=`rgba(255,55,80,${Math.min(.18,screenFlash)})`;ctx.fillRect(0,0,W,H)}
 
  // Floating damage numbers with dark outlines for contrast.

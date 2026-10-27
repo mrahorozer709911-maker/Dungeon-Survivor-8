@@ -957,7 +957,7 @@ window.addEventListener('keydown',e=>{keys[e.key]=true;if(e.code==='Space'&&stat
 
 function loop(t){let dt=Math.min(.033,(t-last)/1000||0);last=t;if(state!=='paused')update(dt);if(state==='play'||state==='upgrade'||state==='paused')draw(dt);requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
-loadMeta();
+try{loadMeta()}catch(e){console.warn('Meta profile load failed; using defaults',e);try{renderMeta()}catch(_){const el=document.getElementById('metaStats');if(el)el.textContent='Профиль не загружен — игра доступна, прогресс начнётся заново после сброса данных.'}}
 $('start').onclick=()=>{adminArena=false;reset()};
 if($('adminOpen'))$('adminOpen').onclick=()=>{$('menu').style.display='none';$('adminPanel').style.display='flex'};
 $('adminBack').onclick=()=>{$('adminPanel').style.display='none';$('menu').style.display='flex';renderMeta()};

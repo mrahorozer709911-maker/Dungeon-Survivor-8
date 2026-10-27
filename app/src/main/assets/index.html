@@ -919,12 +919,15 @@ function draw(dt=0){
   if(activeHero.id==='scout'){
    let aimTarget=null,aimDist=1e9;
    for(const candidate of enemies){if(candidate.adminDummy||candidate.hp<=0)continue;const dd=Math.hypot(candidate.x-player.x,candidate.y-player.y);if(dd<aimDist){aimDist=dd;aimTarget=candidate;}}
-   let wanted=player.aimAngle??-Math.PI/2;
+   const movingX=Math.abs(joy.x)>.12,movingY=Math.abs(joy.y)>.12,moving=Math.hypot(joy.x,joy.y)>.12;
+   let wanted=player.aimAngle??0;
    if(aimTarget)wanted=Math.atan2(aimTarget.y-player.y,aimTarget.x-player.x);
-   else if(Math.hypot(joy.x,joy.y)>.12)wanted=Math.atan2(joy.y,joy.x);
-   const current=player.aimAngle??-Math.PI/2,turn=Math.atan2(Math.sin(wanted-current),Math.cos(wanted-current));
-   player.aimAngle=current+turn*Math.min(1,dt*(aimTarget?18:7));
-   ctx.save();ctx.translate(player.x,player.y);ctx.rotate(Math.cos(player.aimAngle)>=0?0:Math.PI);ctx.translate(-player.x,-player.y);
+   if(moving)wanted=Math.atan2(joy.y,joy.x);
+   const current=player.aimAngle??wanted,turn=Math.atan2(Math.sin(wanted-current),Math.cos(wanted-current));
+   player.aimAngle=current+turn*Math.min(1,dt*(moving?10:18));
+   // Keep the character upright: mirror the side-profile art left/right instead of rotating the whole body upside down.
+   const faceLeft=moving?joy.x<-.12:Math.cos(player.aimAngle)<0;
+   ctx.save();ctx.translate(player.x,player.y);ctx.scale(faceLeft?-1:1,1);ctx.translate(-player.x,-player.y);
   }
   const skin=SKINS.find(sk=>sk.id===meta.equippedSkins?.[activeHero.id]),weaponSkin=WEAPON_SKINS.find(sk=>sk.id===meta.equippedWeaponSkins?.[activeWeapon.id]);
   if(activeHero.id==='scout'){

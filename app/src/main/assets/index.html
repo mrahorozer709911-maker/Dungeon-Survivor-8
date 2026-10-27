@@ -932,6 +932,9 @@ function draw(dt=0){
   const skin=SKINS.find(sk=>sk.id===meta.equippedSkins?.[activeHero.id]),weaponSkin=WEAPON_SKINS.find(sk=>sk.id===meta.equippedWeaponSkins?.[activeWeapon.id]);
   if(activeHero.id==='scout'){
    const bobY=bob,sy=skin?.color||'#528ac4',metal=weaponSkin?.color||'#d9edff',pulse=.5+.5*Math.sin(runTime*8),kick=attackAnim>0?Math.min(3,attackAnim*35):0;
+   const verticalFacing=Math.abs(Math.cos(player.aimAngle??0))<.42 && Math.abs(joy.x)<.35;
+   if(!verticalFacing){
+
    // Sculpted side-profile Scout: articulated legs, utility pack, layered armor, sealed visor and rifle.
    ctx.save();ctx.globalAlpha=.28;ctx.fillStyle='#020711';ctx.beginPath();ctx.ellipse(player.x,player.y+9,11,4,0,0,Math.PI*2);ctx.fill();ctx.restore();
    for(const side of [-1,1]){const swing=leg*.55*side;ctx.fillStyle='#101a2b';ctx.beginPath();ctx.roundRect(player.x-5+swing,player.y+3+side*2,7,7,2);ctx.fill();ctx.fillStyle='#315577';ctx.beginPath();ctx.roundRect(player.x-4+swing,player.y+5+side*2,6,5,1);ctx.fill();ctx.fillStyle='#b8e3ff';ctx.fillRect(player.x-3+swing,player.y+7+side*2,4,1);ctx.fillStyle='#182940';ctx.beginPath();ctx.roundRect(player.x-6+swing,player.y+10+side*2,8,3,1);ctx.fill();ctx.fillStyle='#f0fbff';ctx.fillRect(player.x-5+swing,player.y+10+side*2,4,1);}
@@ -952,6 +955,37 @@ function draw(dt=0){
    if(activeWeapon.id==='laser'){ctx.globalAlpha=.5+.45*pulse;ctx.strokeStyle='#9dffff';ctx.shadowColor='#43efff';ctx.shadowBlur=7;ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(player.x+15-kick,player.y);ctx.lineTo(player.x+20-kick,player.y);ctx.stroke();ctx.shadowBlur=0;ctx.globalAlpha=1;}
    if(attackAnim>0){ctx.globalAlpha=Math.min(1,attackAnim*20);ctx.fillStyle=activeWeapon.id==='laser'?'#9effff':'#fff0a4';ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=10;ctx.beginPath();ctx.moveTo(player.x+16-kick,player.y-3-bobY);ctx.lineTo(player.x+22-kick,player.y-bobY);ctx.lineTo(player.x+17-kick,player.y+2-bobY);ctx.closePath();ctx.fill();ctx.shadowBlur=0;ctx.globalAlpha=1;}
    if(player.inv>0){ctx.globalAlpha=.6+.35*Math.sin(runTime*24);ctx.strokeStyle='#a3efff';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(player.x,player.y,12,15,0,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;}
+   }else{
+    // Dedicated front/back-facing Scout pose for vertical movement/aiming.
+    const towardFront=Math.sin(player.aimAngle??0)>0;
+    ctx.save();ctx.globalAlpha=.24;ctx.fillStyle='#020711';ctx.beginPath();ctx.ellipse(player.x,player.y+9,8,3,0,0,Math.PI*2);ctx.fill();ctx.restore();
+    for(const side of [-1,1]){
+     const swing=leg*.42*side;
+     ctx.fillStyle='#101a2b';ctx.beginPath();ctx.roundRect(player.x+side*3-2,player.y+3+swing,4,8,1.5);ctx.fill();
+     ctx.fillStyle='#315577';ctx.beginPath();ctx.roundRect(player.x+side*3-2,player.y+5+swing,4,5,1);ctx.fill();
+     ctx.fillStyle='#b8e3ff';ctx.fillRect(player.x+side*3-1,player.y+8+swing,2,1);
+     ctx.fillStyle='#182940';ctx.beginPath();ctx.roundRect(player.x+side*3-3,player.y+10+swing,5,3,1);ctx.fill();
+    }
+    if(!towardFront){
+     ctx.fillStyle='#091322';ctx.beginPath();ctx.roundRect(player.x-7,player.y-7-bobY,14,13,3);ctx.fill();
+     ctx.fillStyle='#42698d';ctx.beginPath();ctx.roundRect(player.x-5,player.y-5-bobY,10,9,2);ctx.fill();
+     ctx.fillStyle='#80eaff';ctx.globalAlpha=.6+.35*pulse;ctx.fillRect(player.x-2,player.y-3-bobY,4,3);ctx.globalAlpha=1;
+    }else{
+     ctx.fillStyle='#101d30';ctx.beginPath();ctx.roundRect(player.x-8,player.y-7-bobY,16,13,3);ctx.fill();
+     ctx.fillStyle=sy;ctx.beginPath();ctx.roundRect(player.x-6,player.y-6-bobY,12,11,3);ctx.fill();
+     ctx.fillStyle='#d9edff';ctx.fillRect(player.x-5,player.y-4-bobY,10,1);
+     ctx.fillStyle='#091322';ctx.beginPath();ctx.roundRect(player.x-6,player.y-13-bobY,12,9,3);ctx.fill();
+     ctx.fillStyle='#5285ad';ctx.beginPath();ctx.roundRect(player.x-4,player.y-11-bobY,8,5,2);ctx.fill();
+     ctx.fillStyle='#8af4ff';ctx.fillRect(player.x-4,player.y-8-bobY,8,2);
+    }
+    // Weapon sits in front of the torso, aligned to the facing direction.
+    ctx.fillStyle='#172b43';ctx.beginPath();ctx.roundRect(player.x+3,player.y-4-bobY,7,10,2);ctx.fill();
+    ctx.fillStyle=metal;ctx.fillRect(player.x+5,player.y-3-bobY,3,8);
+    ctx.fillStyle='#091322';ctx.fillRect(player.x+4,player.y-7-bobY,4,5);
+    ctx.fillStyle='#a8f8ff';ctx.fillRect(player.x+5,player.y-8-bobY,2,2);
+    if(attackAnim>0){ctx.globalAlpha=Math.min(1,attackAnim*20);ctx.fillStyle=activeWeapon.id==='laser'?'#9effff':'#fff0a4';ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=9;ctx.beginPath();ctx.arc(player.x+8,player.y-8-bobY,2+Math.random()*1.5,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.globalAlpha=1;}
+    if(player.inv>0){ctx.globalAlpha=.6+.35*Math.sin(runTime*24);ctx.strokeStyle='#a3efff';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(player.x,player.y,12,15,0,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;}
+   }
   }else{
  // Outline and legs
  rect(player.x-6,player.y+1+leg,5,7,'#101523');rect(player.x+1,player.y+1-leg,5,7,'#101523');

@@ -405,15 +405,15 @@ function addEnemy(){
  if(Math.hypot(x-player.x,y-player.y)<145){x=x<W/2?W+10:-10;y=rand(30,H-30)}
  const roll=Math.random();let type=roll<.16?'fast':roll<.29?'ranged':roll<.39?'brute':roll<.51?'charger':roll<.62?'spitter':'grunt';
  const phase=Math.min(4,Math.floor(runTime/180)),scale=1+phase*.28;
- let hp=(type==='fast'?5:type==='brute'?17:type==='charger'?12:type==='spitter'?10:type==='ranged'?9:8.5)*scale;
+ let hp=(type==='fast'?9:type==='brute'?31:type==='charger'?22:type==='spitter'?18:type==='ranged'?16:type==='grunt'?15:15)*scale;
  const radius={fast:6,brute:11,charger:9,spitter:8,ranged:8,grunt:8}[type];
  enemies.push({id:enemyId++,x,y,r:radius,hp,maxhp:hp,speed:(type==='fast'?rand(48,66):type==='brute'?rand(18,26):type==='charger'?rand(22,30):type==='spitter'?rand(18,25):type==='ranged'?rand(20,30):rand(25,42))+phase*2.2,damage:(type==='fast'?.65:type==='brute'?1.6:type==='charger'?1.8:type==='spitter'?.7:type==='ranged'?.8:1)*(1+phase*.12),flash:0,type,fire:rand(.8,1.8),attack:rand(.7,1.5),windup:0,chargeX:0,chargeY:0,anim:rand(0,6.28)});
  }
 function spawnBoss(isFinal=false){
- finalBoss=isFinal;const phase=Math.min(5,Math.floor(runTime/180));const hp=isFinal?1900:430+phase*270;
+ finalBoss=isFinal;const phase=Math.min(5,Math.floor(runTime/180));const hp=isFinal?4200:900+phase*520;
  const kind=isFinal?'void':['storm','hunter','frost'][phase%3];
  const names={storm:'ГРОМОВЕРЖЕЦ',hunter:'КРОВАВЫЙ ОХОТНИК',frost:'ЛЕДЯНОЙ ЖНЕЦ',void:'ПОЖИРАТЕЛЬ БЕЗДНЫ'};
- boss={x:clamp(player.x+rand(-150,150),70,W-70),y:clamp(player.y+rand(-90,90),55,H-55),r:isFinal?30:23,hp,maxhp:hp,speed:isFinal?46:29+phase*5,fire:isFinal?.62:1.02,flash:0,phase,kind,name:names[kind],damage:isFinal?2.1:1+phase*.4};
+ boss={x:clamp(player.x+rand(-150,150),70,W-70),y:clamp(player.y+rand(-90,90),55,H-55),r:isFinal?30:23,hp,maxhp:hp,speed:isFinal?52:32+phase*5.5,fire:isFinal?.48:.82,flash:0,phase,kind,name:names[kind],damage:isFinal?3.1:1.35+phase*.5};
  enemies.push({id:enemyId++,x:boss.x,y:boss.y,r:boss.r,hp:boss.hp,maxhp:boss.maxhp,speed:boss.speed,damage:boss.damage,flash:0,type:'boss',bossKind:kind,fire:boss.fire,anim:rand(0,6.28)});
  bossWarning=3;alertToast(isFinal?'⚠ '+names[kind]+' · ФИНАЛЬНЫЙ БОСС':'⚠ '+names[kind]+' ВСТУПАЕТ В БОЙ');sfx('boss');
 }
@@ -433,8 +433,8 @@ function killEnemy(e,cause){
  if(!e||e.adminDummy||e.dead)return;
  e.dead=true;
  cause=cause||e.deathCause||(e.burn>0?'fire':e.poison>0?'poison':'physical');
- sfx(e.type==='boss'?'boss':cause==='fire'?'burnDeath':cause==='poison'?'poisonDeath':cause==='lightning'?'lightningDeath':cause==='explosion'?'explodeDeath':'hit');kills++;meta.totalKills++;streakTimer=3;killStreak=Math.min(10,killStreak+1);if(artifact==='vampire'&&Math.random()<Math.min(.85,.22+.10*(artifactLevel-1)))player.hp=Math.min(player.maxhp,player.hp+(player.hp<player.maxhp*.35?Math.min(1.5,.5+.2*artifactLevel):1));if(e.type!=='boss'){roomKills++;}gold+=e.type==='boss'?20:((Math.random()<.55?1:0)+(hordeEventLeft>0?1:0));xp+=e.type==='boss'?5:1;
- if(kills>0&&kills%25===0){gold+=12;if(player)player.hp=Math.min(player.maxhp,player.hp+1.5);toast('ОХОТНИЧИЙ РУБЕЖ! '+kills+' УБИЙСТВ · +12 МОНЕТ · ЛЕЧЕНИЕ');sfx('coin');for(let j=0;j<18;j++){const a=Math.PI*2*j/18,sp=rand(35,115);particles.push({x:e.x,y:e.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:rand(.35,.8),color:['#ffc83d','#8df5ff','#aaffdd'][j%3],flame:true,scale:rand(2,4)});}}
+ sfx(e.type==='boss'?'boss':cause==='fire'?'burnDeath':cause==='poison'?'poisonDeath':cause==='lightning'?'lightningDeath':cause==='explosion'?'explodeDeath':'hit');kills++;meta.totalKills++;streakTimer=3;killStreak=Math.min(10,killStreak+1);if(artifact==='vampire'&&Math.random()<Math.min(.85,.22+.10*(artifactLevel-1)))player.hp=Math.min(player.maxhp,player.hp+(player.hp<player.maxhp*.35?Math.min(1.5,.5+.2*artifactLevel):1));if(e.type!=='boss'){roomKills++;}gold+=e.type==='boss'?8:((Math.random()<.28?1:0)+(hordeEventLeft>0&&Math.random()<.25?1:0));xp+=e.type==='boss'?5:1;
+ if(kills>0&&kills%25===0){gold+=5;toast('ОХОТНИЧИЙ РУБЕЖ! '+kills+' УБИЙСТВ · +5 МОНЕТ');sfx('coin');for(let j=0;j<18;j++){const a=Math.PI*2*j/18,sp=rand(35,115);particles.push({x:e.x,y:e.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:rand(.35,.8),color:['#ffc83d','#8df5ff','#aaffdd'][j%3],flame:true,scale:rand(2,4)});}}
  const chunks=cause==='explosion'?10:cause==='physical'?8:5;
  for(let i=0;i<chunks;i++){const a=Math.random()*Math.PI*2,sp=rand(cause==='explosion'?55:22,cause==='explosion'?180:100);particles.push({x:e.x+rand(-e.r/2,e.r/2),y:e.y+rand(-e.r/2,e.r/2),vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-8,life:rand(.35,.95),color:cause==='fire'?['#ff8b37','#e34b22','#4a4140'][i%3]:cause==='poison'?['#8dff4d','#3fae48','#244e2b'][i%3]:cause==='lightning'?'#a5f6ff':cause==='explosion'?['#a9253d','#d95761','#4d2635'][i%3]:['#a91f39','#e34858','#5b192b'][i%3],chunk:cause==='explosion'||cause==='physical'});}
  if(cause==='laser'){deathFx.push({x:e.x,y:e.y,r:e.r,life:1.5,maxLife:1.5,color:'#70f7ff',kind:'shock',seed:Math.random()});for(let i=0;i<14;i++){const a=Math.random()*Math.PI*2,sp=rand(25,125);particles.push({x:e.x,y:e.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:rand(.25,.8),color:i%2?'#8cfaff':'#ff9c42',glow:true});}}
@@ -449,10 +449,10 @@ function killEnemy(e,cause){
   for(let i=0;i<26;i++){const ang=i*Math.PI*2/26+Math.random()*.12,sp=rand(45,190);particles.push({x:e.x,y:e.y,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,life:rand(.55,1.25),color:['#ffd56b','#d89cff','#8df5ff','#fff1b2'][i%4],flame:true,scale:rand(2,5)});}
  }
  if(cause==='physical'||cause==='explosion'){bloodStains.push({x:e.x,y:e.y,r:e.type==='boss'?20:rand(8,15),life:16,maxLife:16,seed:Math.random(),splatter:true});for(let i=0;i<7;i++)bloodStains.push({x:e.x+rand(-e.r*2.6,e.r*2.6),y:e.y+rand(-e.r*2.2,e.r*2.2),r:rand(1.5,4),life:rand(7,15),maxLife:15,seed:Math.random()});}
- if(e.type==='boss'){boss=null;gold+=10;meta.bosses++;meta.chests=(meta.chests||0)+1;saveMeta();if(finalBoss){victory();return;}toast('БОСС ПОВЕРЖЕН! +10 МОНЕТ · СУНДУК В ИНВЕНТАРЕ');}
- else if(Math.random()<.044)loot.push({x:e.x,y:e.y,type:'gear',life:22});
+ if(e.type==='boss'){boss=null;gold+=4;meta.bosses++;meta.chests=(meta.chests||0)+1;saveMeta();if(finalBoss){victory();return;}toast('БОСС ПОВЕРЖЕН! +10 МОНЕТ · СУНДУК В ИНВЕНТАРЕ');}
+ else if(Math.random()<.012)loot.push({x:e.x,y:e.y,type:'gear',life:22});
  
- else if(Math.random()<.085)coins.push({x:e.x,y:e.y,r:5});
+ else if(Math.random()<.045)coins.push({x:e.x,y:e.y,r:5});
  if(xp>=xpNeed){xp-=xpNeed;level++;xpNeed=Math.ceil(xpNeed*1.28);showUpgrades()}
 }
 function showUpgrades(){
@@ -474,8 +474,8 @@ function showUpgrades(){
   ...(specific[activeWeapon.id]||specific.pistol)
  ];
  const general=[
-  ['УРОН ГЕРОЯ +0.12','Небольшой прирост общего урона.',()=>{player.damage+=.12;upgrades.damage++;}],
-  ['БЫСТРЫЕ НОГИ','Скорость движения +2,5%.',()=>{player.speed*=1.025;upgrades.speed++;}],
+  ['УРОН ГЕРОЯ +0.28','Сильный прирост общего урона.',()=>{player.damage+=.28;upgrades.damage++;}],
+  ['БЫСТРЫЕ НОГИ','Скорость движения +0,5%.',()=>{player.speed*=1.005;upgrades.speed++;}],
   ['ЗАПАС ЗДОРОВЬЯ','Восстанови 1 ♥ и увеличь максимум.',()=>{player.maxhp++;player.hp=Math.min(player.maxhp,player.hp+1);upgrades.maxhp++;}],
   ['МАГНИТ ОПЫТА','Радиус сбора монет выше.',()=>{upgrades.magnet++;}],
   ['ОРЛИНЫЙ ГЛАЗ','Шанс критического урона +1,5%.',()=>{critChance=Math.min(.35,critChance+.015);}],
@@ -549,9 +549,9 @@ if(e.type==='boss'&&boss){boss.hp=e.hp;boss.x=e.x;boss.y=e.y;}b.pierce=b.pierce|
  for(let b of ebullets){b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;if(Math.hypot(b.x-player.x,b.y-player.y)<player.r+b.r&&player.inv<=0){const taken=Math.max(.35,(b.damage||1)*(1-armor*.25));player.hp-=taken;damageNumbers.push({x:player.x+rand(-5,5),y:player.y-18,v:rand(24,38),value:Math.ceil(taken*10)+' HP',life:.9,maxLife:.9,color:'#ff5266'});player.inv=.9;b.life=0;shake=7;screenFlash=.16;particle(player.x,player.y,'#ff5266',10);if(player.hp<=0){endGame();return}}}
  ebullets=ebullets.filter(b=>b.life>0&&b.x>-20&&b.x<W+20&&b.y>-20&&b.y<H+20);
  enemies=enemies.filter(e=>e.hp>0);
- for(let l of loot){l.life-=dt;let d=Math.hypot(l.x-player.x,l.y-player.y);if(d<player.r+15){l.got=true;if(l.type==='chest'){gold+=12;xp+=3;showLoot('СУНДУК! +12 МОНЕТ +3 ОПЫТА');particle(l.x,l.y,'#ffc83d',12)}
+ for(let l of loot){l.life-=dt;let d=Math.hypot(l.x-player.x,l.y-player.y);if(d<player.r+15){l.got=true;if(l.type==='chest'){gold+=5;xp+=3;showLoot('СУНДУК! +5 МОНЕТ +3 ОПЫТА');particle(l.x,l.y,'#ffc83d',12)}
  else if(l.type==='artifact'){const a=ARTIFACTS[Math.floor(Math.random()*ARTIFACTS.length)];artifact=a.id;if(a.id==='guardian')armor++;if(a.id==='vampire')player.hp=Math.min(player.maxhp,player.hp+1);if(a.id==='storm')critChance=Math.min(.65,critChance+.12);if(a.id==='void')pierce=Math.min(5,pierce+1);showLoot(iconFor('artifacts',a.id)+' АРТЕФАКТ: '+a.name+' — '+a.desc);particle(l.x,l.y,a.color,14);saveMeta()}
- else{const r=Math.random();if(r<.25){player.hp=Math.min(player.maxhp,player.hp+1);showLoot('РЕДКИЙ ЛУТ: +1 ♥')}else if(r<.5){player.damage+=.25;showLoot('РЕДКИЙ ЛУТ: УРОН +0.25')}else if(r<.72){armor++;showLoot('БРОНЯ +1: УРОН СНИЖЕН')}else{player.speed*=1.04;showLoot('РЕДКИЙ ЛУТ: СКОРОСТЬ +4%')}particle(l.x,l.y,'#8fffe0',10)}}}
+ else{const r=Math.random();if(r<.25){player.hp=Math.min(player.maxhp,player.hp+1);showLoot('РЕДКИЙ ЛУТ: +1 ♥')}else if(r<.5){player.damage+=.35;showLoot('РЕДКИЙ ЛУТ: УРОН +0.35')}else if(r<.72){armor++;showLoot('БРОНЯ +1: УРОН СНИЖЕН')}else{player.speed*=1.01;showLoot('РЕДКИЙ ЛУТ: СКОРОСТЬ +1%')}particle(l.x,l.y,'#8fffe0',10)}}}
  loot=loot.filter(l=>!l.got&&l.life>0);
  const pet=PETS.find(p=>p.id===meta.equippedPet),petLv=Math.min(5,Math.min(5,(meta.petLevels||{})[pet?.id]||1)+petCardLevel);if(pet&&petAttackTimer<=0){petAttackTimer=Math.max(.55,2.5-petLv*.22);let target=null,td=1e9;for(const en of enemies){const d=Math.hypot(en.x-player.x,en.y-player.y);if(!en.adminDummy&&en.hp>0&&d<td&&d<220){target=en;td=d}}if(target){if(pet.id==='drone'){target.hp-=player.damage*(.3+petLv*.12);target.deathCause='lightning';particle(target.x,target.y,pet.color,5);if(target.hp<=0)killEnemy(target,'lightning')}else if(pet.id==='fox'){target.burn=Math.max(target.burn||0,1+petLv*.35);target.hp-=player.damage*(.15+petLv*.07);particle(target.x,target.y,pet.color,5);if(target.hp<=0)killEnemy(target,'fire')}else if(pet.id==='raven'){target.marked=Math.max(target.marked||0,2+petLv*.3);particle(target.x,target.y,pet.color,4)}else if(pet.id==='orb'){target.hp-=player.damage*(.4+petLv*.15);target.deathCause='explosion';particle(target.x,target.y,pet.color,7);if(target.hp<=0)killEnemy(target,'explosion')}else if(pet.id==='wisp'&&player.hp<player.maxhp){player.hp=Math.min(player.maxhp,player.hp+.16+petLv*.07);particle(player.x,player.y,pet.color,3)}else if(pet.id==='slime'){for(const near of enemies){if(Math.hypot(near.x-player.x,near.y-player.y)<38+petLv*3)near.speed=Math.max(6,near.speed*(.96-petLv*.008))}}}}if(orbitTimer>0){orbitAngle+=dt*2.8;for(let oi=0;oi<orbitTimer;oi++){const ox=player.x+Math.cos(orbitAngle+oi*Math.PI*2/orbitTimer)*23,oy=player.y+Math.sin(orbitAngle+oi*Math.PI*2/orbitTimer)*23;for(const e of enemies){if(!e.adminDummy&&Math.hypot(e.x-ox,e.y-oy)<e.r+5){e.hp-=8*dt;if(e.hp<=0)killEnemy(e)}}particle(ox,oy,'#b9a0ff',1)}}
  for(let c of coins){let d=Math.hypot(c.x-player.x,c.y-player.y);if(d<35+upgrades.magnet*10){c.x+=(player.x-c.x)*Math.min(1,dt*5);c.y+=(player.y-c.y)*Math.min(1,dt*5)}if(d<player.r+c.r+4){c.got=true;gold++;sfx('coin');particle(c.x,c.y,'#ffce45',5)}}

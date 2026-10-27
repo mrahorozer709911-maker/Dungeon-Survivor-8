@@ -259,6 +259,60 @@ function iconFor(kind,id){
  };
  let n=key.match(/skin_(\d+)$/); if(kind==='skins'){const ix=Number(n?.[1]||0),groups=[['heroes',['scout','tank','tech','medic','phantom','engineer']],['weapons',['pistol','shotgun','rifle','laser','burst','rail','grenade','crossbow']],['pets',['wisp','drone','slime','raven','fox','orb']]];const group=groups[ix%groups.length];kind=group[0];key=group[1][Math.floor(ix/3)%group[1].length];}
  let d=shapes[kind]?.[key]||shapes[kind]?.default||shapes.artifacts.void;
+ // Unique silhouette overlays make each item identifiable even at tiny menu sizes.
+ const detail={
+  heroes:{
+   scout:'<path d="M7 8 12 5l5 3-1 5-4 3-4-3z" fill="#d8f5ff"/><path d="m9 10 3 2 3-2M12 13v3" fill="none" stroke="#123d72" stroke-width="1.4"/><path d="M5 7 3 4l4 1M19 7l2-3-4 1" fill="none" stroke="#fff" stroke-width="1"/>',
+   tank:'<path d="M4 8 8 5l4 2 4-2 4 3-2 9-6 3-6-3z" fill="#a6c8dc"/><path d="M7 10h10M8 13h8M9 16h6" fill="none" stroke="#123d72" stroke-width="1.4"/><path d="M12 7v12" stroke="#e9fbff" stroke-width="1"/>',
+   tech:'<path d="M5 6h14v11H5z" fill="#9bf5ff"/><circle cx="9" cy="11" r="2" fill="#123d72"/><circle cx="15" cy="11" r="2" fill="#123d72"/><path d="M9 15h6M7 4l2-2m6 2 2-2" stroke="#fff" stroke-width="1.2"/>',
+   medic:'<path d="M5 7 12 3l7 4-2 10-5 4-5-4z" fill="#fff"/><path d="M10 7h4v3h3v4h-3v3h-4v-3H7v-4h3z" fill="#e64f68" stroke="#9d1f3c" stroke-width=".7"/>',
+   phantom:'<path d="M12 3 19 8l-2 8-5 5-5-5-2-8z" fill="#d8c4ff"/><path d="m7 10 3 2-2 3m9-5-3 2 2 3" fill="none" stroke="#49216f" stroke-width="1.3"/><path d="M9 17h6" stroke="#fff" stroke-width="1.2"/>',
+   engineer:'<path d="m5 7 7-4 7 4-2 10-5 4-5-4z" fill="#ffe2a1"/><path d="M8 9h8v5H8z" fill="#7b351c"/><path d="m10 11 2-2 2 2-2 2z" fill="#fff4bd"/><path d="M4 5 2 3m18 2 2-2" stroke="#fff" stroke-width="1.2"/>'
+  },
+  weapons:{
+   pistol:'<path d="M4 7h12l3 2-3 2H9l-1 5H5l1-6H4z" fill="#e8edf4"/><path d="M6 8h9M11 11v2" stroke="#ffca65" stroke-width="1.3"/><path d="M17 8h3v2h-3z" fill="#fff4bd"/>',
+   shotgun:'<path d="M3 6h17v5H3z" fill="#d9e4f0"/><circle cx="6" cy="8.5" r="1.4" fill="#26354c"/><circle cx="10" cy="8.5" r="1.4" fill="#26354c"/><path d="M5 11v5h4v-5M16 6V4h4v2" fill="#8c9aab" stroke="#7b351c" stroke-width=".7"/>',
+   rifle:'<path d="M2 8h16l4 2-4 2H2z" fill="#d9e4f0"/><path d="M6 12v5h4v-5M14 8V5h4v3M4 9h10" fill="#647b91" stroke="#7b351c" stroke-width=".8"/><path d="M19 9h2" stroke="#fff4bd" stroke-width="1.5"/>',
+   laser:'<path d="M4 6h11l5 4-5 4H4z" fill="#ff8b6b"/><path d="M7 8h7l2 2-2 2H7z" fill="#fff4bd"/><path d="M20 10h3M19 6l3-2M19 14l3 2" stroke="#ff5bdb" stroke-width="1.5"/><circle cx="15" cy="10" r="1.7" fill="#fff"/>',
+   burst:'<path d="M3 8h13l4 3-4 3H3z" fill="#e9edf5"/><path d="m10 2-2 4h4l-2 4" fill="#ffcf55" stroke="#7b351c" stroke-width=".8"/><path d="M6 9h8" stroke="#7b351c" stroke-width="1.2"/>',
+   rail:'<path d="M3 6h17v3H3zM3 11h17v3H3z" fill="#b9d6f3"/><path d="M5 7h13M5 12h13" stroke="#ffca65" stroke-width="1"/><path d="M6 4V2h3v2M15 15v3h3v-3" fill="#7b351c"/>',
+   grenade:'<path d="M9 4h6v3l3 3v7l-6 4-6-4v-7l3-3z" fill="#8ce0a2"/><path d="M10 4V2h4v2M7 11h10M8 14h8" stroke="#125b62" stroke-width="1.4"/><circle cx="12" cy="16" r="1.4" fill="#fff"/>',
+   crossbow:'<path d="M3 7q9 10 18 0M3 7l18 0M12 7v14" fill="none" stroke="#e7c18a" stroke-width="2"/><path d="M4 7h16M12 7 8 11m4-4 4 4" stroke="#7b351c" stroke-width="1.3"/><path d="M12 3v15" stroke="#fff4bd" stroke-width=".8"/>'
+  },
+  pets:{
+   wisp:'<path d="M12 3c4 4 5 7 3 10l-3 4-3-4c-2-3-1-6 3-10z" fill="#fff4bd"/><circle cx="10" cy="10" r="1.2" fill="#125b62"/><circle cx="14" cy="10" r="1.2" fill="#125b62"/><path d="M8 17q4 4 8 0" fill="none" stroke="#eaffff" stroke-width="1.2"/>',
+   drone:'<circle cx="12" cy="12" r="5" fill="#bde9ff"/><circle cx="12" cy="12" r="2" fill="#123d72"/><path d="M7 7 4 4h4m9 3 3-3h-4M7 17l-3 3h4m9-3 3 3h-4" fill="none" stroke="#eaffff" stroke-width="1.5"/><circle cx="12" cy="5" r="1" fill="#ffca65"/>',
+   slime:'<path d="M3 18q0-9 5-9l4-5 4 5q5 0 5 9z" fill="#8af5c7"/><circle cx="9" cy="13" r="1.5" fill="#125b62"/><circle cx="15" cy="13" r="1.5" fill="#125b62"/><path d="M9 16q3 2 6 0" fill="none" stroke="#eaffff" stroke-width="1.2"/>',
+   raven:'<path d="M3 17 8 6l4 4 8-2-4 8-5 4z" fill="#8e9eff"/><path d="m12 10 4 2-4 2z" fill="#ffca65"/><circle cx="14" cy="11" r="1" fill="#fff"/>',
+   fox:'<path d="M4 4 10 7 14 7 20 4 19 16 12 21 5 16z" fill="#ffb36b"/><path d="m7 13 5 4 5-4-5 1z" fill="#fff4bd"/><circle cx="9" cy="11" r="1" fill="#123d72"/><circle cx="15" cy="11" r="1" fill="#123d72"/>',
+   orb:'<circle cx="12" cy="12" r="8" fill="#b7f5ff"/><circle cx="12" cy="12" r="4" fill="#123d72"/><circle cx="10" cy="10" r="1.5" fill="#fff"/><path d="M12 1v3M23 12h-3M12 23v-3M1 12h3" stroke="#eaffff" stroke-width="1.5"/>'
+  },
+  artifacts:{
+   ember:'<path d="M12 3c4 5-1 6 3 9 3-2 3-3 3-3 3 7-1 12-6 12S3 16 7 10c1 3 2 4 3 4 2-3-1-6 2-11z" fill="#ff6a38"/><path d="M12 11c2 3 0 4 2 6-2 2-5 0-4-2z" fill="#fff4bd"/>',
+   frost:'<path d="M12 2v20M3.3 7l17.4 10M3.3 17 20.7 7" stroke="#c6f7ff" stroke-width="2"/><path d="m8 4 4 3 4-3M8 20l4-3 4 3M3 12l4-1 1-4M21 12l-4 1-1 4" fill="none" stroke="#fff" stroke-width="1.3"/>',
+   vampire:'<path d="M3 5q5 0 9 5 4-5 9-5l-2 12-7 5-7-5z" fill="#f18aa6"/><path d="m8 13 4 6 4-6-4 2z" fill="#fff"/><path d="M5 7 9 10m10-3-4 3" stroke="#612c86" stroke-width="1.2"/>',
+   guardian:'<path d="M12 2 21 6v6c0 5-4 8-9 10-5-2-9-5-9-10V6z" fill="#7bdcff"/><path d="m8 12 3 3 5-6" stroke="#fff" stroke-width="2.2"/><path d="M12 4v3" stroke="#123d72" stroke-width="1.5"/>',
+   storm:'<path d="M14 2 5 13h6l-1 9 9-12h-6z" fill="#fff36a"/><path d="m14 4-4 8h4l-2 6" fill="none" stroke="#fff" stroke-width="1.2"/>',
+   void:'<circle cx="12" cy="12" r="9" fill="#a45dff"/><circle cx="12" cy="12" r="5" fill="#160a2d"/><path d="M12 2v5M21 12h-5M12 21v-5M3 12h5" stroke="#f5d6ff" stroke-width="1.5"/><circle cx="14" cy="9" r="1.5" fill="#fff"/>',
+   plague:'<circle cx="12" cy="12" r="4" fill="#a6f27b"/><circle cx="12" cy="4" r="2" fill="#c8ff9a"/><circle cx="19" cy="8" r="2" fill="#c8ff9a"/><circle cx="19" cy="16" r="2" fill="#c8ff9a"/><circle cx="12" cy="20" r="2" fill="#c8ff9a"/><circle cx="5" cy="16" r="2" fill="#c8ff9a"/><circle cx="5" cy="8" r="2" fill="#c8ff9a"/><circle cx="12" cy="12" r="1.5" fill="#234f26"/>',
+   thunder:'<path d="M14 2 5 13h6l-1 9 9-12h-6z" fill="#fff36a"/><path d="M6 16h3m6-8h3" stroke="#fff" stroke-width="1.3"/>',
+   gravity:'<circle cx="12" cy="12" r="8" fill="#d4a1ff"/><circle cx="12" cy="12" r="3" fill="#24103b"/><path d="M3 4l4 2M21 4l-4 2M3 20l4-2M21 20l-4-2" stroke="#fff0ff" stroke-width="1.5"/>',
+   phoenix:'<path d="M12 22 4 15l3-1-3-7 7 4 1-8 4 8 5-3-2 7 2 1z" fill="#ff984e"/><path d="m12 18-2-6 3 2 2-4 1 6z" fill="#fff3a0"/>'
+  },
+  items:{
+   iron:'<path d="M6 3h12l3 9-3 9H6l-3-9z" fill="#c7d6e8"/><circle cx="12" cy="12" r="4" fill="#26354c"/><circle cx="12" cy="12" r="1.5" fill="#ffca65"/>',
+   scope:'<circle cx="12" cy="12" r="8" fill="#a9dfff"/><circle cx="12" cy="12" r="3" fill="#123d72"/><path d="M12 1v5M12 18v5M1 12h5M18 12h5" stroke="#fff" stroke-width="1.3"/>',
+   boots:'<path d="M7 3h6v9l7 3v5H4v-5l3-3z" fill="#b5c4d7"/><path d="M6 16h12M8 13l4 1" stroke="#334d70" stroke-width="1.4"/>',
+   charm:'<path d="M12 2 15 8l7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" fill="#ffdf70"/><circle cx="12" cy="12" r="2" fill="#fff"/>'
+  },
+  rarity:{
+   common:'<path d="M12 3 21 12 12 21 3 12z" fill="#c9d8e8"/><path d="m7 12 3 3 7-7" stroke="#fff" stroke-width="1.4"/>',
+   rare:'<path d="M12 2 21 8v8l-9 6-9-6V8z" fill="#5fcfff"/><path d="m7 12 3 3 7-7" stroke="#fff" stroke-width="1.8"/>',
+   epic:'<path d="M12 2 22 20H2z" fill="#c48cff"/><path d="M12 7v6m0 3v.5" stroke="#fff" stroke-width="2"/>',
+   legendary:'<path d="m12 2 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" fill="#ffcc4d"/><path d="m12 5 1.8 4 4 .7-3 2.7.7 4-3.5-1.8-3.5 1.8.7-4-3-2.7 4-.7z" fill="#fff4bd"/>'
+  }
+ };
+ d += detail[kind]?.[key]||'';
  const palettes={heroes:['#65d9ff','#123d72','#e9fbff'],weapons:['#ffca65','#7b351c','#fff4bd'],pets:['#6df2c1','#125b62','#eaffff'],artifacts:['#d7a0ff','#49216f','#fff0ad'],items:['#c4d8ee','#334d70','#ffffff'],rarity:['#ffd36b','#7a3d19','#fff7cc'],skins:['#ff8ce4','#612c86','#fff0ff']};
  const tones=palettes[kind]||palettes.items;
  const uid='ico'+kind+key.replace(/[^a-z0-9]/gi,'');

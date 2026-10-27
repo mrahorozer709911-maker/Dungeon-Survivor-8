@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="288" height="112" viewBox="0 0 288 112">
+<defs>
+ <linearGradient id="steel" x2="0" y2="1"><stop stop-color="#eaf8ff"/><stop offset=".45" stop-color="#799ab9"/><stop offset="1" stop-color="#293c59"/></linearGradient>
+ <linearGradient id="teal" x2="0" y2="1"><stop stop-color="#c5fff8"/><stop offset=".5" stop-color="#29b9b4"/><stop offset="1" stop-color="#124e60"/></linearGradient>
+ <linearGradient id="gold" x2="0" y2="1"><stop stop-color="#fff0a6"/><stop offset=".5" stop-color="#d58c32"/><stop offset="1" stop-color="#6b3c25"/></linearGradient>
+ <linearGradient id="violet" x2="0" y2="1"><stop stop-color="#f1e6ff"/><stop offset=".5" stop-color="#9873e9"/><stop offset="1" stop-color="#342451"/></linearGradient>
+ <linearGradient id="med" x2="0" y2="1"><stop stop-color="#e9fff1"/><stop offset=".5" stop-color="#65c68a"/><stop offset="1" stop-color="#245342"/></linearGradient>
+ <linearGradient id="scout" x2="0" y2="1"><stop stop-color="#d9f2ff"/><stop offset=".5" stop-color="#528ac4"/><stop offset="1" stop-color="#1c3555"/></linearGradient>
+</defs>
+<!-- Each 48x56 cell is transparent, with crisp armor edges and luminous accents. -->
+<g id="scout" transform="translate(0 0)" stroke-linejoin="round">
+<ellipse cx="24" cy="51" rx="14" ry="3" fill="#07101d" opacity=".65"/>
+<path d="M14 37L11 47 18 50 22 41M34 37L37 47 30 50 26 41" fill="#172943" stroke="#8dc9f5" stroke-width="1.5"/>
+<path d="M13 22L8 31 13 39 18 34M35 22L40 31 35 39 30 34" fill="#315e8b" stroke="#b5e4ff" stroke-width="1.5"/>
+<path d="M15 22L18 17 30 17 33 22 34 36 29 42 19 42 14 36Z" fill="url(#scout)" stroke="#b5e4ff" stroke-width="1.5"/>
+<path d="M18 24L30 24 31 33 24 38 17 33Z" fill="#213b5b" stroke="#75b4e6"/>
+<path d="M19 27H29V31H19Z" fill="#9eeaff"/><path d="M21 28H23V30H21M26 28H28V30H26" fill="#fff"/>
+<path d="M17 13L19 6 29 6 32 13 30 21 18 21Z" fill="url(#steel)" stroke="#d9f3ff" stroke-width="1.5"/>
+<path d="M17 13L24 10 32 13 30 16 18 16Z" fill="#1d3451"/><path d="M20 14H23V16H20M26 14H29V16H26" fill="#76edff"/>
+<path d="M13 25L9 28 12 33 16 31M35 25L39 28 36 33 32 31" fill="#193653" stroke="#79bde9"/>
+<path d="M29 30L39 28 42 31 32 35Z" fill="#23364d" stroke="#a5dfff"/><path d="M38 27L44 26 45 29 40 31Z" fill="#e6faff"/>
+<path d="M19 41L22 42 21 47 17 47ZM27 42L30 41 32 47 28 47Z" fill="#83caff"/>
+<path d="M20 19L24 21 28 19" fill="none" stroke="#e7fbff" stroke-width="1.5"/>
+</g>
+<g id="tank" transform="translate(48 0)" stroke-linejoin="round">
+<ellipse cx="24" cy="51" rx="16" ry="3" fill="#07101d" opacity=".7"/>
+<path d="M11 34L9 47 20 50 23 40M37 34L39 47 28 50 25 40" fill="#263548" stroke="#b8d5ef" stroke-width="2"/>
+<path d="M9 21L3 28 8 40 17 36M39 21L45 28 40 40 31 36" fill="url(#steel)" stroke="#e5f5ff" stroke-width="2"/>
+<path d="M12 21L16 16 32 16 36 21 37 37 31 43 17 43 11 37Z" fill="#536d89" stroke="#d9eaff" stroke-width="2"/>
+<path d="M15 24L33 24 33 34 24 39 15 34Z" fill="#273d57" stroke="#9cbad6"/>
+<path d="M19 27H29V33H19Z" fill="#18293e"/><path d="M21 28H23V31H21M26 28H28V31H26" fill="#fff0b0"/>
+<path d="M12 14L14 7 34 7 37 14 34 22 14 22Z" fill="url(#steel)" stroke="#f2fbff" stroke-width="2"/>
+<path d="M10 13L14 5 34 5 38 13 33 15 15 15Z" fill="#35475d" stroke="#d7e9fa" stroke-width="2"/>
+<path d="M18 15H30V18H18Z" fill="#8db2d6"/><path d="M21 25L24 23 27 25V34L24 36 21 34Z" fill="#f7d66e"/>
+<path d="M9 25L15 28 13 34 8 32M39 25L33 28 35 34 40 32" fill="#25384d" stroke="#d2eaff" stroke-width="1.5"/>
+<path d="M7 28H12V32H7M36 28H41V32H36" fill="#f4d277"/>
+<path d="M18 42L22 42 21 48 16 48ZM26 42L30 42 33 48 28 48Z" fill="#a9c5df"/>
+</g>
+<g id="tech" transform="translate(96 0)" stroke-linejoin="round">
+<ellipse cx="24" cy="51" rx="14" ry="3" fill="#06151b" opacity=".7"/>
+<path d="M14 37L11 47 19 49 22 40M34 37L37 47 29 49 26 40" fill="#153b48" stroke="#4ce5d8" stroke-width="1.5"/>
+<path d="M13 22L8 29 13 38 18 34M35 22L40 29 35 38 30 34" fill="#137c80" stroke="#9efff5" stroke-width="1.5"/>
+<path d="M15 21L19 17 30 17 33 22 34 37 29 42 19 42 14 36Z" fill="url(#teal)" stroke="#c2fff8" stroke-width="1.5"/>
+<path d="M18 24H30L29 35 24 38 19 35Z" fill="#123e4d" stroke="#56dcd1"/>
+<path d="M20 27H28V31H20Z" fill="#54f5e4"/><path d="M22 28H26V30H22Z" fill="#f0ffff"/>
+<path d="M16 12L19 6H30L33 13 30 21H18Z" fill="#16424f" stroke="#9cfff5" stroke-width="1.5"/>
+<path d="M17 12L20 5H29L32 12Z" fill="#2b8f91" stroke="#d0fffa" stroke-width="1.5"/>
+<path d="M20 13H23V16H20ZM26 13H29V16H26Z" fill="#8afff4"/>
+<path d="M12 25L8 28 12 33 16 31M36 25L40 28 36 33 32 31" fill="#102f3d" stroke="#62fff0"/>
+<path d="M29 29L39 27 43 30 32 35Z" fill="#183d50" stroke="#83fff2"/><path d="M39 26L45 25 46 29 41 31Z" fill="#adfff9"/>
+<path d="M18 42H22L21 48H16ZM26 42H30L33 48H28Z" fill="#4ee5d6"/>
+<path d="M21 19H27" stroke="#eaffff" stroke-width="2"/><circle cx="24" cy="32" r="2" fill="#eaffff"/>
+</g>
+<g id="medic" transform="translate(144 0)" stroke-linejoin="round">
+<ellipse cx="24" cy="51" rx="14" ry="3" fill="#081a12" opacity=".7"/>
+<path d="M14 37L11 47 19 49 22 40M34 37L37 47 29 49 26 40" fill="#254e3c" stroke="#baffcc" stroke-width="1.5"/>
+<path d="M13 22L8 29 13 38 18 34M35 22L40 29 35 38 30 34" fill="#3f9868" stroke="#d7ffe2" stroke-width="1.5"/>
+<path d="M15 21L19 17 30 17 33 22 34 37 29 42 19 42 14 36Z" fill="url(#med)" stroke="#e2ffeb" stroke-width="1.5"/>
+<path d="M18 24H30V35L24 39 18 35Z" fill="#245541" stroke="#8debb1"/>
+<path d="M21 27H27V33H21Z" fill="#f5fff5"/><path d="M23 28H25V32H23ZM22 29H26V31H22Z" fill="#e6fff0"/>
+<path d="M17 13L19 6H30L32 13 30 21H18Z" fill="#2e664c" stroke="#c9ffda" stroke-width="1.5"/>
+<path d="M18 12L20 7H28L31 12Z" fill="#b8f5c9"/><path d="M21 13H27V17H21Z" fill="#173b31"/>
+<path d="M12 25L8 28 12 33 16 31M36 25L40 28 36 33 32 31" fill="#2a684d" stroke="#c9ffda"/>
+<path d="M30 29L39 27 42 30 32 35Z" fill="#e4fff0" stroke="#71dba0"/><path d="M39 26L45 25 46 29 41 31Z" fill="#ffffff"/>
+<path d="M17 42H22L21 48H16ZM26 42H31L33 48H28Z" fill="#9de6b6"/>
+<path d="M20 19H28" stroke="#fff" stroke-width="2"/><path d="M23 17V21" stroke="#fff" stroke-width="2"/>
+</g>
+<g id="phantom" transform="translate(192 0)" stroke-linejoin="round">
+<ellipse cx="24" cy="51" rx="14" ry="3" fill="#0b0719" opacity=".7"/>
+<path d="M14 36L10 47 18 49 22 40M34 36L38 47 30 49 26 40" fill="#292040" stroke="#d5c4ff" stroke-width="1.5"/>
+<path d="M13 21L5 28 12 40 19 34M35 21L43 28 36 40 29 34" fill="#49356f" stroke="#c5afff" stroke-width="1.5"/>
+<path d="M15 21L19 17 30 17 33 22 34 37 29 42 19 42 14 36Z" fill="url(#violet)" stroke="#e6d9ff" stroke-width="1.5"/>
+<path d="M17 24L31 24 30 35 24 39 18 35Z" fill="#251b3d" stroke="#b49aff"/>
+<path d="M18 27L30 27 27 31 21 31Z" fill="#a88bff"/><path d="M21 28H27V29H21Z" fill="#fff"/>
+<path d="M13 12L18 5H30L35 12 31 22H17Z" fill="#30234a" stroke="#d9caff" stroke-width="1.5"/>
+<path d="M14 12L19 5 22 12 24 4 27 12 33 5 35 13Z" fill="#8e6ce0" stroke="#eadfff" stroke-width="1.2"/>
+<path d="M18 14L22 13 24 17 26 13 30 14 29 20 19 20Z" fill="#17162c"/>
+<path d="M12 25L8 28 12 33 16 31M36 25L40 28 36 33 32 31" fill="#221a39" stroke="#a68af5"/>
+<path d="M29 30L39 28 43 30 32 35Z" fill="#33254d" stroke="#cbbaff"/><path d="M39 27L45 25 46 29 41 31Z" fill="#f1eaff"/>
+<path d="M17 42H22L21 48H16ZM26 42H31L33 48H28Z" fill="#a58be9"/>
+<path d="M20 19L24 21 28 19" fill="none" stroke="#f4edff" stroke-width="1.5"/>
+</g>
+<g id="engineer" transform="translate(240 0)" stroke-linejoin="round">
+<ellipse cx="24" cy="51" rx="15" ry="3" fill="#171008" opacity=".7"/>
+<path d="M13 36L10 47 19 50 22 40M35 36L38 47 29 50 26 40" fill="#44311d" stroke="#ffdc84" stroke-width="1.5"/>
+<path d="M12 22L7 29 12 39 18 34M36 22L41 29 36 39 30 34" fill="#8c612e" stroke="#ffdf8c" stroke-width="1.5"/>
+<path d="M15 21L19 17 30 17 33 22 34 37 29 42 19 42 14 36Z" fill="url(#gold)" stroke="#fff0bc" stroke-width="1.5"/>
+<path d="M18 24H30V35L24 39 18 35Z" fill="#4b351d" stroke="#e7b75b"/>
+<path d="M20 27H28V32H20Z" fill="#ffcf64"/><path d="M22 28H26V30H22Z" fill="#fff8d8"/>
+<path d="M14 12L18 5H30L34 12 31 21H17Z" fill="#614321" stroke="#ffe8a3" stroke-width="1.5"/>
+<path d="M13 12L17 7H31L35 12 32 15H16Z" fill="url(#gold)" stroke="#fff0bc" stroke-width="1.5"/>
+<path d="M18 14H30V17H18Z" fill="#392919"/><path d="M20 14H28V16H20Z" fill="#fff0a8"/>
+<path d="M12 25L8 28 12 33 16 31M36 25L40 28 36 33 32 31" fill="#48311a" stroke="#ffdc84"/>
+<path d="M29 29L39 27 43 30 32 35Z" fill="#50391f" stroke="#f8d477"/><path d="M39 26L45 25 46 29 41 31Z" fill="#fff0b5"/>
+<path d="M17 42H22L21 48H16ZM26 42H31L33 48H28Z" fill="#f3c66c"/>
+<path d="M19 19H29" stroke="#fff0b5" stroke-width="1.5"/><circle cx="24" cy="31" r="2" fill="#fff1b0"/>
+</g>
+<!-- second row: alternate gait poses for all six classes -->
+<g transform="translate(0 56)"><use href="#scout" transform="translate(0 -0.5)"/></g>
+<g transform="translate(48 56)"><use href="#tank" transform="translate(0 -0.5)"/></g>
+<g transform="translate(96 56)"><use href="#tech" transform="translate(0 -0.5)"/></g>
+<g transform="translate(144 56)"><use href="#medic" transform="translate(0 -0.5)"/></g>
+<g transform="translate(192 56)"><use href="#phantom" transform="translate(0 -0.5)"/></g>
+<g transform="translate(240 56)"><use href="#engineer" transform="translate(0 -0.5)"/></g>
+</svg>

@@ -666,6 +666,19 @@ function pixelSprite(kind,frame=0){
   px(12,7,3,2,p[3]);px(14,5,1,4,p[2]);px(12,9,3,1,p[0]);
  }
  else {px(2,7,3,4,p[1]);px(11,7,3,4,p[1]);px(4,4,8,9,p[0]);px(5,3,6,10,p[1]);px(5,5,6,5,p[2]);px(5,6,2,2,p[3]);px(9,6,2,2,p[3]);px(6,9,4,2,p[0]);px(6,11,4,1,p[3]);if(kind==='charger'){px(3,3,3,2,p[3]);px(10,3,3,2,p[3]);}if(kind==='spitter'){px(6,10,4,2,'#baff65');px(7,12,2,1,'#e7ff99');}if(kind==='brute'){px(1,6,3,6,p[0]);px(12,6,3,6,p[0]);}}
+ 
+ // Extra handcrafted pixels give each existing class a clearer silhouette at phone scale.
+ if(kind.startsWith('hero_')){
+  // Armor rim, face shadow, chest seams and boot highlights.
+  px(4,5,1,7,p[0]);px(11,5,1,7,p[0]);px(5,5,2,1,p[3]);px(9,5,2,1,p[3]);
+  px(5,10,2,1,p[5]);px(9,10,2,1,p[5]);px(4,14,3,1,p[2]);px(9,14,3,1,p[2]);
+  if(heroType==='scout'){px(4,3,2,2,p[5]);px(10,3,2,2,p[5]);px(7,6,2,1,'#ffffff');px(12,6,4,1,'#dceeff');px(13,5,2,1,'#ffffff');}
+  else if(heroType==='tank'){px(3,3,2,3,p[0]);px(11,3,2,3,p[0]);px(4,4,2,2,p[3]);px(10,4,2,2,p[3]);px(6,9,4,1,p[3]);px(7,10,2,1,p[0]);}
+  else if(heroType==='tech'){px(4,2,2,1,'#a6fff4');px(10,2,2,1,'#a6fff4');px(6,6,1,2,p[3]);px(9,6,1,2,p[3]);px(12,8,3,2,'#55e5d5');px(14,7,2,1,'#eaffff');}
+  else if(heroType==='medic'){px(7,2,2,4,'#ffffff');px(6,3,4,2,'#ffffff');px(6,8,1,2,p[3]);px(9,8,1,2,p[3]);px(12,8,3,1,p[3]);}
+  else if(heroType==='phantom'){px(3,2,3,2,p[5]);px(10,2,3,2,p[5]);px(4,4,2,3,p[0]);px(10,4,2,3,p[0]);px(12,6,3,1,'#d7caff');px(14,5,1,4,p[3]);}
+  else if(heroType==='engineer'){px(3,4,3,3,p[0]);px(10,4,3,3,p[0]);px(4,5,2,1,p[3]);px(10,5,2,1,p[3]);px(2,8,2,3,'#fff0bd');px(12,8,2,3,'#fff0bd');px(6,9,4,1,p[3]);}
+ }
  pixelSpriteCache.set(key,c);return c;
 }
 function drawPixelActor(kind,x,y,size,frame=0){const im=pixelSprite(kind,frame);ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(im,Math.round(x-size/2),Math.round(y-size/2),Math.round(size),Math.round(size*1.12));ctx.restore();}

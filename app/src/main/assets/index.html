@@ -667,6 +667,11 @@ function draw(dt=0){
   if(landscapePhase===2&&n===4){ctx.globalAlpha=.32;rect(x+5,y+6,13,1,'#77dfe0');rect(x+9,y+6,1,11,'#77dfe0');ctx.globalAlpha=1;}
   if(landscapePhase===3&&n===5){ctx.strokeStyle='#a995ed';ctx.globalAlpha=.4;ctx.beginPath();ctx.moveTo(x+4,y+18);ctx.lineTo(x+12,y+4);ctx.lineTo(x+19,y+16);ctx.stroke();ctx.globalAlpha=1;}
   if(landscapePhase===4&&n===1){ctx.globalAlpha=.5;rect(x+5,y+5,2,2,'#d35be9');rect(x+16,y+16,3,2,'#6d35a0');ctx.globalAlpha=1;}
+  // Deterministic pixel chips, seams and biome glints keep the floor varied without random flicker.
+  const tileSeed=(Math.floor(x/24)*13+Math.floor(y/24)*29+landscapePhase*7)%11;
+  if(tileSeed===2){rect(x+5,y+7,4,2,floors[0]);rect(x+7,y+6,2,4,floors[1]);}
+  if(tileSeed===6){rect(x+15,y+11,3,2,landscapePhase===2?'#6de6df':landscapePhase===3?'#bba7ff':landscapePhase===4?'#e77cff':'#9aacc2');rect(x+16,y+10,1,4,'#101727');}
+  if(tileSeed===9){rect(x+4,y+17,6,1,'#0b101d');rect(x+5,y+18,4,1,floors[0]);}
  }
  // Blood remains on the dungeon floor for about 10 seconds.
  for(const b of bloodStains){const fade=Math.min(1,b.life/1.4);ctx.globalAlpha=.68*fade;ctx.fillStyle=b.seed>.5?'#741f35':'#9b263b';ctx.beginPath();ctx.ellipse(b.x,b.y,b.r*(1.2+b.seed*.45),b.r*.55,b.seed*2,0,Math.PI*2);ctx.fill();if(b.splatter){for(let k=0;k<8;k++){const a=k*Math.PI/4+b.seed;ctx.beginPath();ctx.ellipse(b.x+Math.cos(a)*b.r*1.05,b.y+Math.sin(a)*b.r*.6,Math.max(1,b.r*.13),Math.max(1,b.r*.34),a,0,Math.PI*2);ctx.fill();}}ctx.fillStyle='#4d1728';ctx.beginPath();ctx.ellipse(b.x-2,b.y-1,b.r*.55,b.r*.25,0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
@@ -905,7 +910,7 @@ function draw(dt=0){
  // Floating damage numbers with dark outlines for contrast.
  for(const n of damageNumbers){ctx.globalAlpha=Math.max(0,n.life/n.maxLife);ctx.font='bold 12px ui-monospace, monospace';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='#080b13';ctx.strokeText(String(n.value),n.x,n.y);ctx.fillStyle=n.color;ctx.fillText(String(n.value),n.x,n.y);ctx.globalAlpha=1;}
  // Extra sparks around active projectiles and particles fade smoothly.
- for(const p of particles){const alpha=Math.max(0,Math.min(1,p.life/.45));if(p.flame){ctx.save();ctx.globalAlpha=alpha;ctx.fillStyle=p.color;ctx.shadowColor=p.color;ctx.shadowBlur=7;ctx.beginPath();ctx.ellipse(p.x,p.y,Math.max(1,(p.scale||3)*alpha),Math.max(1,(p.scale||3)*1.5*alpha),0,0,Math.PI*2);ctx.fill();ctx.restore()}else{rect(p.x-1,p.y-1,3,3,p.color);if(alpha>.5)rect(p.x,p.y,1,1,'#ffffff')}}
+ for(const p of particles){const alpha=Math.max(0,Math.min(1,p.life/.45));ctx.save();ctx.globalAlpha=alpha;if(p.flame){const z=Math.max(2,Math.round((p.scale||3)*alpha));ctx.fillStyle=p.color;ctx.shadowColor=p.color;ctx.shadowBlur=4;rect(Math.round(p.x-z/2),Math.round(p.y-z/2),z,z+2,p.color);rect(Math.round(p.x),Math.round(p.y-z),Math.max(1,Math.floor(z/2)),Math.max(1,Math.floor(z/2)),'#ffe7a0');}else{const z=Math.max(2,Math.round((p.scale||2)*1.2));rect(Math.round(p.x-z/2),Math.round(p.y-z/2),z,z,p.color);if(alpha>.5){rect(Math.round(p.x),Math.round(p.y),2,2,'#ffffff');if(z>=3)rect(Math.round(p.x-z),Math.round(p.y),1,1,p.color);}}ctx.restore();}
  ctx.restore();
 }
 

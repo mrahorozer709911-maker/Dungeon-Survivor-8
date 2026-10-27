@@ -963,7 +963,7 @@ function draw(dt=0){
  if(attackAnim>0){rect(player.x+14+recoil,player.y-3-bob,5,7,activeWeapon.id==='laser'?'#9effff':activeWeapon.id==='shotgun'?'#ffb178':'#fff0a1');rect(player.x+18+recoil,player.y-1-bob,3,3,activeWeapon.id==='laser'?'#48eaff':'#ff9b45');if(activeWeapon.id==='laser'){rect(player.x+20+recoil,player.y,8,1,'#9effff');}else if(activeWeapon.id==='shotgun'){rect(player.x+19+recoil,player.y-4,4,2,'#ffdfb0');}}
  // Brief invulnerability shimmer; never hides the player.
  if(player.inv>0){rect(player.x-9,player.y-10-bob,18,1,'#9beaff');rect(player.x-9,player.y+10-bob,18,1,'#9beaff')}
- rect(player.x-3,player.y-1-bob,6,1,'#ffffffaa');rect(player.x-5,player.y+3-bob,3,2,'#d9eaff');rect(player.x+2,player.y+3-bob,3,2,'#d9eaff');rect(player.x-2,player.y+7,4,2,'#283955');ctx.restore();ctx.restore();
+ rect(player.x-3,player.y-1-bob,6,1,'#ffffffaa');rect(player.x-5,player.y+3-bob,3,2,'#d9eaff');rect(player.x+2,player.y+3-bob,3,2,'#d9eaff');rect(player.x-2,player.y+7,4,2,'#283955');if(activeHero.id==='scout')ctx.restore();ctx.restore();
  if(screenFlash>0){ctx.fillStyle=`rgba(255,55,80,${Math.min(.18,screenFlash)})`;ctx.fillRect(0,0,W,H)}
 
  // Floating damage numbers with dark outlines for contrast.

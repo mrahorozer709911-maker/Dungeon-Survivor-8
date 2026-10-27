@@ -681,7 +681,29 @@ function pixelSprite(kind,frame=0){
  }
  pixelSpriteCache.set(key,c);return c;
 }
-function drawPixelActor(kind,x,y,size,frame=0){const im=pixelSprite(kind,frame);ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(im,Math.round(x-size/2),Math.round(y-size/2),Math.round(size),Math.round(size*1.12));ctx.restore();}
+// Detailed transparent SVG character atlas; keep the handcrafted pixel renderer as a safe fallback.
+const heroAtlas=new Image();
+let heroAtlasReady=false;
+heroAtlas.onload=()=>{heroAtlasReady=true;};
+heroAtlas.onerror=()=>{heroAtlasReady=false;};
+heroAtlas.src='hero_sprites.svg';
+const heroAtlasIndex={scout:0,tank:1,tech:2,medic:3,phantom:4,engineer:5};
+function drawPixelActor(kind,x,y,size,frame=0){
+ ctx.save();
+ if(kind.startsWith('hero_')&&heroAtlasReady){
+  const idx=heroAtlasIndex[kind.slice(5)];
+  if(idx!==undefined){
+   const cellW=48,cellH=56,row=(frame%2),dw=Math.round(size),dh=Math.round(size*1.12);
+   ctx.imageSmoothingEnabled=false;
+   ctx.drawImage(heroAtlas,idx*cellW,row*cellH,cellW,cellH,Math.round(x-dw/2),Math.round(y-dh/2),dw,dh);
+   ctx.restore();return;
+  }
+ }
+ const im=pixelSprite(kind,frame);
+ ctx.imageSmoothingEnabled=false;
+ ctx.drawImage(im,Math.round(x-size/2),Math.round(y-size/2),Math.round(size),Math.round(size*1.12));
+ ctx.restore();
+}
 function draw(dt=0){
  ctx.save();if(shake>0){ctx.translate(rand(-shake,shake),rand(-shake,shake));shake=Math.max(0,shake-.5)}
  const cameraX=clamp(player.x-VIEW_W/2,0,W-VIEW_W),cameraY=clamp(player.y-VIEW_H/2,0,H-VIEW_H);

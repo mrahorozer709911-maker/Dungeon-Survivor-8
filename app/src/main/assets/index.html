@@ -1432,6 +1432,44 @@ function draw(dt=0){
     ctx.fillRect(xx,yy,Math.ceil(px),Math.ceil(px));
     if((x+y+frame)%11===0&&material>0&&material<4){ctx.globalAlpha=.48;ctx.fillStyle=palette[Math.max(0,material-1)];ctx.fillRect(xx,yy,Math.max(1,px*.55),Math.max(1,px*.55));ctx.globalAlpha=.92;}
    }
+   // Distinct high-resolution facial features and silhouettes for each enemy family.
+   const dot=(dx,dy,color,w=1,h=1)=>{ctx.fillStyle=color;ctx.fillRect(Math.round(e.x+dx*px),Math.round(e.y+dy*px+bob),Math.max(1,Math.ceil(px*w)),Math.max(1,Math.ceil(px*h)))};
+   const dark=palette[5],light=palette[3],glow=palette[6];
+   // Eye sockets, pupils, and a small mouth make the face readable at gameplay scale.
+   dot(-4,-2,dark,3,2);dot(2,-2,dark,3,2);
+   dot(-3,-2,charging?'#fff0a1':light,1,1);dot(3,-2,charging?'#fff0a1':light,1,1);
+   dot(-1,1,dark,2,1);
+   if(e.type==='boss'){
+    // Crown horns and a glowing central gem.
+    dot(-6,-6,light,2,3);dot(-7,-7,glow,1,2);dot(4,-6,light,2,3);dot(6,-7,glow,1,2);
+    dot(-1,0,'#fff0a1',2,2);dot(-5,3,dark,10,2);dot(-4,3,'#fff0a1',2,1);dot(2,3,'#fff0a1',2,1);
+    // Broad shoulder plates.
+    dot(-10,1,light,3,4);dot(8,1,light,3,4);
+   }else if(e.type==='brute'){
+    // Heavy brow, tusks, and chunky shoulder armour.
+    dot(-5,-3,dark,10,2);dot(-4,2,'#fff0ee',2,2);dot(2,2,'#fff0ee',2,2);
+    dot(-10,2,light,4,5);dot(7,2,light,4,5);dot(-2,5,dark,4,2);
+   }else if(e.type==='spitter'){
+    // Acid sacs and a dripping toxic mouth.
+    dot(-7,2,glow,2,3);dot(6,2,glow,2,3);dot(-2,2,dark,4,2);
+    dot(-1,4,'#efffa1',2,3);dot(-8,5,light,2,2);dot(7,5,light,2,2);
+   }else if(e.type==='ranged'){
+    // Hood brim and a bright targeting lens.
+    dot(-7,-5,dark,14,2);dot(4,-2,'#fff0b0',2,2);dot(7,0,light,3,2);
+    dot(8,2,glow,2,1);dot(-5,4,dark,10,1);
+   }else if(e.type==='charger'){
+    // Forward-facing horn and plated cheek.
+    dot(2,-5,light,5,2);dot(6,-6,glow,3,2);dot(7,-4,light,2,3);
+    dot(-7,1,dark,3,3);dot(5,2,light,4,3);
+   }else if(e.type==='fast'){
+    // Narrow mask and bright cheek streaks.
+    dot(-6,0,light,2,1);dot(5,0,light,2,1);dot(-4,3,dark,8,1);
+    dot(-7,2,glow,2,1);dot(6,2,glow,2,1);
+   }else{
+    // Standard monster: cheek plates and a jagged mouth.
+    dot(-6,1,light,2,2);dot(5,1,light,2,2);dot(-3,3,dark,6,1);
+    dot(-2,3,'#eaffb5',1,1);dot(2,3,'#eaffb5',1,1);
+   }
    // Eye highlights follow the gait; wind-up and ranged attacks flash brighter.
    ctx.globalAlpha=charging||firing?.99:.98;ctx.fillStyle=(charging||firing)?palette[6]:palette[4];
    const eyeShift=frame===1||frame===4?px*2:frame===3||frame===5?-px*2:0;

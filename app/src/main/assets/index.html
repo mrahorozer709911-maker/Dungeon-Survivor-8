@@ -311,7 +311,7 @@ button{min-height:42px;font-size:clamp(12px,3.2vw,14px);padding:11px 12px}
 
 
 /* Combat HUD refresh v1: compact, readable panels and clearer progression */
-#hud .hudtop{left:max(10px,env(safe-area-inset-left));right:max(10px,env(safe-area-inset-right));top:max(8px,env(safe-area-inset-top));align-items:flex-start;gap:8px;font-size:12px;text-shadow:0 1px 3px #000}
+#hud .hudtop{left:max(10px,env(safe-area-inset-left));right:max(86px,calc(env(safe-area-inset-right) + 78px));top:max(8px,env(safe-area-inset-top));align-items:flex-start;gap:8px;font-size:12px;text-shadow:0 1px 3px #000}
 #hud .hudbox{min-width:0;padding:8px 10px;border:1px solid #7c9bbb;border-radius:8px;background:linear-gradient(145deg,#091426ed,#0b1223e8);box-shadow:0 4px 14px #0006,inset 0 1px #e8f6ff20;backdrop-filter:blur(7px)}
 #hud .hud-primary{width:clamp(150px,28vw,240px);border-left:3px solid #ff6b7d}
 #hud .hud-secondary{width:clamp(145px,26vw,218px);border-right:3px solid #70dfff;text-align:right!important}
@@ -338,7 +338,7 @@ button{min-height:42px;font-size:clamp(12px,3.2vw,14px);padding:11px 12px}
 #hud #stick{box-shadow:0 3px 12px #0008,inset 0 0 18px #87aaff18}
 #hud #shootBtn{border-radius:50%;border-width:3px}
 @media(max-width:650px){
- #hud .hudtop{gap:5px;left:6px;right:6px}
+ #hud .hudtop{gap:5px;left:6px;right:82px}
  #hud .hud-primary{width:clamp(135px,31vw,190px);padding:6px 7px}
  #hud .hud-secondary{width:clamp(130px,29vw,175px);padding:6px 7px}
  #hud .hudbox{font-size:10px}
@@ -347,7 +347,7 @@ button{min-height:42px;font-size:clamp(12px,3.2vw,14px);padding:11px 12px}
  #hud .xp-caption{margin-top:4px}
 }
 @media(max-height:420px){
- #hud .hudtop{top:4px;left:6px;right:6px}
+ #hud .hudtop{top:4px;left:6px;right:78px}
  #hud .hudbox{padding:5px 7px}
  #hud .hud-primary{width:clamp(130px,27vw,190px)}
  #hud .hud-secondary{width:clamp(125px,25vw,175px)}

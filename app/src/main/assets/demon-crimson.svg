@@ -1,4 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 48 48" shape-rendering="crispEdges">
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 128 128" shape-rendering="crispEdges">
+<g transform="scale(2.6666667)">
 <defs><linearGradient id="wing" x2="1" y2="1"><stop stop-color="#9b3048"/><stop offset=".55" stop-color="#4b142c"/><stop offset="1" stop-color="#170d20"/></linearGradient><linearGradient id="armor" x2=".8" y2="1"><stop stop-color="#ff7162"/><stop offset=".35" stop-color="#a6233e"/><stop offset="1" stop-color="#321329"/></linearGradient><radialGradient id="core"><stop stop-color="#fff8b5"/><stop offset=".28" stop-color="#ffb43e"/><stop offset=".65" stop-color="#ff3b27"/><stop offset="1" stop-color="#7c102b" stop-opacity="0"/></radialGradient></defs>
 <!-- shadow --> <ellipse cx="24" cy="43" rx="14" ry="3" fill="#050811" opacity=".9"/>
 <!-- wing silhouettes --> <path d="M18 18 11 8 7 4 8 12 3 8 5 18 2 15 5 26 10 32 16 29 20 23Z" fill="#130c1b" stroke="#080711"/><path d="M30 18 37 8 41 4 40 12 45 8 43 18 46 15 43 26 38 32 32 29 28 23Z" fill="#130c1b" stroke="#080711"/>
@@ -14,4 +15,4 @@
 <!-- head and horns --> <path d="M18 15 15 10 16 6 20 12 22 13M30 15 33 10 32 6 28 12 26 13" fill="#d9bda0" stroke="#241021" stroke-width="1.5"/><path d="M17 12 17 8 19 12M31 12 31 8 29 12" fill="#f8d8ad"/><path d="M18 13 20 10 28 10 30 13 29 19 26 22 22 22 19 19Z" fill="#361027" stroke="#100711" stroke-width="1.5"/><path d="M19 14 22 12 26 12 29 14 27 18 24 20 21 18Z" fill="url(#armor)"/><path d="M19 14 22 13 21 16 19 16M29 14 26 13 27 16 29 16" fill="#ff8a69"/><path d="M20 16 23 17 22 18 20 17M28 16 25 17 26 18 28 17" fill="#fff0a3"/><rect x="21" y="16" width="1" height="1" fill="#fff"/><rect x="27" y="16" width="1" height="1" fill="#fff"/><path d="M22 19 24 18 26 19 25 21 23 21Z" fill="#120916"/><path d="M22 20 23 21 25 21 26 20" fill="none" stroke="#e7b59c" stroke-width=".7"/>
 <!-- horns and crown spines --> <path d="M19 12 17 9 18 5 20 9 21 12M29 12 31 9 30 5 28 9 27 12" fill="#9e7a6e" stroke="#20101d" stroke-width="1"/><path d="M18 6 18 9 19 10M30 6 30 9 29 10" stroke="#fff0c5" stroke-width=".8"/>
 <!-- engraved armor and highlights --> <path d="M17 22 19 23 18 26M31 22 29 23 30 26M21 32 22 34M27 32 26 34" fill="none" stroke="#ff9a78" stroke-width=".8"/><path d="M15 19 17 20M33 19 31 20" stroke="#ffd18c" stroke-width="1"/><rect x="19" y="29" width="2" height="1" fill="#f8bd72"/><rect x="27" y="29" width="2" height="1" fill="#f8bd72"/>
-</svg>
+</g></svg>

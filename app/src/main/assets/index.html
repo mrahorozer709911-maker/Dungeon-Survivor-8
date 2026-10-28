@@ -767,6 +767,7 @@ function addEnemy(){
  let hp=(type==='fast'?9:type==='brute'?31:type==='charger'?22:type==='spitter'?18:type==='ranged'?16:type==='grunt'?15:15)*scale;
  const radius={fast:6,brute:11,charger:9,spitter:8,ranged:8,grunt:8}[type];
  enemies.push({id:enemyId++,x,y,r:radius,hp,maxhp:hp,speed:(type==='fast'?rand(48,66):type==='brute'?rand(18,26):type==='charger'?rand(22,30):type==='spitter'?rand(18,25):type==='ranged'?rand(20,30):rand(25,42))+phase*2.2,damage:(type==='fast'?.65:type==='brute'?1.6:type==='charger'?1.8:type==='spitter'?.7:type==='ranged'?.8:1)*(1+phase*.12),flash:0,type,fire:rand(.8,1.8),attack:rand(.7,1.5),windup:0,chargeX:0,chargeY:0,anim:rand(0,6.28)});
+ particle(x,y,type==='fast'?'#ff8a9b':type==='spitter'?'#a6ff61':'#ff5b70',3);
  }
 function spawnBoss(isFinal=false){
  finalBoss=isFinal;const phase=Math.min(5,Math.floor(runTime/180));const hp=isFinal?4200:900+phase*520;
@@ -774,6 +775,7 @@ function spawnBoss(isFinal=false){
  const names={storm:'ГРОМОВЕРЖЕЦ',hunter:'КРОВАВЫЙ ОХОТНИК',frost:'ЛЕДЯНОЙ ЖНЕЦ',void:'ПОЖИРАТЕЛЬ БЕЗДНЫ'};
  boss={x:clamp(player.x+rand(-150,150),70,W-70),y:clamp(player.y+rand(-90,90),55,H-55),r:isFinal?30:23,hp,maxhp:hp,speed:isFinal?52:32+phase*5.5,fire:isFinal?.48:.82,flash:0,phase,kind,name:names[kind],damage:isFinal?3.1:1.35+phase*.5};
  enemies.push({id:enemyId++,x:boss.x,y:boss.y,r:boss.r,hp:boss.hp,maxhp:boss.maxhp,speed:boss.speed,damage:boss.damage,flash:0,type:'boss',bossKind:kind,fire:boss.fire,anim:rand(0,6.28)});
+ deathFx.push({x:boss.x,y:boss.y,r:boss.r*1.8,life:1.25,maxLife:1.25,color:isFinal?'#d8a0ff':'#ff7080',kind:'bossBurst',seed:Math.random()});particle(boss.x,boss.y,isFinal?'#d8a0ff':'#ff7080',18);
  bossWarning=3;alertToast(isFinal?'⚠ '+names[kind]+' · ФИНАЛЬНЫЙ БОСС':'⚠ '+names[kind]+' ВСТУПАЕТ В БОЙ');sfx('boss');
 }
 function victory(){clearRunSave();sfx('upgrade');state='end';$('hud').style.display='none';$('end').style.display='flex';$('endStats').innerHTML='ПОБЕДА!<br>Ты выжил 15 минут и победил главного босса.<br>Убийств: '+kills+'<br>Монет собрано: '+gold+'<br>Уровень героя: '+level+'<br><br><span style="color:#9effb4">Легенда арены!</span>';meta.coins+=gold;meta.best=Math.max(meta.best,kills);saveMeta();}

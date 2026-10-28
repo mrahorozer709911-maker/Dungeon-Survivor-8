@@ -1286,6 +1286,39 @@ function draw(dt=0){
    ctx.strokeStyle='#ff9a6b';ctx.lineWidth=Math.max(1,er*.045);ctx.beginPath();ctx.moveTo(e.x-er*.38,e.y+er*.08+bob);ctx.lineTo(e.x-er*.2,e.y+er*.18+bob);ctx.moveTo(e.x+er*.38,e.y+er*.08+bob);ctx.lineTo(e.x+er*.2,e.y+er*.18+bob);ctx.stroke();
    ctx.restore();
   }
+  // Distinct silhouettes for regular mobs: hood, plated brute, charger crest and toxic spitter.
+  if(!e.adminDummy&&e.type!=='boss'){
+   ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
+   if(e.type==='fast'){
+    // Agile crawler: swept-back spines and bright narrow eyes.
+    ctx.fillStyle='#174b35';ctx.strokeStyle='#8dffb0';ctx.lineWidth=Math.max(1,er*.055);
+    ctx.beginPath();ctx.moveTo(e.x-er*.35,e.y-er*.42+bob);ctx.lineTo(e.x-er*.72,e.y-er*.9+bob);ctx.lineTo(e.x-er*.15,e.y-er*.58+bob);ctx.lineTo(e.x+er*.12,e.y-er*.72+bob);ctx.lineTo(e.x+er*.35,e.y-er*.38+bob);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.fillStyle='#eaffb5';ctx.fillRect(e.x-er*.34,e.y-er*.2+bob,Math.max(2,er*.2),Math.max(1,er*.07));ctx.fillRect(e.x+er*.12,e.y-er*.2+bob,Math.max(2,er*.2),Math.max(1,er*.07));
+   }else if(e.type==='ranged'){
+    // Hooded caster silhouette and glowing focus gem.
+    ctx.fillStyle='#75452d';ctx.strokeStyle='#ffd18a';ctx.lineWidth=Math.max(1,er*.06);
+    ctx.beginPath();ctx.moveTo(e.x-er*.55,e.y-er*.12+bob);ctx.lineTo(e.x-er*.48,e.y-er*.58+bob);ctx.lineTo(e.x,e.y-er*.78+bob);ctx.lineTo(e.x+er*.48,e.y-er*.58+bob);ctx.lineTo(e.x+er*.55,e.y-er*.12+bob);ctx.lineTo(e.x+er*.25,e.y+er*.03+bob);ctx.lineTo(e.x-er*.25,e.y+er*.03+bob);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.fillStyle='#fff0b0';ctx.shadowColor='#ffb84d';ctx.shadowBlur=lowGraphics?0:er*.3;ctx.beginPath();ctx.moveTo(e.x,e.y-er*.3+bob);ctx.lineTo(e.x+er*.12,e.y-er*.12+bob);ctx.lineTo(e.x,e.y+er*.02+bob);ctx.lineTo(e.x-er*.12,e.y-er*.12+bob);ctx.closePath();ctx.fill();ctx.shadowBlur=0;
+   }else if(e.type==='brute'){
+    // Heavy armored shoulders and a jaw guard make this enemy visibly bulkier.
+    ctx.fillStyle='#572b49';ctx.strokeStyle='#f1a0c5';ctx.lineWidth=Math.max(1,er*.07);
+    for(const side of [-1,1]){ctx.beginPath();ctx.moveTo(e.x+side*er*.3,e.y-er*.25+bob);ctx.lineTo(e.x+side*er*.85,e.y-er*.48+bob);ctx.lineTo(e.x+side*er*1.02,e.y+er*.08+bob);ctx.lineTo(e.x+side*er*.58,e.y+er*.25+bob);ctx.closePath();ctx.fill();ctx.stroke();}
+    ctx.fillStyle='#d78bad';ctx.fillRect(e.x-er*.3,e.y+er*.27+bob,er*.6,Math.max(2,er*.12));
+    ctx.strokeStyle='#ffe0ee';ctx.beginPath();ctx.moveTo(e.x-er*.2,e.y+er*.3+bob);ctx.lineTo(e.x-er*.1,e.y+er*.43+bob);ctx.moveTo(e.x+er*.2,e.y+er*.3+bob);ctx.lineTo(e.x+er*.1,e.y+er*.43+bob);ctx.stroke();
+   }else if(e.type==='charger'){
+    // Forward-pointing horns and a hot ridge signal an imminent rush.
+    ctx.fillStyle='#7a3028';ctx.strokeStyle='#ffb07b';ctx.lineWidth=Math.max(1,er*.065);
+    ctx.beginPath();ctx.moveTo(e.x-er*.42,e.y-er*.38+bob);ctx.lineTo(e.x-er*.78,e.y-er*.8+bob);ctx.lineTo(e.x-er*.18,e.y-er*.57+bob);ctx.lineTo(e.x+er*.12,e.y-er*.57+bob);ctx.lineTo(e.x+er*.65,e.y-er*.82+bob);ctx.lineTo(e.x+er*.42,e.y-er*.28+bob);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.fillStyle='#ffe2a0';ctx.fillRect(e.x-er*.27,e.y-er*.16+bob,Math.max(2,er*.18),Math.max(1,er*.08));ctx.fillRect(e.x+er*.09,e.y-er*.16+bob,Math.max(2,er*.18),Math.max(1,er*.08));
+   }else if(e.type==='spitter'){
+    // Toxic bulb, mouth and side sacs.
+    ctx.fillStyle='#4f7625';ctx.strokeStyle='#d8ff85';ctx.lineWidth=Math.max(1,er*.055);
+    ctx.beginPath();ctx.ellipse(e.x,e.y-er*.24+bob,er*.38,er*.3,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+    ctx.fillStyle='#eaff9b';ctx.shadowColor='#aaff3f';ctx.shadowBlur=lowGraphics?0:er*.2;ctx.beginPath();ctx.arc(e.x,e.y-er*.27+bob,Math.max(2,er*.12),0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+    ctx.fillStyle='#b5ed55';ctx.beginPath();ctx.ellipse(e.x-er*.48,e.y+er*.12+bob,er*.16,er*.25,-.3,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(e.x+er*.48,e.y+er*.12+bob,er*.16,er*.25,.3,0,Math.PI*2);ctx.fill();
+   }
+   ctx.restore();
+  }
   // Type-specific motion silhouettes make enemies readable even in a crowd.
   ctx.save();ctx.lineCap='round';ctx.globalAlpha=.7;
   if(e.type==='fast'&&!e.adminDummy){ctx.strokeStyle='#a9ffc0';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(e.x-er-5,e.y-er*.2+bob);ctx.lineTo(e.x-er-10-Math.abs(Math.sin(runTime*18+(e.anim||0)))*4,e.y+bob);ctx.moveTo(e.x+er+4,e.y-er*.1+bob);ctx.lineTo(e.x+er+8,e.y+er*.25+bob);ctx.stroke();}

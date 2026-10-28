@@ -728,62 +728,62 @@ function showUpgrades(){
  // Weapon cards are selected from the weapon currently equipped. Each effect maps to a mechanic used by that weapon.
  const weaponCards={
   pistol:[
-   ['ПИСТОЛЕТ · ПРОБОЙ','Пули пробивают ещё одного врага за уровень.',()=>{wu.trait=Math.min(10,(wu.trait||0)+1)}],
-   ['ПИСТОЛЕТ · БЫСТРЫЙ ЗАТВОР','Скорость стрельбы пистолета +4% за уровень.',()=>{wu.tempo=Math.min(10,(wu.tempo||0)+1)}],
-   ['ПИСТОЛЕТ · ТЯЖЁЛЫЙ КАЛИБР','Урон пуль +9% за уровень.',()=>{wu.power=Math.min(10,(wu.power||0)+1)}]
+   ['ПИСТОЛЕТ: ПРОБИТИЕ','Пули пробивают ещё одного врага за уровень.',()=>{wu.trait=Math.min(10,(wu.trait||0)+1)}],
+   ['ПИСТОЛЕТ: СКОРОСТЬ','Скорость стрельбы пистолета +4% за уровень.',()=>{wu.tempo=Math.min(10,(wu.tempo||0)+1)}],
+   ['ПИСТОЛЕТ: УРОН','Урон пуль +9% за уровень.',()=>{wu.power=Math.min(10,(wu.power||0)+1)}]
   ],
   shotgun:[
-   ['ДРОБОВИК · ДОПОЛНИТЕЛЬНЫЕ СТВОЛЫ','Больше дробинок в залпе и уже разброс.',()=>{wu.trait=Math.min(10,(wu.trait||0)+1)}],
-   ['ДРОБОВИК · ПОМПОВЫЙ МЕХАНИЗМ','Скорость стрельбы дробовика +4% за уровень.',()=>{wu.tempo=Math.min(10,(wu.tempo||0)+1)}],
-   ['ДРОБОВИК · КАРТЕЧЬ','Урон дробинок +14% за уровень.',()=>{wu.power=Math.min(10,(wu.power||0)+1)}]
+   ['ДРОБОВИК: БОЛЬШЕ ДРОБИНОК','Больше дробинок в залпе и уже разброс.',()=>{wu.trait=Math.min(10,(wu.trait||0)+1)}],
+   ['ДРОБОВИК: СКОРОСТЬ','Скорость стрельбы дробовика +4% за уровень.',()=>{wu.tempo=Math.min(10,(wu.tempo||0)+1)}],
+   ['ДРОБОВИК: УРОН','Урон дробинок +14% за уровень.',()=>{wu.power=Math.min(10,(wu.power||0)+1)}]
   ],
   rifle:[
-   ['АВТОМАТ · БРОНЕБОЙНЫЕ ПАТРОНЫ','Пули пробивают больше врагов по линии огня.',()=>{wu.trait=Math.min(10,(wu.trait||0)+1)}],
-   ['АВТОМАТ · УСИЛЕННЫЙ ЗАТВОР','Скорость стрельбы автомата +4% за уровень.',()=>{wu.tempo=Math.min(10,(wu.tempo||0)+1)}],
-   ['АВТОМАТ · КРУПНЫЙ КАЛИБР','Урон пуль +14% за уровень.',()=>{wu.power=Math.min(10,(wu.power||0)+1)}]
+   ['АВТОМАТ: ПРОБИТИЕ','Пули пробивают больше врагов по линии огня.',()=>{wu.trait=Math.min(10,(wu.trait||0)+1)}],
+   ['АВТОМАТ: СКОРОСТЬ','Скорость стрельбы автомата +4% за уровень.',()=>{wu.tempo=Math.min(10,(wu.tempo||0)+1)}],
+   ['АВТОМАТ: УРОН','Урон пуль +14% за уровень.',()=>{wu.power=Math.min(10,(wu.power||0)+1)}]
   ],
   laser:[
-   ['ЛАЗЕР · ТЕРМАЛЬНАЯ ФОКУСИРОВКА','Дальность захвата цели +24 и урон луча усиливается.',()=>{wu.trait=Math.min(10,(wu.trait||0)+1)}],
-   ['ЛАЗЕР · УСКОРИТЕЛЬ ИМПУЛЬСА','Скорость прожига цели +5% за уровень.',()=>{wu.tempo=Math.min(10,(wu.tempo||0)+1)}],
-   ['ЛАЗЕР · ПЛАЗМЕННЫЙ РЕЗОНАТОР','Урон луча +14% за уровень.',()=>{wu.power=Math.min(10,(wu.power||0)+1)}]
+   ['ЛАЗЕР: ДАЛЬНОСТЬ','Дальность захвата цели +24 и урон луча усиливается.',()=>{wu.trait=Math.min(10,(wu.trait||0)+1)}],
+   ['ЛАЗЕР: СКОРОСТЬ','Скорость прожига цели +5% за уровень.',()=>{wu.tempo=Math.min(10,(wu.tempo||0)+1)}],
+   ['ЛАЗЕР: УРОН','Урон луча +14% за уровень.',()=>{wu.power=Math.min(10,(wu.power||0)+1)}]
   ],
   burst:[
-   ['ИМПУЛЬСНАЯ ВИНТОВКА · ДЛИННАЯ ОЧЕРЕДЬ','Добавляет импульсы в каждый залп.',()=>{wu.trait=Math.min(10,(wu.trait||0)+1)}],
-   ['ИМПУЛЬСНАЯ ВИНТОВКА · СИНХРОНИЗАТОР','Скорость стрельбы +4% за уровень.',()=>{wu.tempo=Math.min(10,(wu.tempo||0)+1)}],
-   ['ИМПУЛЬСНАЯ ВИНТОВКА · ПЕРЕГРУЗКА','Урон импульсов +14% за уровень.',()=>{wu.power=Math.min(10,(wu.power||0)+1)}]
+   ['ИМПУЛЬСНАЯ ВИНТОВКА: ЗАЛП','Добавляет импульсы в каждый залп.',()=>{wu.trait=Math.min(10,(wu.trait||0)+1)}],
+   ['ИМПУЛЬСНАЯ ВИНТОВКА: СКОРОСТЬ','Скорость стрельбы +4% за уровень.',()=>{wu.tempo=Math.min(10,(wu.tempo||0)+1)}],
+   ['ИМПУЛЬСНАЯ ВИНТОВКА: УРОН','Урон импульсов +14% за уровень.',()=>{wu.power=Math.min(10,(wu.power||0)+1)}]
   ],
   rail:[
-   ['РЕЛЬСОТРОН · КОНДЕНСАТОР','Дальность разряда +38 и усиливает пробивающий удар.',()=>{wu.trait=Math.min(10,(wu.trait||0)+1)}],
-   ['РЕЛЬСОТРОН · СБРОС ТЕПЛА','Скорость стрельбы рельсотрона +4% за уровень.',()=>{wu.tempo=Math.min(10,(wu.tempo||0)+1)}],
-   ['РЕЛЬСОТРОН · ТИТАНОВЫЙ СЕРДЕЧНИК','Урон разряда +14% за уровень.',()=>{wu.power=Math.min(10,(wu.power||0)+1)}]
+   ['РЕЛЬСОТРОН: ДАЛЬНОСТЬ','Дальность разряда +38 и усиливает пробивающий удар.',()=>{wu.trait=Math.min(10,(wu.trait||0)+1)}],
+   ['РЕЛЬСОТРОН: СКОРОСТЬ','Скорость стрельбы рельсотрона +4% за уровень.',()=>{wu.tempo=Math.min(10,(wu.tempo||0)+1)}],
+   ['РЕЛЬСОТРОН: УРОН','Урон разряда +14% за уровень.',()=>{wu.power=Math.min(10,(wu.power||0)+1)}]
   ],
   grenade:[
-   ['ГРАНАТОМЁТ · УСИЛЕННАЯ ДЕТОНАЦИЯ','Радиус взрыва +8 за уровень.',()=>{wu.trait=Math.min(10,(wu.trait||0)+1)}],
-   ['ГРАНАТОМЁТ · БЫСТРЫЙ ЗАПАЛ','Скорость запуска гранат +4% за уровень.',()=>{wu.tempo=Math.min(10,(wu.tempo||0)+1)}],
-   ['ГРАНАТОМЁТ · ТЯЖЁЛЫЙ ЗАРЯД','Урон взрыва +14% за уровень.',()=>{wu.power=Math.min(10,(wu.power||0)+1)}]
+   ['ГРАНАТОМЁТ: РАДИУС ВЗРЫВА','Радиус взрыва +8 за уровень.',()=>{wu.trait=Math.min(10,(wu.trait||0)+1)}],
+   ['ГРАНАТОМЁТ: СКОРОСТЬ','Скорость запуска гранат +4% за уровень.',()=>{wu.tempo=Math.min(10,(wu.tempo||0)+1)}],
+   ['ГРАНАТОМЁТ: УРОН ВЗРЫВА','Урон взрыва +14% за уровень.',()=>{wu.power=Math.min(10,(wu.power||0)+1)}]
   ],
   crossbow:[
-   ['АРБАЛЕТ · БРОНЕБОЙНЫЕ БОЛТЫ','Болты пробивают больше врагов и теряют меньше урона при пробитии.',()=>{wu.trait=Math.min(10,(wu.trait||0)+1)}],
-   ['АРБАЛЕТ · МЕХАНИЗМ НАТЯЖЕНИЯ','Скорость стрельбы арбалета +4% за уровень.',()=>{wu.tempo=Math.min(10,(wu.tempo||0)+1)}],
-   ['АРБАЛЕТ · СТАЛЬНЫЙ НАКОНЕЧНИК','Урон болтов +14% за уровень.',()=>{wu.power=Math.min(10,(wu.power||0)+1)}]
+   ['АРБАЛЕТ: ПРОБИТИЕ','Болты пробивают больше врагов и теряют меньше урона при пробитии.',()=>{wu.trait=Math.min(10,(wu.trait||0)+1)}],
+   ['АРБАЛЕТ: СКОРОСТЬ','Скорость стрельбы арбалета +4% за уровень.',()=>{wu.tempo=Math.min(10,(wu.tempo||0)+1)}],
+   ['АРБАЛЕТ: УРОН','Урон болтов +14% за уровень.',()=>{wu.power=Math.min(10,(wu.power||0)+1)}]
   ]
  };
  const general=[
-  {key:'damage',title:'УСИЛЕНИЕ ОРУЖИЯ +10%',desc:'Урон всех попаданий и луча повышается на 10%.',apply:()=>{player.damage*=1.10;upgrades.damage++}},
-  {key:'speed',title:'БЫСТРЫЕ НОГИ',desc:'Скорость движения +5%.',apply:()=>{player.speed*=1.05;upgrades.speed++}},
-  {key:'maxhp',title:'ЗАПАС ЗДОРОВЬЯ',desc:'Восстанови 1 ♥ и увеличь максимум здоровья.',apply:()=>{player.maxhp++;player.hp=Math.min(player.maxhp,player.hp+1);upgrades.maxhp++}},
-  {key:'rate',title:'БОЕВОЙ ТЕМП',desc:'Скорость стрельбы всего оружия +5%.',apply:()=>{player.fireRate=Math.max(.075,player.fireRate*.95);upgrades.rate++}},
-  {key:'crit',title:'ОРЛИНЫЙ ГЛАЗ',desc:'Шанс критического удара +1,5%.',apply:()=>{critChance=Math.min(.35,critChance+.015);upgrades.crit++}},
-  {key:'pierce',title:'ПРОБОЙ',desc:'Пули проходят сквозь ещё одного врага.',apply:()=>{pierce=Math.min(10,pierce+1);upgrades.pierce++}},
+  {key:'damage',title:'УРОН +10%',desc:'Урон всех попаданий и луча повышается на 10%.',apply:()=>{player.damage*=1.10;upgrades.damage++}},
+  {key:'speed',title:'СКОРОСТЬ ДВИЖЕНИЯ',desc:'Скорость движения +5%.',apply:()=>{player.speed*=1.05;upgrades.speed++}},
+  {key:'maxhp',title:'ЗДОРОВЬЕ +1',desc:'Восстанови 1 ♥ и увеличь максимум здоровья.',apply:()=>{player.maxhp++;player.hp=Math.min(player.maxhp,player.hp+1);upgrades.maxhp++}},
+  {key:'rate',title:'СКОРОСТЬ СТРЕЛЬБЫ',desc:'Скорость стрельбы всего оружия +5%.',apply:()=>{player.fireRate=Math.max(.075,player.fireRate*.95);upgrades.rate++}},
+  {key:'crit',title:'КРИТИЧЕСКИЙ ШАНС',desc:'Шанс критического удара +1,5%.',apply:()=>{critChance=Math.min(.35,critChance+.015);upgrades.crit++}},
+  {key:'pierce',title:'ПРОБИТИЕ +1',desc:'Пули проходят сквозь ещё одного врага.',apply:()=>{pierce=Math.min(10,pierce+1);upgrades.pierce++}},
   {key:'orbit',title:'ОРБИТАЛЬНЫЙ ДРОН',desc:'Спутник наносит урон ближайшим врагам.',apply:()=>{orbitTimer=Math.min(10,orbitTimer+1);upgrades.orbit++}},
-  {key:'heal',title:'ВТОРОЕ ДЫХАНИЕ',desc:'Восстанови 1 ♥.',apply:()=>{player.hp=Math.min(player.maxhp,player.hp+1);upgrades.heal++}},
-  {key:'streak',title:'БОЕВОЙ АЗАРТ',desc:'Ускорение после убийства длится дольше.',apply:()=>{killStreak=Math.min(10,killStreak+1);streakTimer=3.5}}
+  {key:'heal',title:'ВОССТАНОВЛЕНИЕ ЗДОРОВЬЯ',desc:'Восстанови 1 ♥.',apply:()=>{player.hp=Math.min(player.maxhp,player.hp+1);upgrades.heal++}},
+  {key:'streak',title:'УСКОРЕНИЕ ЗА УБИЙСТВА',desc:'Ускорение после убийства длится дольше.',apply:()=>{killStreak=Math.min(10,killStreak+1);streakTimer=3.5}}
  ];
  const rareCards=[
   {key:'rareChain',rare:true,title:'ЦЕПНАЯ МОЛНИЯ',desc:'Убийства выпускают молнию по ближайшим врагам — до 3 целей.',apply:()=>{rareChainLevel=Math.min(3,rareChainLevel+1)}},
-  {key:'rareBlast',rare:true,title:'СМЕРТЕЛЬНЫЙ РИТМ',desc:'Каждые 8 убийств — взрыв вокруг павшего врага.',apply:()=>{rareBlastLevel=Math.min(3,rareBlastLevel+1)}}
+  {key:'rareBlast',rare:true,title:'ВЗРЫВ КАЖДЫЕ 8 УБИЙСТВ',desc:'Каждые 8 убийств — взрыв вокруг павшего врага.',apply:()=>{rareBlastLevel=Math.min(3,rareBlastLevel+1)}}
  ].filter(c=>c.key==='rareChain'?rareChainLevel<3:rareBlastLevel<3);
- const evolutionNames={pistol:'ПРОБОЙ ПУСТОТЫ',shotgun:'СОЛНЕЧНЫЙ ЗАЛП',rifle:'ШТОРМОВОЙ АВТОМАТ',laser:'СИНГУЛЯРНЫЙ ЛАЗЕР',burst:'ГРОМОВОЙ ШКВАЛ',rail:'РАЗЛОМ ТИТАНА',grenade:'ЗВЁЗДНЫЙ АРСЕНАЛ',crossbow:'АПОКАЛИПТИЧЕСКИЙ АРБАЛЕТ'};
+ const evolutionNames={pistol:'ПРОБИТИЕ +1 ПУСТОТЫ',shotgun:'СОЛНЕЧНЫЙ ЗАЛП',rifle:'ШТОРМОВОЙ АВТОМАТ',laser:'СИНГУЛЯРНЫЙ ЛАЗЕР',burst:'ГРОМОВОЙ ШКВАЛ',rail:'РАЗЛОМ ТИТАНА',grenade:'ЗВЁЗДНЫЙ АРСЕНАЛ',crossbow:'АПОКАЛИПТИЧЕСКИЙ АРБАЛЕТ'};
  const evolution=(wu.trait>=10&&!wu.evolved)?['✦ ЭВОЛЮЦИЯ · '+(evolutionNames[id]||'ПРЕДЕЛЬНАЯ ФОРМА'),'Оружие получает новую форму и +25% урона до конца забега.',()=>{wu.evolved=true;particle(player.x,player.y,'#ffe27a',34);shake=Math.max(shake,7);sfx('upgrade')}]:null;
  const cards=(weaponCards[id]||weaponCards.pistol).filter((_,i)=>i===0?(wu.trait||0)<10:i===1?(wu.tempo||0)<10:(wu.power||0)<10);
  // Do not offer global upgrades that have no effect on the weapon's actual attack model.

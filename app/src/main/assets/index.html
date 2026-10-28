@@ -1254,6 +1254,38 @@ function draw(dt=0){
   else if(e.type==='brute'){rect(e.x-er-2,e.y-er*.45+bob,5,er*.8,'#6d3654');rect(e.x+er-3,e.y-er*.45+bob,5,er*.8,'#6d3654');rect(e.x-er*.4,e.y+er*.25+bob,er*.8,3,'#ffd0df');}
   else if(e.type==='ranged'){rect(e.x-er*.5,e.y-er*.5+bob,er,3,'#fff0b0');rect(e.x-er*.2,e.y+er*.1+bob,er*.4,er*.4,'#80502d');}
   else if(e.type==='spitter'){rect(e.x-er*.35,e.y-er*.4+bob,er*.7,3,'#efffa1');rect(e.x-er*.18,e.y+er*.25+bob,er*.36,er*.35,'#4d7b24');}
+  // Demon sprite pass: layered horns, swept wings, armor and glowing eyes.
+  if(e.type==='boss'){
+   const sway=Math.sin(runTime*7+(e.anim||0))*1.5;
+   ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
+   // Bat wings behind the shoulders.
+   ctx.fillStyle='#351126';ctx.strokeStyle='#a72b49';ctx.lineWidth=Math.max(1.5,er*.09);
+   ctx.beginPath();ctx.moveTo(e.x-er*.42,e.y-er*.18+bob);ctx.lineTo(e.x-er*1.05,e.y-er*.72+bob+sway);ctx.lineTo(e.x-er*1.12,e.y+er*.12+bob);ctx.lineTo(e.x-er*.62,e.y+er*.56+bob);ctx.lineTo(e.x-er*.48,e.y+er*.2+bob);ctx.closePath();ctx.fill();ctx.stroke();
+   ctx.beginPath();ctx.moveTo(e.x+er*.42,e.y-er*.18+bob);ctx.lineTo(e.x+er*1.05,e.y-er*.72+bob-sway);ctx.lineTo(e.x+er*1.12,e.y+er*.12+bob);ctx.lineTo(e.x+er*.62,e.y+er*.56+bob);ctx.lineTo(e.x+er*.48,e.y+er*.2+bob);ctx.closePath();ctx.fill();ctx.stroke();
+   // Wing ribs.
+   ctx.strokeStyle='#e04a60';ctx.lineWidth=Math.max(1,er*.045);ctx.beginPath();
+   ctx.moveTo(e.x-er*.48,e.y-er*.12+bob);ctx.lineTo(e.x-er*1.02,e.y-er*.55+bob+sway);
+   ctx.moveTo(e.x-er*.5,e.y+er*.08+bob);ctx.lineTo(e.x-er*.98,e.y+er*.1+bob);
+   ctx.moveTo(e.x+er*.48,e.y-er*.12+bob);ctx.lineTo(e.x+er*1.02,e.y-er*.55+bob-sway);
+   ctx.moveTo(e.x+er*.5,e.y+er*.08+bob);ctx.lineTo(e.x+er*.98,e.y+er*.1+bob);ctx.stroke();
+   // Curved horns, with pale tips.
+   ctx.strokeStyle='#171522';ctx.lineWidth=Math.max(2,er*.19);ctx.beginPath();
+   ctx.moveTo(e.x-er*.35,e.y-er*.53+bob);ctx.quadraticCurveTo(e.x-er*.8,e.y-er*1.05+bob,e.x-er*.72,e.y-er*1.18+bob);
+   ctx.moveTo(e.x+er*.35,e.y-er*.53+bob);ctx.quadraticCurveTo(e.x+er*.8,e.y-er*1.05+bob,e.x+er*.72,e.y-er*1.18+bob);ctx.stroke();
+   ctx.strokeStyle='#c4a4a0';ctx.lineWidth=Math.max(1,er*.055);ctx.beginPath();
+   ctx.moveTo(e.x-er*.72,e.y-er*1.12+bob);ctx.lineTo(e.x-er*.72,e.y-er*1.18+bob);
+   ctx.moveTo(e.x+er*.72,e.y-er*1.12+bob);ctx.lineTo(e.x+er*.72,e.y-er*1.18+bob);ctx.stroke();
+   // Chest armor plates and ember core.
+   ctx.fillStyle='#61172e';ctx.strokeStyle='#f05a70';ctx.lineWidth=Math.max(1,er*.045);
+   ctx.beginPath();ctx.moveTo(e.x-er*.42,e.y-er*.08+bob);ctx.lineTo(e.x,e.y-er*.28+bob);ctx.lineTo(e.x+er*.42,e.y-er*.08+bob);ctx.lineTo(e.x+er*.3,e.y+er*.35+bob);ctx.lineTo(e.x,e.y+er*.48+bob);ctx.lineTo(e.x-er*.3,e.y+er*.35+bob);ctx.closePath();ctx.fill();ctx.stroke();
+   ctx.fillStyle='#ff6a32';ctx.shadowColor='#ff3c24';ctx.shadowBlur=lowGraphics?0:er*.35;ctx.beginPath();ctx.moveTo(e.x,e.y-er*.02+bob);ctx.lineTo(e.x+er*.12,e.y+er*.18+bob);ctx.lineTo(e.x,e.y+er*.29+bob);ctx.lineTo(e.x-er*.12,e.y+er*.18+bob);ctx.closePath();ctx.fill();ctx.shadowBlur=0;
+   // Eyes and sharp cheek highlights.
+   ctx.fillStyle='#fff3a1';ctx.shadowColor='#ff3a16';ctx.shadowBlur=lowGraphics?0:er*.3;
+   ctx.fillRect(e.x-er*.31,e.y-er*.31+bob,Math.max(2,er*.19),Math.max(1.5,er*.09));
+   ctx.fillRect(e.x+er*.12,e.y-er*.31+bob,Math.max(2,er*.19),Math.max(1.5,er*.09));ctx.shadowBlur=0;
+   ctx.strokeStyle='#ff9a6b';ctx.lineWidth=Math.max(1,er*.045);ctx.beginPath();ctx.moveTo(e.x-er*.38,e.y+er*.08+bob);ctx.lineTo(e.x-er*.2,e.y+er*.18+bob);ctx.moveTo(e.x+er*.38,e.y+er*.08+bob);ctx.lineTo(e.x+er*.2,e.y+er*.18+bob);ctx.stroke();
+   ctx.restore();
+  }
   // Type-specific motion silhouettes make enemies readable even in a crowd.
   ctx.save();ctx.lineCap='round';ctx.globalAlpha=.7;
   if(e.type==='fast'&&!e.adminDummy){ctx.strokeStyle='#a9ffc0';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(e.x-er-5,e.y-er*.2+bob);ctx.lineTo(e.x-er-10-Math.abs(Math.sin(runTime*18+(e.anim||0)))*4,e.y+bob);ctx.moveTo(e.x+er+4,e.y-er*.1+bob);ctx.lineTo(e.x+er+8,e.y+er*.25+bob);ctx.stroke();}

@@ -1384,79 +1384,35 @@ function draw(dt=0){
   if(e.type==='boss'){rect(e.x-5,e.y+2,10,4,'#32142b');rect(e.x-13,e.y- e.r-3,6,4,'#ffbd51');rect(e.x+7,e.y-e.r-3,6,4,'#ffbd51');
    // Animated boss crown, rune halo and layered shoulder armor.
    const ba=runTime*1.8,br=e.r+11+Math.sin(runTime*5)*2;ctx.save();ctx.globalAlpha=.45+.25*Math.sin(runTime*4);ctx.strokeStyle=finalBoss?'#ff6b9e':'#ffcb63';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(e.x,e.y,br,br*.55,ba*.12,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=.8;for(let bi=0;bi<5;bi++){const aa=ba+bi*Math.PI*2/5,bx=e.x+Math.cos(aa)*br,by=e.y+Math.sin(aa)*br*.55;ctx.fillStyle=bi%2?'#ff8aa9':'#fff0a1';ctx.beginPath();ctx.moveTo(bx,by-3);ctx.lineTo(bx+3,by);ctx.lineTo(bx,by+3);ctx.lineTo(bx-3,by);ctx.closePath();ctx.fill()}ctx.restore();rect(e.x-e.r*.8,e.y-e.r*.55+bob,5,Math.max(5,e.r*.55),'#ffbd51');rect(e.x+e.r*.45,e.y-e.r*.55+bob,5,Math.max(5,e.r*.55),'#ffbd51');rect(e.x-3,e.y-e.r-7+bob,6,4,'#fff0a1');rect(e.x-1,e.y-e.r-9+bob,2,3,'#ffcf58');}if(e.adminDummy){ctx.save();ctx.font='bold 9px monospace';ctx.textAlign='center';ctx.fillStyle='#e6c7ff';ctx.shadowColor='#9c5bff';ctx.shadowBlur=lowGraphics?0:(5);ctx.fillText(({grunt:'ОБЫЧНЫЙ',fast:'БЫСТРЫЙ',ranged:'СТРЕЛОК',brute:'ТЯЖЁЛЫЙ',charger:'РЫВОК',spitter:'ЯДОВИТЫЙ',boss:'БОСС'})[e.type]||e.type,e.x,e.y+e.r+13);ctx.fillStyle='#d9a8ff';ctx.fillText('∞ HP',e.x,e.y-e.r-9);ctx.restore();}
-  // Dedicated hand-authored crimson demon sprite. Animation is pose-driven and uses crisp pixel clusters.
-  // It deliberately replaces the generic body for the ordinary melee enemy.
+  // Detailed authored SVG sprite replaces the procedural block-built demon.
   const bespokeDemon=!['boss','brute','spitter','ranged','charger','fast'].includes(e.type);
   if(!e.adminDummy&&bespokeDemon){
-   const phase=runTime*8+(e.anim||0), frame=((Math.floor(phase)%6)+6)%6;
+   const phase=runTime*8+(e.anim||0);
    const moving=Math.hypot(e.vx||0,e.vy||0)>4;
    const gait=moving?Math.sin(phase):Math.sin(runTime*2.1+(e.anim||0))*.12;
    const attackT=Math.max(0,Math.min(1,1-(e.attack||0)/.28));
    const attacking=(e.attack||0)>.001&&attackT<1;
    const hurt=typeof hitAge!=='undefined'&&hitAge>=0&&hitAge<.16;
-   const breathing=Math.sin(runTime*2.8+(e.anim||0));
-   const bob=(moving?Math.abs(gait)*1.5:breathing*.65);
-   const cell=Math.max(1.35,Math.min(2.65,er*.079));
-   const ox=Math.round(e.x-16*cell),oy=Math.round(e.y-16*cell+bob);
-   const C={ink:'#130b19',shadow:'#281020',deep:'#451327',wine:'#702039',red:'#a62840',mid:'#d43b4d',light:'#f45b5d',edge:'#ff9878',bone:'#e8c5b1',gold:'#ffc76b',eye:'#fff4b0',wing:'#351127',wing2:'#64203a',steel:'#51263b',core:'#ff6b38'};
-   const px=(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(ox+Math.round(x*cell),oy+Math.round(y*cell),Math.max(1,Math.round(w*cell)),Math.max(1,Math.round(h*cell)));};
-   ctx.save();ctx.imageSmoothingEnabled=false;ctx.globalAlpha=1;
-   // Shadow and wings: the wing tips flex on alternating gait frames.
-   px(7,29,18,2,'#080910');px(10,30,12,1,'#20101e');
-   const wingLift=Math.round(gait*1.3),wingFold=attacking?2:0;
-   px(3,8-wingLift,5,2,C.ink);px(2,6-wingLift,4,3,C.ink);px(1,5-wingLift,3,3,C.wing);
-   px(2,8-wingLift,5,5,C.wing);px(4,10-wingLift,4,5,C.wing2);px(5,14-wingLift,3,4,C.wing);px(6,17-wingLift,3,3,C.ink);
-   px(4,8-wingLift,1,7,C.red);px(4,12-wingLift,4,1,C.red);px(5,15-wingLift,3,1,C.red);
-   px(24,8+wingLift,5,2,C.ink);px(26,6+wingLift,4,3,C.ink);px(28,5+wingLift,3,3,C.wing);
-   px(26,8+wingLift,4,5,C.wing);px(24,10+wingLift,4,5,C.wing2);px(24,14+wingLift,3,4,C.wing);px(23,17+wingLift,3,3,C.ink);
-   px(27,8+wingLift,1,7,C.red);px(24,12+wingLift,4,1,C.red);px(24,15+wingLift,3,1,C.red);
-   px(2,12-wingLift,2,3,C.ink);px(5,17-wingLift,2,2,C.ink);px(27,17+wingLift,2,2,C.ink);
-   if(wingFold){px(3,10-wingLift,4,5,C.ink);px(25,10+wingLift,4,5,C.ink);}
-   // Horns are outlined in near-black with bone tips and hot red inner facets.
-   px(10,5,4,4,C.ink);px(9,3,4,4,C.ink);px(8,1,4,4,C.ink);px(10,3,2,4,C.red);px(9,1,2,3,C.bone);
-   px(18,5,4,4,C.ink);px(19,3,4,4,C.ink);px(20,1,4,4,C.ink);px(20,3,2,4,C.red);px(21,1,2,3,C.bone);
-   px(13,5,6,3,C.deep);px(12,6,8,2,C.wine);
-   // Head silhouette and brow plates; eye shape narrows during attack.
-   px(9,7,14,10,C.ink);px(10,7,12,9,C.deep);px(11,8,10,7,C.red);
-   px(10,8,3,5,C.mid);px(19,8,3,5,C.mid);px(12,7,8,2,C.light);
-   px(10,10,5,2,C.ink);px(17,10,5,2,C.ink);px(11,10,3,1,C.gold);px(18,10,3,1,C.gold);
-   px(12,11,2,2,hurt?'#ffffff':C.eye);px(18,11,2,2,hurt?'#ffffff':C.eye);
-   px(13,11,1,2,'#ffffff');px(19,11,1,2,'#ffffff');
-   px(14,13,4,1,C.ink);px(13,14,6,2,C.ink);px(14,14,1,1,C.bone);px(17,14,1,1,C.bone);
-   px(10,13,3,2,C.steel);px(19,13,3,2,C.steel);px(11,15,3,1,C.light);px(18,15,3,1,C.light);
-   // Neck and torso. Plates are offset by one pixel on breathing frames for a living silhouette.
-   const breath=breathing>.35?1:0;
-   px(12,16,8,3,C.ink);px(13,16,6,3,C.deep);
-   px(10,18-breath,12,9,C.ink);px(11,18-breath,10,8,C.deep);
-   px(12,18-breath,8,2,C.red);px(11,20-breath,10,4,C.mid);px(12,20-breath,8,1,C.light);
-   px(14,19-breath,4,7,C.ink);px(15,19-breath,2,6,C.steel);px(15,20-breath,1,4,C.edge);
-   px(12,22-breath,3,2,C.gold);px(17,22-breath,3,2,C.gold);px(13,22-breath,2,1,C.eye);px(17,22-breath,2,1,C.eye);
-   // Shoulder spikes, forearms and claws move independently during the gait.
-   const armL=Math.round(gait*1.7)+(attacking?-Math.round(attackT*3):0);
-   const armR=-Math.round(gait*1.7)+(attacking?Math.round(attackT*4):0);
-   px(6,17+armL,6,5,C.ink);px(5,16+armL,4,4,C.ink);px(4,15+armL,3,3,C.ink);
-   px(5,17+armL,5,3,C.steel);px(6,17+armL,3,2,C.light);px(4,15+armL,2,2,C.edge);
-   px(20,17+armR,6,5,C.ink);px(23,16+armR,4,4,C.ink);px(25,15+armR,3,3,C.ink);
-   px(21,17+armR,5,3,C.steel);px(23,17+armR,3,2,C.light);px(26,15+armR,2,2,C.edge);
-   px(6,21+armL,4,4,C.deep);px(7,22+armL,3,3,C.red);px(22,21+armR,4,4,C.deep);px(22,22+armR,3,3,C.red);
-   px(6,24+armL,4,3,C.ink);px(7,24+armL,2,2,C.steel);px(7,26+armL,1,2,C.bone);px(9,26+armL,1,2,C.gold);
-   px(22,24+armR,4,3,C.ink);px(23,24+armR,2,2,C.steel);px(23,26+armR,1,2,C.bone);px(25,26+armR,1,2,C.gold);
-   // Waist, separate greaves and alternating planted feet.
-   px(11,26,10,2,C.ink);px(12,26,8,1,C.gold);px(12,27,3,2,C.deep);px(17,27,3,2,C.deep);
-   const step=moving?(Math.sin(phase)>0?2:-2):0;
-   px(12+step,28,4,2,C.ink);px(13+step,28,2,1,C.steel);px(17-step,28,4,2,C.ink);px(18-step,28,2,1,C.steel);
-   px(11+step,30,5,1,C.ink);px(17-step,30,5,1,C.ink);
-   // Attack tells: torso commits forward, raised claw flashes, core flares then settles.
-   if(attacking){
-    px(22+Math.round(attackT*2),20,5,2,C.edge);px(25+Math.round(attackT*2),19,3,2,C.gold);
-    px(26+Math.round(attackT*2),18,2,1,'#fff4c2');
-    if(attackT>.35){ctx.globalAlpha=.75;ctx.strokeStyle='#ff8059';ctx.lineWidth=Math.max(1,cell*.65);ctx.beginPath();ctx.moveTo(ox+26*cell,oy+19*cell);ctx.lineTo(ox+(30+attackT*2)*cell,oy+15*cell);ctx.stroke();ctx.globalAlpha=1;}
+   const bob=moving?Math.abs(gait)*1.5:Math.sin(runTime*2.8+(e.anim||0))*.65;
+   const spriteSize=Math.max(er*2.9,34);
+   if(!window.__demonCrimsonSprite){window.__demonCrimsonSprite=new Image();window.__demonCrimsonSprite.src='demon-crimson.svg';}
+   const demonImg=window.__demonCrimsonSprite;
+   ctx.save();ctx.imageSmoothingEnabled=false;
+   const lean=attacking?attackT*er*.16:0;
+   if(demonImg.complete&&demonImg.naturalWidth){
+    ctx.translate(Math.round(e.x+lean),Math.round(e.y+bob));
+    if((e.vx||0)<-1)ctx.scale(-1,1);
+    ctx.drawImage(demonImg,-spriteSize/2,-spriteSize/2,spriteSize,spriteSize);
+    if(hurt){ctx.globalCompositeOperation='source-atop';ctx.globalAlpha=.5;ctx.fillStyle='#fff1df';ctx.fillRect(-spriteSize/2,-spriteSize/2,spriteSize,spriteSize);}
+    if(attacking&&attackT>.35){
+     ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.7;
+     ctx.strokeStyle='#ff7653';ctx.lineWidth=Math.max(1,er*.06);
+     ctx.beginPath();ctx.arc(spriteSize*.2,-spriteSize*.03,spriteSize*.28,-.95,.6);ctx.stroke();
+    }
+   }else{
+    // Keep the old silhouette visible during the first frame while the SVG loads.
+    ctx.fillStyle='#a62840';ctx.fillRect(e.x-er*.35,e.y-er*.4,er*.7,er*.8);
    }
-   // Flickering ember core and tiny sparks are deterministic, not random per frame.
-   const pulse=.5+.5*Math.sin(runTime*11+(e.anim||0));
-   px(15,20,2,2,pulse>.55?C.eye:C.core);px(15,22,2,1,C.gold);
-   if(frame===1||frame===4){px(12,11,2,2,'#ffffff');px(18,11,2,2,'#ffffff');px(14,19,1,1,C.edge);px(18,18,1,1,C.edge);}
-   if(hurt){ctx.globalAlpha=.65;ctx.fillStyle='#fff3dc';ctx.fillRect(ox+8*cell,oy+7*cell,16*cell,21*cell);ctx.globalAlpha=1;}
    ctx.restore();
   }
   // High-resolution 26x26 pixel sprites. Each source cell becomes four independently shaded pixels.

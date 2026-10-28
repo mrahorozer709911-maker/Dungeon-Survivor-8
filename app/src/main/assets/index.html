@@ -1387,7 +1387,7 @@ function draw(dt=0){
   // Hand-authored 32x32 crimson demon sprite: layered silhouette, horns, wings, armour, claws and emissive eyes.
   // This bespoke sprite intentionally replaces the generic mask for the standard melee demon.
   const bespokeDemon=!['boss','brute','spitter','ranged','charger','fast'].includes(e.type);
-  if(!lowGraphics&&!e.adminDummy&&bespokeDemon){
+  if(!e.adminDummy&&bespokeDemon){
    const cell=Math.max(1,er*.073), frame=Math.floor(runTime*8+(e.anim||0))%6;
    const ox=Math.round(e.x-16*cell),oy=Math.round(e.y-16*cell+bob);
    const C={outline:'#170d1b',shadow:'#301126',deep:'#50172b',red:'#8d2038',mid:'#c73549',hot:'#f15b5c',edge:'#ff9476',gold:'#ffcc73',eye:'#fff3a6',wing:'#41152e',wingHi:'#76223a',steel:'#5c263d'};

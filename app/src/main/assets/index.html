@@ -1516,7 +1516,7 @@ if(activeHero.id==='scout')ctx.restore();ctx.restore();
  // Floating damage numbers with dark outlines for contrast.
  for(const n of damageNumbers){const a=Math.max(0,n.life/n.maxLife);ctx.globalAlpha=a;const critical=!!n.critical||String(n.value).includes('HP')||Number(n.value)>=Math.max(18,player.damage*2);ctx.font=(critical?'900 16px':'800 12px')+' ui-monospace, monospace';ctx.textAlign='center';ctx.lineWidth=critical?4.5:3;ctx.lineJoin='round';ctx.strokeStyle=critical?'#32150b':'#080b13';ctx.strokeText(String(n.value),n.x,n.y);ctx.shadowColor=n.color;ctx.shadowBlur=lowGraphics?0:(critical?11:2);ctx.fillStyle=n.color;ctx.fillText(String(n.value),n.x,n.y);ctx.shadowBlur=0;ctx.globalAlpha=1;}
  // Extra sparks around active projectiles and particles fade smoothly.
- for(const p of particles){const alpha=Math.max(0,Math.min(1,p.life/.45));if(p.flame){ctx.save();ctx.globalAlpha=alpha;ctx.fillStyle=p.color;ctx.shadowColor=p.color;ctx.shadowBlur=lowGraphics?0:(7);ctx.beginPath();ctx.ellipse(p.x,p.y,Math.max(1,(p.scale||3)*alpha),Math.max(1,(p.scale||3)*1.5*alpha),0,0,Math.PI*2);ctx.fill();ctx.restore()}else{rect(p.x-1,p.y-1,3,3,p.color);if(alpha>.5)rect(p.x,p.y,1,1,'#ffffff')}}
+ for(const p of particles){const alpha=Math.max(0,Math.min(1,p.life/.45));if(p.flame){ctx.save();ctx.globalAlpha=alpha;ctx.fillStyle=p.color;ctx.shadowColor=p.color;ctx.shadowBlur=lowGraphics?0:7;ctx.beginPath();ctx.ellipse(p.x,p.y,Math.max(1,(p.scale||3)*alpha),Math.max(1,(p.scale||3)*1.5*alpha),0,0,Math.PI*2);ctx.fill();ctx.restore()}else{rect(p.x-1,p.y-1,3,3,p.color);if(!lowGraphics&&alpha>.5)rect(p.x,p.y,1,1,'#ffffff')}}
  ctx.restore();
 }
 

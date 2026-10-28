@@ -828,7 +828,7 @@ function spawnBoss(isFinal=false){
  bossWarning=3;alertToast(isFinal?'⚠ '+names[kind]+' · ФИНАЛЬНЫЙ БОСС':'⚠ '+names[kind]+' ВСТУПАЕТ В БОЙ');sfx('boss');
 }
 function victory(){clearRunSave();sfx('upgrade');state='end';$('hud').style.display='none';$('end').style.display='flex';$('endStats').innerHTML='ПОБЕДА!<br>Ты выжил 15 минут и победил главного босса.<br>Убийств: '+kills+'<br>Монет собрано: '+gold+'<br>Уровень героя: '+level+'<br><br><span style="color:#9effb4">Легенда арены!</span>';meta.coins+=gold;meta.best=Math.max(meta.best,kills);saveMeta();}
-const MAX_PARTICLES=240;
+const MAX_PARTICLES=150;
 function particle(x,y,color,n=5){const count=Math.min(n,Math.max(0,MAX_PARTICLES-particles.length));for(let i=0;i<count;i++)particles.push({x,y,vx:rand(-55,55),vy:rand(-55,55),life:rand(.15,.45),color})}
 function ambientBurst(x,y,color,n=16){const count=Math.min(n,Math.max(0,MAX_PARTICLES-particles.length));for(let i=0;i<count;i++){const a=Math.random()*Math.PI*2,sp=rand(8,48);particles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-8,life:rand(.5,1.8),color,glow:true})}}
 function nearest(){let best=null,d=1e9;for(let e of enemies){let dd=Math.hypot(e.x-player.x,e.y-player.y);if(dd<d){best=e;d=dd}}return best}
@@ -1079,26 +1079,31 @@ if(e.type==='boss'&&boss){boss.hp=e.hp;boss.x=e.x;boss.y=e.y;}b.pierce=b.pierce|
  updateHud();
 }
 function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))}
+ const floorLayers=[];
+ function getFloorLayer(phase){
+  if(floorLayers[phase])return floorLayers[phase];
+  const layer=document.createElement('canvas');layer.width=W;layer.height=H;
+  const c=layer.getContext('2d');c.fillStyle=['#182438','#35251e','#12313a','#282044','#160f27'][Math.min(4,phase)];c.fillRect(0,0,W,H);
+  const floors=[['#293b52','#213047','#182438'],['#69442e','#4b2d24','#30201d'],['#24545d','#1b414b','#102d35'],['#514077','#352653','#211a39'],['#492657','#2b1a3c','#160e25']][Math.min(4,phase)];
+  for(let y=0;y<H;y+=24)for(let x=0;x<W;x+=24){
+   const n=(Math.floor(x/24)*17+Math.floor(y/24)*31)%7;
+   c.fillStyle=n===0?floors[0]:n===1?floors[1]:floors[2];c.fillRect(x+1,y+1,22,22);
+   c.fillStyle=phase===1?'#a46b3b':phase===2?'#39808a':phase===3?'#7560a0':'#2b3a51';c.fillRect(x+2,y+2,20,1);c.fillStyle='#0b101d';c.fillRect(x+2,y+21,20,1);
+   if(phase===0&&n===3){c.fillStyle='#71839a';c.fillRect(x+7,y+8,2,2);c.fillStyle='#111b2d';c.fillRect(x+14,y+15,3,2);}
+   if(phase===1&&n===2){c.strokeStyle='#ff7540';c.globalAlpha=.45;c.lineWidth=1;c.beginPath();c.moveTo(x+4,y+5);c.lineTo(x+10,y+12);c.lineTo(x+8,y+19);c.stroke();c.globalAlpha=1;}
+   if(phase===2&&n===4){c.globalAlpha=.32;c.fillStyle='#77dfe0';c.fillRect(x+5,y+6,13,1);c.fillRect(x+9,y+6,1,11);c.globalAlpha=1;}
+   if(phase===3&&n===5){c.strokeStyle='#a995ed';c.globalAlpha=.4;c.beginPath();c.moveTo(x+4,y+18);c.lineTo(x+12,y+4);c.lineTo(x+19,y+16);c.stroke();c.globalAlpha=1;}
+   if(phase===4&&n===1){c.globalAlpha=.5;c.fillStyle='#d35be9';c.fillRect(x+5,y+5,2,2);c.fillStyle='#6d35a0';c.fillRect(x+16,y+16,3,2);c.globalAlpha=1;}
+  }
+  floorLayers[phase]=layer;return layer;
+ }
+
 function draw(dt=0){
  ctx.save();if(shake>0){ctx.translate(rand(-shake,shake),rand(-shake,shake));shake=Math.max(0,shake-.5)}
  const cameraX=clamp(player.x-VIEW_W/2,0,W-VIEW_W),cameraY=clamp(player.y-VIEW_H/2,0,H-VIEW_H);
  ctx.translate(-cameraX,-cameraY);
- const biomeColor=['#182438','#35251e','#12313a','#282044','#160f27'][Math.min(4,landscapePhase)];
- rect(0,0,W,H,biomeColor);
- // Five distinct floor materials and biome-specific surface details.
- const floors=[
-  ['#293b52','#213047','#182438'],['#69442e','#4b2d24','#30201d'],['#24545d','#1b414b','#102d35'],['#514077','#352653','#211a39'],['#492657','#2b1a3c','#160e25']
- ][Math.min(4,landscapePhase)];
- for(let y=Math.max(0,Math.floor(cameraY/24)*24);y<Math.min(H,cameraY+VIEW_H+24);y+=24)for(let x=Math.max(0,Math.floor(cameraX/24)*24);x<Math.min(W,cameraX+VIEW_W+24);x+=24){
-  const n=(Math.floor(x/24)*17+Math.floor(y/24)*31)%7;
-  rect(x+1,y+1,22,22,n===0?floors[0]:n===1?floors[1]:floors[2]);
-  rect(x+2,y+2,20,1,landscapePhase===1?'#a46b3b':landscapePhase===2?'#39808a':landscapePhase===3?'#7560a0':'#2b3a51');rect(x+2,y+21,20,1,'#0b101d');
-  if(landscapePhase===0&&n===3){rect(x+7,y+8,2,2,'#71839a');rect(x+14,y+15,3,2,'#111b2d');}
-  if(landscapePhase===1&&n===2){ctx.strokeStyle='#ff7540';ctx.globalAlpha=.45;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x+4,y+5);ctx.lineTo(x+10,y+12);ctx.lineTo(x+8,y+19);ctx.stroke();ctx.globalAlpha=1;}
-  if(landscapePhase===2&&n===4){ctx.globalAlpha=.32;rect(x+5,y+6,13,1,'#77dfe0');rect(x+9,y+6,1,11,'#77dfe0');ctx.globalAlpha=1;}
-  if(landscapePhase===3&&n===5){ctx.strokeStyle='#a995ed';ctx.globalAlpha=.4;ctx.beginPath();ctx.moveTo(x+4,y+18);ctx.lineTo(x+12,y+4);ctx.lineTo(x+19,y+16);ctx.stroke();ctx.globalAlpha=1;}
-  if(landscapePhase===4&&n===1){ctx.globalAlpha=.5;rect(x+5,y+5,2,2,'#d35be9');rect(x+16,y+16,3,2,'#6d35a0');ctx.globalAlpha=1;}
- }
+ // Static floor tiles are cached per biome instead of redrawn every frame.
+ ctx.drawImage(getFloorLayer(landscapePhase),0,0);
  // Blood remains on the dungeon floor for about 10 seconds.
  for(const b of bloodStains){const fade=Math.min(1,b.life/1.4);ctx.globalAlpha=.68*fade;ctx.fillStyle=b.seed>.5?'#741f35':'#9b263b';ctx.beginPath();ctx.ellipse(b.x,b.y,b.r*(1.2+b.seed*.45),b.r*.55,b.seed*2,0,Math.PI*2);ctx.fill();if(b.splatter){for(let k=0;k<8;k++){const a=k*Math.PI/4+b.seed;ctx.beginPath();ctx.ellipse(b.x+Math.cos(a)*b.r*1.05,b.y+Math.sin(a)*b.r*.6,Math.max(1,b.r*.13),Math.max(1,b.r*.34),a,0,Math.PI*2);ctx.fill();}}ctx.fillStyle='#4d1728';ctx.beginPath();ctx.ellipse(b.x-2,b.y-1,b.r*.55,b.r*.25,0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
  // Scenery silhouettes are purely visual: no collision, pickups or gameplay effects.

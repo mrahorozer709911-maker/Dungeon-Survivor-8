@@ -1435,6 +1435,41 @@ function draw(dt=0){
    // Distinct high-resolution facial features and silhouettes for each enemy family.
    const dot=(dx,dy,color,w=1,h=1)=>{ctx.fillStyle=color;ctx.fillRect(Math.round(e.x+dx*px),Math.round(e.y+dy*px+bob),Math.max(1,Math.ceil(px*w)),Math.max(1,Math.ceil(px*h)))};
    const dark=palette[5],light=palette[3],glow=palette[6];
+   // Silhouette accents: animated limbs and type-specific outlines remain readable at small scale.
+   const stride=frame===0||frame===3?-1:frame===1||frame===4?1:0;
+   if(e.type==='boss'){
+    // Jagged crown tips and a wide, heavy lower silhouette.
+    dot(-8,-8,light,2,2);dot(6,-8,light,2,2);dot(-9,4,dark,2,3);dot(8,4,dark,2,3);
+    dot(-7,7,light,3,2);dot(4,7,light,3,2);
+   }else if(e.type==='brute'){
+    // Oversized forearms swing opposite the legs.
+    dot(-10,5,light,3,3+Math.max(0,stride));dot(8,5,light,3,3+Math.max(0,-stride));
+    dot(-9,8,dark,3,2);dot(7,8,dark,3,2);
+   }else if(e.type==='spitter'){
+    // Rounded side sacs pulse between frames without expensive glow effects.
+    const sac=(frame===1||frame===4)?light:glow;
+    dot(-8,0,sac,2,3);dot(7,0,sac,2,3);dot(-9,3,dark,2,2);dot(7,3,dark,2,2);
+   }else if(e.type==='ranged'){
+    // Hood flaps and a clearly separated weapon barrel.
+    dot(-8,-3,dark,2,4);dot(6,-4,light,2,2);dot(8,-1,glow,4,1);
+    if(firing){dot(11,-1,'#fff0b0',2,2);dot(13,-2,'#ff9a4d',1,1);}
+   }else if(e.type==='charger'){
+    // Forward horn and shoulders lean into the charge.
+    dot(7,-7,glow,4,2);dot(10,-6,light,2,2);
+    dot(-9,3,light,3,3);dot(7,4,light,4,3);
+    if(charging){dot(10,1,'#fff0a1',3,2);dot(12,0,'#ffbd51',2,2);}
+   }else if(e.type==='fast'){
+    // Long swept-back spikes make the agile enemy distinct in motion.
+    dot(-8,-5,light,3,1);dot(-10,-4,glow,3,1);dot(6,-5,light,3,1);
+    dot(-8,5,glow,2,1);dot(7,5,glow,2,1);
+   }else{
+    // Small uneven horns and claws break up the basic round silhouette.
+    dot(-5,-6,light,2,2);dot(3,-6,light,2,2);
+    dot(-8,4,light,2,2);dot(7,4,light,2,2);
+   }
+   // Feet and arms shift in opposite phases to strengthen the six-frame gait.
+   if(frame===1||frame===4){dot(-5,9,light,3,2);dot(3,8,dark,3,2);}
+   else if(frame===2||frame===5){dot(-4,8,dark,3,2);dot(3,9,light,3,2);}
    // Eye sockets, pupils, and a small mouth make the face readable at gameplay scale.
    dot(-4,-2,dark,3,2);dot(2,-2,dark,3,2);
    dot(-3,-2,charging?'#fff0a1':light,1,1);dot(3,-2,charging?'#fff0a1':light,1,1);

@@ -85,9 +85,7 @@ canvas{width:100vw;height:100dvh;object-fit:fill;image-rendering:pixelated}
 #lootToast{top:28%!important}
 
 #hud button{min-height:0}
-@media (orientation:portrait){
- #hud:before{content:'ПОВЕРНИТЕ ТЕЛЕФОН ГОРИЗОНТАЛЬНО';position:absolute;z-index:10;left:50%;top:50%;transform:translate(-50%,-50%);width:min(80vw,340px);padding:14px;background:#081326ee;border:2px solid #ffc83d;color:#fff0b0;text-align:center;font-size:13px;line-height:1.5;box-shadow:0 0 0 100vmax #050916ee}
-}
+/* Portrait mode remains playable; do not cover touch controls with a rotate-screen overlay. */
 @media (max-height:380px){
  .hudtop{top:4px}
  .hudbox{padding:4px 6px}

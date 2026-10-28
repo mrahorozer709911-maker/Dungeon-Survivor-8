@@ -1384,10 +1384,10 @@ function draw(dt=0){
   if(e.type==='boss'){rect(e.x-5,e.y+2,10,4,'#32142b');rect(e.x-13,e.y- e.r-3,6,4,'#ffbd51');rect(e.x+7,e.y-e.r-3,6,4,'#ffbd51');
    // Animated boss crown, rune halo and layered shoulder armor.
    const ba=runTime*1.8,br=e.r+11+Math.sin(runTime*5)*2;ctx.save();ctx.globalAlpha=.45+.25*Math.sin(runTime*4);ctx.strokeStyle=finalBoss?'#ff6b9e':'#ffcb63';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(e.x,e.y,br,br*.55,ba*.12,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=.8;for(let bi=0;bi<5;bi++){const aa=ba+bi*Math.PI*2/5,bx=e.x+Math.cos(aa)*br,by=e.y+Math.sin(aa)*br*.55;ctx.fillStyle=bi%2?'#ff8aa9':'#fff0a1';ctx.beginPath();ctx.moveTo(bx,by-3);ctx.lineTo(bx+3,by);ctx.lineTo(bx,by+3);ctx.lineTo(bx-3,by);ctx.closePath();ctx.fill()}ctx.restore();rect(e.x-e.r*.8,e.y-e.r*.55+bob,5,Math.max(5,e.r*.55),'#ffbd51');rect(e.x+e.r*.45,e.y-e.r*.55+bob,5,Math.max(5,e.r*.55),'#ffbd51');rect(e.x-3,e.y-e.r-7+bob,6,4,'#fff0a1');rect(e.x-1,e.y-e.r-9+bob,2,3,'#ffcf58');}if(e.adminDummy){ctx.save();ctx.font='bold 9px monospace';ctx.textAlign='center';ctx.fillStyle='#e6c7ff';ctx.shadowColor='#9c5bff';ctx.shadowBlur=lowGraphics?0:(5);ctx.fillText(({grunt:'ОБЫЧНЫЙ',fast:'БЫСТРЫЙ',ranged:'СТРЕЛОК',brute:'ТЯЖЁЛЫЙ',charger:'РЫВОК',spitter:'ЯДОВИТЫЙ',boss:'БОСС'})[e.type]||e.type,e.x,e.y+e.r+13);ctx.fillStyle='#d9a8ff';ctx.fillText('∞ HP',e.x,e.y-e.r-9);ctx.restore();}
-  // Detailed 13x13 pixel sprites. Every digit is a deliberate material/shading color.
+  // High-resolution 26x26 pixel sprites. Each source cell becomes four independently shaded pixels.
   // Six-frame gait, centered 13x13 masks, and readable attack poses.
   if(!lowGraphics&&!e.adminDummy){
-   const px=Math.max(1.15,er*.092), frame=Math.floor(runTime*8+(e.anim||0))%6;
+   const px=Math.max(.72,er*.046), frame=Math.floor(runTime*8+(e.anim||0))%6;
    const rawArt=e.type==='boss'?[
     '...1.......1...','...11.....11...','....12...21....','.....12221.....','..1..23332..1..','.1122333332211.','..12234443221..','...122555222...','...122666221...','....1267612.....','....12...21.....','...11.....11....','..1.........1...'
    ]:e.type==='brute'?[
@@ -1404,7 +1404,8 @@ function draw(dt=0){
     '.....111.....','....12221....','...1222221...','..1223333221..','.122333333221.','.122344443221.','.122455554221.','..1226666221..','...12555521...','...11...11....','..11.....11...','.............','.............'
    ];
    // Normalize every handcrafted row to exactly 13 cells and keep it centered.
-   const art=rawArt.map(row=>{if(row.length>13){const cut=Math.floor((row.length-13)/2);return row.slice(cut,cut+13)}return row.padStart(Math.floor((13+row.length)/2),'.').padEnd(13,'.')});
+   const baseArt=rawArt.map(row=>{if(row.length>13){const cut=Math.floor((row.length-13)/2);return row.slice(cut,cut+13)}return row.padStart(Math.floor((13+row.length)/2),'.').padEnd(13,'.')});
+   const art=[];for(const row of baseArt){let top='',bottom='';for(let x=0;x<row.length;x++){const c=row[x];top+=c==='.'?'..':c+c;bottom+=c==='.'?'..':c+c;}art.push(top,bottom);}
    const palette=e.type==='boss'?['#6a1738','#a72b49','#ff6b91','#ffd1df','#ffbd51','#351126','#ff8aab']:
     e.type==='brute'?['#572b49','#8d4768','#d78bad','#f3bfd6','#ffe0ee','#351b30','#f6b7d0']:
     e.type==='spitter'?['#527d2b','#7ea83c','#b9df64','#efffa1','#f6ffd2','#34521f','#d8ff7b']:
@@ -1418,21 +1419,24 @@ function draw(dt=0){
    for(let y=0;y<art.length;y++)for(let x=0;x<art[y].length;x++){
     let ch=art[y][x];if(ch==='.')continue;
     // Feet alternate on six frames; torso and weapon/core react to attack state.
-    if(y>=10&&((x===1||x===2||x===10||x===11)&&frame%3!==0))continue;
+    if(y>=20&&((x===2||x===3||x===20||x===21)&&frame%3!==0))continue;
     if(ch==='6'&&(frame===2||frame===5))ch='4';
     if(ch==='5'&&(frame===3||frame===4)&&x>=5&&x<=7)ch='3';
-    if(charging&&y>=4&&y<=8&&x>=8)ch='2';
-    if(firing&&y>=5&&y<=8&&x>=8)ch='4';
-    const upperLean=y<10?lean:0;
-    const xx=Math.round(e.x+(x-6)*px+upperLean),yy=Math.round(e.y+(y-6)*px+bob+(charging&&y<6?1.2:0));
-    ctx.fillStyle=palette[(Number(ch)-1)%palette.length];
+    if(charging&&y>=8&&y<=16&&x>=16)ch='2';
+    if(firing&&y>=10&&y<=16&&x>=16)ch='4';
+    const upperLean=y<20?lean:0;
+    const xx=Math.round(e.x+(x-12)*px+upperLean),yy=Math.round(e.y+(y-12)*px+bob+(charging&&y<12?1.2:0));
+    const material=(Number(ch)-1)%palette.length;
+    const micro=((x*3+y*5+frame)%7===0)?1:0;
+    ctx.fillStyle=palette[Math.min(palette.length-1,material+micro)];
     ctx.fillRect(xx,yy,Math.ceil(px),Math.ceil(px));
+    if((x+y+frame)%11===0&&material>0&&material<4){ctx.globalAlpha=.48;ctx.fillStyle=palette[Math.max(0,material-1)];ctx.fillRect(xx,yy,Math.max(1,px*.55),Math.max(1,px*.55));ctx.globalAlpha=.92;}
    }
    // Eye highlights follow the gait; wind-up and ranged attacks flash brighter.
    ctx.globalAlpha=charging||firing?.99:.98;ctx.fillStyle=(charging||firing)?palette[6]:palette[4];
-   const eyeShift=frame===1||frame===4?px:frame===3||frame===5?-px:0;
-   ctx.fillRect(Math.round(e.x+eyeShift-px*2.2),Math.round(e.y-er*.13+bob),Math.max(1,Math.ceil(px*.75)),Math.max(1,Math.ceil(px*.55)));
-   ctx.fillRect(Math.round(e.x+eyeShift+px*1.4),Math.round(e.y-er*.13+bob),Math.max(1,Math.ceil(px*.75)),Math.max(1,Math.ceil(px*.55)));
+   const eyeShift=frame===1||frame===4?px*2:frame===3||frame===5?-px*2:0;
+   ctx.fillRect(Math.round(e.x+eyeShift-px*4.4),Math.round(e.y-er*.13+bob),Math.max(1,Math.ceil(px*.75)),Math.max(1,Math.ceil(px*.55)));
+   ctx.fillRect(Math.round(e.x+eyeShift+px*2.8),Math.round(e.y-er*.13+bob),Math.max(1,Math.ceil(px*.75)),Math.max(1,Math.ceil(px*.55)));
    ctx.restore();
   }
  }

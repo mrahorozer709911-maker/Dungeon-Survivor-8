@@ -763,8 +763,9 @@ function addEnemy(){
  let side=Math.floor(rand(0,4)),x=side===0?-10:side===1?W+10:rand(0,W),y=side===2?-10:side===3?H+10:rand(0,H);
  if(Math.hypot(x-player.x,y-player.y)<145){x=x<W/2?W+10:-10;y=rand(30,H-30)}
  const roll=Math.random();let type=roll<.16?'fast':roll<.29?'ranged':roll<.39?'brute':roll<.51?'charger':roll<.62?'spitter':'grunt';
- const phase=Math.min(4,Math.floor(runTime/180)),scale=1+phase*.28;
- let hp=(type==='fast'?9:type==='brute'?31:type==='charger'?22:type==='spitter'?18:type==='ranged'?16:type==='grunt'?15:15)*scale;
+ const phase=Math.min(4,Math.floor(runTime/180)),scale=1+phase*.32;
+ // Slightly tougher enemies, but their health grows slower than the horde size so every weapon remains viable.
+ let hp=(type==='fast'?10:type==='brute'?35:type==='charger'?25:type==='spitter'?20:type==='ranged'?18:type==='grunt'?17:17)*scale;
  const radius={fast:6,brute:11,charger:9,spitter:8,ranged:8,grunt:8}[type];
  enemies.push({id:enemyId++,x,y,r:radius,hp,maxhp:hp,speed:(type==='fast'?rand(48,66):type==='brute'?rand(18,26):type==='charger'?rand(22,30):type==='spitter'?rand(18,25):type==='ranged'?rand(20,30):rand(25,42))+phase*2.2,damage:(type==='fast'?.65:type==='brute'?1.6:type==='charger'?1.8:type==='spitter'?.7:type==='ranged'?.8:1)*(1+phase*.12),flash:0,type,fire:rand(.8,1.8),attack:rand(.7,1.5),windup:0,chargeX:0,chargeY:0,anim:rand(0,6.28)});
  particle(x,y,type==='fast'?'#ff8a9b':type==='spitter'?'#a6ff61':'#ff5b70',3);
@@ -955,7 +956,7 @@ function update(dt){
    }
    const ultNames={scout:'ЗАЛП ОХОТНИКА',tank:'НЕПРОБИВАЕМАЯ СТЕНА',tech:'ЦЕПНАЯ МОЛНИЯ',medic:'СВЕТ ЖИЗНИ',phantom:'ФАЗОВЫЙ СДВИГ',engineer:'КАТАСТРОФА'};toast('УЛЬТА: '+ultNames[hid]+' · ЦЕЛЕЙ: '+ultHits);sfx('boss');screenFlash=Math.max(screenFlash,hid==='tech'?.28:.16);
   }else if(ultRequested){toast('УЛЬТА ПЕРЕЗАРЯЖАЕТСЯ');}ultRequested=false;
- if(!adminArena&&!boss&&spawn<=0){const phaseCount=Math.min(4,Math.floor(runTime/180));const basePack=2*(1+(phaseCount>=1?1:0)+(phaseCount>=2&&Math.random()<.65?1:0)+(phaseCount>=3&&Math.random()<.35?1:0));const pack=Math.max(1,Math.round(basePack*(runTime<360?.5:1)));for(let si=0;si<pack;si++)addEnemy();spawn=Math.max(.18,(1.12-landscapePhase*.13)/(1+phaseCount*.12)*(hordeEventLeft>0?.68:1));}
+ if(!adminArena&&!boss&&spawn<=0){const phaseCount=Math.min(4,Math.floor(runTime/180));const basePack=3*(1+(phaseCount>=1?1:0)+(phaseCount>=2&&Math.random()<.65?1:0)+(phaseCount>=3&&Math.random()<.35?1:0));const pack=Math.max(2,Math.round(basePack*(runTime<360?.62:1)));for(let si=0;si<pack;si++)addEnemy();spawn=Math.max(.16,(.98-landscapePhase*.09)/(1+phaseCount*.1)*(hordeEventLeft>0?.62:1));}
  const previousPhase=landscapePhase;landscapePhase=Math.min(4,Math.floor(runTime/180));floor=landscapePhase+1;if(landscapePhase!==previousPhase){makeRoomProps();if(runTime<900)toast('ЛАНДШАФТ ИЗМЕНИЛСЯ: '+['РУИНЫ','ПЕПЕЛЬНЫЕ ПУСТОШИ','ЗАТОПЛЕННЫЙ ХРАМ','КРИСТАЛЬНАЯ БУРЯ','ЦАРСТВО БЕЗДНЫ'][landscapePhase]);}if(!adminArena){if(runTime>=900&&!finalBoss&&!boss){spawnBoss(true);}else if(runTime>=nextBossTime&&runTime<900&&!boss){spawnBoss(false);nextBossTime+=180;}}
  if(boss){boss.fire-=dt;if(boss.fire<=0){
  const enraged=boss.hp<boss.maxhp*.45,kind=boss.kind||'storm';boss.fire=enraged?.55:(kind==='hunter'?.88:kind==='frost'?.95:1.05);

@@ -485,8 +485,8 @@ button{min-height:42px;font-size:clamp(12px,3.2vw,14px);padding:11px 12px}
 </div>
 <div id="end" class="overlay" style="display:none">
  <div class="card"><div class="logo" style="font-size:34px">ЗАБЕГ<span>ОКОНЧЕН</span></div><div class="subtitle" id="endStats"></div><button class="primary" id="again">↻ ЕЩЁ ОДИН ЗАБЕГ</button><button id="home">В МЕНЮ</button></div>
-<div id="desktopControls">WASD — движение · ЛКМ — выстрел · ПКМ / Space — рывок · Q — ульта</div>
 </div>
+<div id="desktopControls">WASD — движение · ЛКМ — выстрел · ПКМ / Space — рывок · Q — ульта · F — экран</div>
 <script>
 (()=>{
 const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
@@ -1472,7 +1472,7 @@ shootBtn.addEventListener('pointerup',releaseFire);shootBtn.addEventListener('po
 $('dashBtn').addEventListener('pointerdown',e=>{e.preventDefault();if(state==='play')dashRequested=true});
  $('ultBtn').addEventListener('pointerdown',e=>{e.preventDefault();if(state==='play')ultRequested=true});
 $('interactBtn').style.display='none';
-window.addEventListener('keydown',e=>{keys[e.key]=true;if(e.code==='Space'&&state==='play'){e.preventDefault();dashRequested=true}if((e.key==='q'||e.key==='Q')&&state==='play'){e.preventDefault();ultRequested=true}});
+window.addEventListener('keydown',e=>{keys[e.key]=true;if(e.code==='Space'&&state==='play'){e.preventDefault();dashRequested=true}if((e.key==='q'||e.key==='Q')&&state==='play'){e.preventDefault();ultRequested=true}if((e.key==='f'||e.key==='F')&&!e.repeat){e.preventDefault();if(!document.fullscreenElement){const target=document.documentElement;if(target.requestFullscreen)target.requestFullscreen().catch(()=>{})}else if(document.exitFullscreen)document.exitFullscreen().catch(()=>{})}});
 canvas.addEventListener('pointerdown',e=>{
  if(state!=='play'||e.pointerType==='touch')return;
  if(e.button===0){const target=nearest();if(target){shootAt(target);shoot=Math.max(.075,player.fireRate*Math.pow(.94,weaponUpgrades.tempo||0)/(ultRateMult||1));}}
@@ -1482,6 +1482,8 @@ canvas.addEventListener('contextmenu',e=>e.preventDefault());
 
 function loop(t){let dt=Math.min(.033,(t-last)/1000||0);last=t;if(state!=='paused')update(dt);if(state==='play'||state==='upgrade'||state==='paused')draw(dt);requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
+// Browser safety: pause the run when the player switches tabs or minimizes the window.
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='play'){try{saveRun()}catch(e){}state='paused';$('pause').style.display='flex';$('stick').style.display='none';}});
 try{loadMeta()}catch(e){console.warn('Meta profile load failed; using defaults',e);try{renderMeta()}catch(_){const el=document.getElementById('metaStats');if(el)el.textContent='Профиль не загружен — игра доступна, прогресс начнётся заново после сброса данных.'}}
 $('start').onclick=()=>{adminArena=false;reset()};
 $('continueRun').onclick=resumeRun;

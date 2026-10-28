@@ -831,8 +831,9 @@ function spawnBoss(isFinal=false){
 }
 function victory(){clearRunSave();sfx('upgrade');state='end';$('hud').style.display='none';$('end').style.display='flex';$('endStats').innerHTML='ПОБЕДА!<br>Ты выжил 15 минут и победил главного босса.<br>Убийств: '+kills+'<br>Монет собрано: '+gold+'<br>Уровень героя: '+level+'<br><br><span style="color:#9effb4">Легенда арены!</span>';meta.coins+=gold;meta.best=Math.max(meta.best,kills);saveMeta();}
 const MAX_PARTICLES=110;
-function particle(x,y,color,n=5){const count=Math.min(n,Math.max(0,MAX_PARTICLES-particles.length));for(let i=0;i<count;i++)particles.push({x,y,vx:rand(-55,55),vy:rand(-55,55),life:rand(.15,.45),color})}
-function ambientBurst(x,y,color,n=16){const count=Math.min(n,Math.max(0,MAX_PARTICLES-particles.length));for(let i=0;i<count;i++){const a=Math.random()*Math.PI*2,sp=rand(8,48);particles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-8,life:rand(.5,1.8),color,glow:true})}}
+// Adaptive particle budget: cut cosmetic workload when the FPS monitor detects a slow device.
+function particle(x,y,color,n=5){const cap=lowGraphics?42:MAX_PARTICLES;const count=Math.min(lowGraphics?Math.ceil(n*.55):n,Math.max(0,cap-particles.length));for(let i=0;i<count;i++)particles.push({x,y,vx:rand(-55,55),vy:rand(-55,55),life:rand(.15,.45),color})}
+function ambientBurst(x,y,color,n=16){const cap=lowGraphics?42:MAX_PARTICLES;const count=Math.min(lowGraphics?Math.ceil(n*.4):n,Math.max(0,cap-particles.length));for(let i=0;i<count;i++){const a=Math.random()*Math.PI*2,sp=rand(8,48);particles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-8,life:rand(.5,1.8),color,glow:true})}}
 function nearest(){let best=null,d=1e9;for(let e of enemies){let dd=Math.hypot(e.x-player.x,e.y-player.y);if(dd<d){best=e;d=dd}}return best}
 function shootAt(e){
  if(!e)return;const id=activeWeapon.id,dx=e.x-player.x,dy=e.y-player.y,d=Math.hypot(dx,dy)||1,baseAng=Math.atan2(dy,dx),critical=Math.random()<critChance,ox=player.x+Math.cos(baseAng)*10,oy=player.y+Math.sin(baseAng)*10,wu=weaponUpgrades||{power:0,tempo:0,trait:0},wd=player.damage*(1+(wu.power||0)*.12)*(wu.evolved?1.25:1)*(ultDamageMult||1)*(activeHero.id==='engineer'&&boss?1.2+((meta.heroSkills||{}).engineer||0)*.05:1),trait=wu.trait||0;

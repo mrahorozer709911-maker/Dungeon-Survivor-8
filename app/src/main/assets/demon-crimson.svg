@@ -14,5 +14,24 @@
 <!-- glowing core --> <circle cx="24" cy="25" r="5.5" fill="url(#core)"/><path d="M24 22 26 25 24 28 22 25Z" fill="#fff4a0"/><path d="M24 23 25 25 24 27 23 25Z" fill="#fff"/>
 <!-- head and horns --> <path d="M18 15 15 10 16 6 20 12 22 13M30 15 33 10 32 6 28 12 26 13" fill="#d9bda0" stroke="#241021" stroke-width="1.5"/><path d="M17 12 17 8 19 12M31 12 31 8 29 12" fill="#f8d8ad"/><path d="M18 13 20 10 28 10 30 13 29 19 26 22 22 22 19 19Z" fill="#361027" stroke="#100711" stroke-width="1.5"/><path d="M19 14 22 12 26 12 29 14 27 18 24 20 21 18Z" fill="url(#armor)"/><path d="M19 14 22 13 21 16 19 16M29 14 26 13 27 16 29 16" fill="#ff8a69"/><path d="M20 16 23 17 22 18 20 17M28 16 25 17 26 18 28 17" fill="#fff0a3"/><rect x="21" y="16" width="1" height="1" fill="#fff"/><rect x="27" y="16" width="1" height="1" fill="#fff"/><path d="M22 19 24 18 26 19 25 21 23 21Z" fill="#120916"/><path d="M22 20 23 21 25 21 26 20" fill="none" stroke="#e7b59c" stroke-width=".7"/>
 <!-- horns and crown spines --> <path d="M19 12 17 9 18 5 20 9 21 12M29 12 31 9 30 5 28 9 27 12" fill="#9e7a6e" stroke="#20101d" stroke-width="1"/><path d="M18 6 18 9 19 10M30 6 30 9 29 10" stroke="#fff0c5" stroke-width=".8"/>
+<!-- extra hand-crafted pixel details: layered plates, runes, scars and wing ribs -->
+<path d="M18 20 20 19 22 20 20 22Z M26 20 28 19 30 20 28 22Z" fill="#ffb17b"/>
+<path d="M19 22 21 23 20 25 18 24Z M29 22 27 23 28 25 30 24Z" fill="#5d1731" stroke="#e34a53" stroke-width=".55"/>
+<path d="M20 27 22 28 21 30 19 29Z M28 27 26 28 27 30 29 29Z" fill="#d43b4d"/>
+<path d="M22 29 24 30 26 29 25 31 23 31Z" fill="#ffad70"/>
+<path d="M20 31 21 32 20 33M28 31 27 32 28 33" fill="none" stroke="#ffd6a1" stroke-width=".7"/>
+<path d="M15 21 17 22 16 24M33 21 31 22 32 24" fill="none" stroke="#ffb17b" stroke-width=".7"/>
+<path d="M11 20 13 21 12 23M37 20 35 21 36 23" fill="none" stroke="#d94b5a" stroke-width=".7"/>
+<path d="M12 25 14 26 13 28M36 25 34 26 35 28" fill="none" stroke="#f1786d" stroke-width=".6"/>
+<path d="M21 12 22 14 21 15M27 12 26 14 27 15" fill="none" stroke="#ffb17b" stroke-width=".6"/>
+<path d="M22 13 24 12 26 13 24 14Z" fill="#ffd6a1"/>
+<path d="M21 18 23 19 22 20M27 18 25 19 26 20" fill="none" stroke="#ffd6a1" stroke-width=".6"/>
+<path d="M23 23 24 22 25 23 24 24Z" fill="#fff4a5"/>
+<path d="M23 26 24 25 25 26 24 27Z" fill="#ffdc66"/>
+<path d="M23 29 24 28 25 29 24 30Z" fill="#ff7047"/>
+<path d="M10 13 12 16 13 15M38 13 36 16 35 15M7 17 9 20M41 17 39 20" fill="none" stroke="#ff8b72" stroke-width=".55"/>
+<path d="M14 28 16 29 15 30M34 28 32 29 33 30" fill="none" stroke="#ffb17b" stroke-width=".6"/>
+<path d="M18 35 20 36 19 38M30 35 28 36 29 38" fill="none" stroke="#d44a57" stroke-width=".7"/>
+<path d="M17 40 19 41 18 42M31 40 29 41 30 42" fill="none" stroke="#f7c4a0" stroke-width=".6"/>
 <!-- engraved armor and highlights --> <path d="M17 22 19 23 18 26M31 22 29 23 30 26M21 32 22 34M27 32 26 34" fill="none" stroke="#ff9a78" stroke-width=".8"/><path d="M15 19 17 20M33 19 31 20" stroke="#ffd18c" stroke-width="1"/><rect x="19" y="29" width="2" height="1" fill="#f8bd72"/><rect x="27" y="29" width="2" height="1" fill="#f8bd72"/>
 </g></svg>

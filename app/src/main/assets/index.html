@@ -36,7 +36,29 @@ button:active{transform:translateY(2px);filter:brightness(1.15)}
 #dashBtn{position:absolute;right:25px;bottom:max(105px,calc(env(safe-area-inset-bottom) + 105px));width:72px;height:72px;border-radius:50%;padding:5px;margin:0;background:#39285dcc;border:2px solid #d6a5ff;color:#fff;font-size:11px;line-height:1.2;text-align:center;pointer-events:auto}#dashBtn.ready{box-shadow:0 0 12px #bd7aff88}#dashBtn.cooling{opacity:.55}
 #toast{position:absolute;top:calc(env(safe-area-inset-top,0px) + 78px);left:50%;transform:translateX(-50%);width:max-content;max-width:min(82vw,520px);padding:6px 10px;border:1px solid #8ba7c7aa;border-radius:8px;background:#08101ee8;box-shadow:0 3px 12px #0008;text-align:center;font-weight:800;font-size:clamp(10px,2.5vw,13px);line-height:1.2;color:#ffe18a;text-shadow:1px 1px #000;overflow-wrap:anywhere;pointer-events:none;z-index:4;display:none}
  #alertToast{position:absolute;top:calc(env(safe-area-inset-top,0px) + 82px);left:50%;transform:translateX(-50%);width:max-content;max-width:min(88vw,480px);padding:8px 13px;border:1px solid #ff7a86;border-radius:9px;background:linear-gradient(110deg,#310d20f2,#151025f2);box-shadow:0 0 14px #ff355566,0 3px 12px #0009;text-align:center;font-weight:900;font-size:clamp(11px,2.8vw,15px);line-height:1.2;color:#ffe4a6;text-shadow:1px 1px #000;overflow-wrap:anywhere;pointer-events:none;z-index:5;display:none}
-#choices{display:grid;grid-template-columns:1fr;gap:7px;margin:12px 0}
+#upgrade .card{width:min(94vw,560px);max-height:92dvh;overflow-y:auto;padding:clamp(14px,3.5vw,24px);border:1px solid #5f82a8;background:linear-gradient(155deg,#172844f7,#080f1ffb 70%);box-shadow:0 0 0 3px #050b17,0 0 35px #49a9ff20,inset 0 1px #d9efff20}
+#upgrade .logo{color:#f3d58a;text-shadow:0 3px #57391e,0 0 16px #e8ae4a35;letter-spacing:1.5px}
+#upgrade .subtitle{color:#b8cde6}
+#choices{display:grid;grid-template-columns:1fr;gap:9px;margin:14px 0 4px}
+.choice{position:relative;display:grid;grid-template-columns:34px minmax(0,1fr) 14px;grid-template-rows:auto 1fr;align-items:center;column-gap:10px;row-gap:5px;min-height:86px;padding:12px 13px 13px 11px;border:1px solid #526b8c;border-left:3px solid #73bce9;border-radius:9px;background:linear-gradient(110deg,#1c304b,#101a2c 65%,#0b1322);box-shadow:inset 0 1px #ffffff12,0 3px 0 #050a13,0 5px 12px #0004;color:#e5efff;text-align:left;font-size:13px;line-height:1.35;transition:transform .12s,border-color .12s,filter .12s;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.choice:before{content:"";position:absolute;left:7px;right:7px;top:0;height:1px;background:linear-gradient(90deg,transparent,#bfe8ff55,transparent);pointer-events:none}
+.choice:active{transform:translateY(2px);filter:brightness(1.25)}
+.choice:focus-visible{outline:2px solid #ffe49a;outline-offset:2px}
+.choice-rank{grid-column:1/4;grid-row:1;font-size:9px;font-weight:900;letter-spacing:1.2px;color:#9dc6eb;opacity:.95}
+.choice-icon{grid-column:1;grid-row:2;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid #8cb9d9;border-radius:7px;background:linear-gradient(145deg,#345477,#101d31);box-shadow:inset 0 1px #ffffff25,0 0 12px #6cbcff18;color:#e6f7ff;font-size:20px;text-shadow:0 0 9px #72d7ff77}
+.choice-copy{grid-column:2;grid-row:2;min-width:0;display:flex;flex-direction:column;gap:4px}
+.choice b{display:block;margin:0;color:#f4d58c;font-size:12px;line-height:1.25;letter-spacing:.25px}
+.choice-desc{display:block;color:#c1d0e3;font-size:11px;line-height:1.35;font-weight:500}
+.choice-arrow{grid-column:3;grid-row:2;align-self:center;color:#8ab8df;font-size:24px;text-align:center}
+.choice-weapon{border-left-color:#a98aff;background:linear-gradient(110deg,#282346,#111a2d 70%,#0b1322)}
+.choice-weapon .choice-rank{color:#c5aaff}.choice-weapon .choice-icon{border-color:#b9a0ff;background:linear-gradient(145deg,#514078,#1b1934);color:#e2d7ff}
+.choice-general{border-left-color:#66d9bb}
+.choice-general .choice-rank{color:#8fe4ce}.choice-general .choice-icon{border-color:#75d8c3;background:linear-gradient(145deg,#24594f,#102a2b);color:#c5fff0}
+.choice-evolution{border:1px solid #e6bd62;border-left:4px solid #ffd66e;background:linear-gradient(110deg,#50371b,#211b22 65%,#111522);box-shadow:inset 0 1px #fff0b455,0 0 16px #ffce5a1c,0 3px 0 #050a13}
+.choice-evolution .choice-rank{color:#ffdf8d}.choice-evolution .choice-icon{border-color:#f0c66c;background:linear-gradient(145deg,#98632d,#3e291e);color:#fff0b4;text-shadow:0 0 10px #ffb32e}
+@media(min-width:520px){#choices{grid-template-columns:1fr 1fr}.choice{min-height:105px}.choice-evolution{grid-column:1/-1}}
+@media(prefers-reduced-motion:reduce){.choice{transition:none}}
+
 .choice{font-size:13px;text-align:left;padding:12px}
 .choice b{color:#ffda69;display:block;margin-bottom:5px}
 @media (min-width:700px){.card{width:460px}#stick{width:120px;height:120px}#knob{left:35px;top:35px}}
@@ -747,7 +769,7 @@ function showUpgrades(){
   {key:'damage',title:'УСИЛЕНИЕ ОРУЖИЯ +10%',desc:'Урон всех попаданий и луча повышается на 10%.',apply:()=>{player.damage*=1.10;upgrades.damage++}},
   {key:'speed',title:'БЫСТРЫЕ НОГИ',desc:'Скорость движения +5%.',apply:()=>{player.speed*=1.05;upgrades.speed++}},
   {key:'maxhp',title:'ЗАПАС ЗДОРОВЬЯ',desc:'Восстанови 1 ♥ и увеличь максимум здоровья.',apply:()=>{player.maxhp++;player.hp=Math.min(player.maxhp,player.hp+1);upgrades.maxhp++}},
-  {key:'magnet',title:'МАГНИТ ОПЫТА',desc:'Радиус сбора добычи выше.',apply:()=>{upgrades.magnet++}},
+  {key:'rate',title:'БОЕВОЙ ТЕМП',desc:'Скорость стрельбы всего оружия +5%.',apply:()=>{player.fireRate=Math.max(.075,player.fireRate*.95);upgrades.rate++}},
   {key:'crit',title:'ОРЛИНЫЙ ГЛАЗ',desc:'Шанс критического удара +1,5%.',apply:()=>{critChance=Math.min(.35,critChance+.015);upgrades.crit++}},
   {key:'pierce',title:'ПРОБОЙ',desc:'Пули проходят сквозь ещё одного врага.',apply:()=>{pierce=Math.min(10,pierce+1);upgrades.pierce++}},
   {key:'orbit',title:'ОРБИТАЛЬНЫЙ ДРОН',desc:'Спутник наносит урон ближайшим врагам.',apply:()=>{orbitTimer=Math.min(10,orbitTimer+1);upgrades.orbit++}},
@@ -759,13 +781,20 @@ function showUpgrades(){
  const cards=(weaponCards[id]||weaponCards.pistol).filter((_,i)=>i===0?(wu.trait||0)<10:i===1?(wu.tempo||0)<10:(wu.power||0)<10);
  // Do not offer global upgrades that have no effect on the weapon's actual attack model.
  const irrelevant=id==='laser'?new Set(['pierce','crit']):id==='rail'?new Set(['pierce']):new Set();
- const availableGeneral=general.filter(g=>!irrelevant.has(g.key)&&((g.key==='streak')||(g.key==='heal')||(g.key==='damage')||(g.key==='speed')||(g.key==='maxhp')||(g.key==='magnet')||(g.key==='crit'&&(upgrades.crit||0)<10)||(g.key==='pierce'&&(upgrades.pierce||0)<10)||(g.key==='orbit'&&(upgrades.orbit||0)<10)));
+ const availableGeneral=general.filter(g=>!irrelevant.has(g.key)&&((g.key==='streak')||(g.key==='heal')||(g.key==='damage')||(g.key==='speed')||(g.key==='maxhp')||(g.key==='rate')||(g.key==='crit'&&(upgrades.crit||0)<10)||(g.key==='pierce'&&(upgrades.pierce||0)<10)||(g.key==='orbit'&&(upgrades.orbit||0)<10)));
  const shuffled=a=>a.slice().sort(()=>Math.random()-.5);
  const weaponChoices=shuffled(cards).slice(0,Math.min(2,cards.length));
  const generalChoices=shuffled(availableGeneral).slice(0,Math.max(0,3-(evolution?1:0)-weaponChoices.length));
  const opts=[...(evolution?[evolution]:[]),...weaponChoices,...generalChoices].slice(0,3);
  $('choices').innerHTML='';
- opts.forEach(o=>{const title=Array.isArray(o)?o[0]:o.title,desc=Array.isArray(o)?o[1]:o.desc,apply=Array.isArray(o)?o[2]:o.apply;const b=document.createElement('button');b.className='choice';b.innerHTML='<b>✦ '+title+'</b>'+desc;b.onclick=()=>{apply();sfx('upgrade');$('upgrade').style.display='none';$('stick').style.display='block';state='play';updateHud();toast(title.includes('ЭВОЛЮЦИЯ')?'ЭВОЛЮЦИЯ АКТИВИРОВАНА!':'УЛУЧШЕНИЕ ПОЛУЧЕНО')};$('choices').appendChild(b)});
+ opts.forEach(o=>{
+  const title=Array.isArray(o)?o[0]:o.title,desc=Array.isArray(o)?o[1]:o.desc,apply=Array.isArray(o)?o[2]:o.apply;
+  const evolutionCard=title.includes('ЭВОЛЮЦИЯ'),weaponCard=title.includes('·'),icon=evolutionCard?'✦':weaponCard?'⚔':({'damage':'✹','rate':'➶','speed':'➤','maxhp':'♥','crit':'✧','pierce':'➤','orbit':'◉','heal':'✚','streak':'ϟ'}[(o.key)||'']||'✦');
+  const category=evolutionCard?'ЛЕГЕНДАРНОЕ · ЭВОЛЮЦИЯ':weaponCard?'УЛУЧШЕНИЕ ОРУЖИЯ':'БОЕВОЙ НАВЫК';
+  const b=document.createElement('button');b.className='choice'+(evolutionCard?' choice-evolution':weaponCard?' choice-weapon':' choice-general');
+  b.innerHTML='<span class="choice-rank">'+category+'</span><span class="choice-icon" aria-hidden="true">'+icon+'</span><span class="choice-copy"><b>'+title+'</b><span class="choice-desc">'+desc+'</span></span><span class="choice-arrow">›</span>';
+  b.onclick=()=>{apply();sfx('upgrade');$('upgrade').style.display='none';$('stick').style.display='block';state='play';updateHud();toast(title.includes('ЭВОЛЮЦИЯ')?'ЭВОЛЮЦИЯ АКТИВИРОВАНА!':'УЛУЧШЕНИЕ ПОЛУЧЕНО')};$('choices').appendChild(b)
+ });
 }
 function endGame(){
  clearRunSave();sfx('death');state='end';$('hud').style.display='none';$('end').style.display='flex';$('endStats').innerHTML=`Время выживания: ${Math.floor(runTime/60)}:${String(Math.floor(runTime%60)).padStart(2,'0')}<br>Убийств: ${kills}<br>Монет собрано: ${gold}<br>Уровень героя: ${level}<br><br><span style="color:#ffcf54">Попробуй продержаться все 15 минут.</span>`;
@@ -876,7 +905,7 @@ if(e.type==='boss'&&boss){boss.hp=e.hp;boss.x=e.x;boss.y=e.y;}b.pierce=b.pierce|
  else{const r=Math.random();if(r<.25){player.hp=Math.min(player.maxhp,player.hp+1);showLoot('РЕДКИЙ ЛУТ: +1 ♥')}else if(r<.5){player.damage+=.35;showLoot('РЕДКИЙ ЛУТ: УРОН +0.35')}else if(r<.72){armor++;showLoot('БРОНЯ +1: УРОН СНИЖЕН')}else{player.speed*=1.01;showLoot('РЕДКИЙ ЛУТ: СКОРОСТЬ +1%')}particle(l.x,l.y,'#8fffe0',10)}}}
  loot=loot.filter(l=>!l.got&&l.life>0);
  const pet=null,petLv=0;if(false&&pet&&petAttackTimer<=0){petAttackTimer=Math.max(.55,2.5-petLv*.22);let target=null,td=1e9;for(const en of enemies){const d=Math.hypot(en.x-player.x,en.y-player.y);if(!en.adminDummy&&en.hp>0&&d<td&&d<220){target=en;td=d}}if(target){if(pet.id==='drone'){target.hp-=player.damage*(.3+petLv*.12);target.deathCause='lightning';particle(target.x,target.y,pet.color,5);if(target.hp<=0)killEnemy(target,'lightning')}else if(pet.id==='fox'){target.burn=Math.max(target.burn||0,1+petLv*.35);target.hp-=player.damage*(.15+petLv*.07);particle(target.x,target.y,pet.color,5);if(target.hp<=0)killEnemy(target,'fire')}else if(pet.id==='raven'){target.marked=Math.max(target.marked||0,2+petLv*.3);particle(target.x,target.y,pet.color,4)}else if(pet.id==='orb'){target.hp-=player.damage*(.4+petLv*.15);target.deathCause='explosion';particle(target.x,target.y,pet.color,7);if(target.hp<=0)killEnemy(target,'explosion')}else if(pet.id==='wisp'&&player.hp<player.maxhp){player.hp=Math.min(player.maxhp,player.hp+.16+petLv*.07);particle(player.x,player.y,pet.color,3)}else if(pet.id==='slime'){for(const near of enemies){if(Math.hypot(near.x-player.x,near.y-player.y)<38+petLv*3)near.speed=Math.max(6,near.speed*(.96-petLv*.008))}}}}if(orbitTimer>0){orbitAngle+=dt*2.8;for(let oi=0;oi<orbitTimer;oi++){const ox=player.x+Math.cos(orbitAngle+oi*Math.PI*2/orbitTimer)*23,oy=player.y+Math.sin(orbitAngle+oi*Math.PI*2/orbitTimer)*23;for(const e of enemies){if(!e.adminDummy&&Math.hypot(e.x-ox,e.y-oy)<e.r+5){e.hp-=8*dt;if(e.hp<=0)killEnemy(e)}}particle(ox,oy,'#b9a0ff',1)}}
- for(let c of coins){let d=Math.hypot(c.x-player.x,c.y-player.y);if(d<35+upgrades.magnet*10){c.x+=(player.x-c.x)*Math.min(1,dt*5);c.y+=(player.y-c.y)*Math.min(1,dt*5)}if(d<player.r+c.r+4){c.got=true;gold++;sfx('coin');particle(c.x,c.y,'#ffce45',5)}}
+ for(let c of coins){let d=Math.hypot(c.x-player.x,c.y-player.y);if(d<55){c.x+=(player.x-c.x)*Math.min(1,dt*5);c.y+=(player.y-c.y)*Math.min(1,dt*5)}if(d<player.r+c.r+4){c.got=true;gold++;sfx('coin');particle(c.x,c.y,'#ffce45',5)}}
  coins=coins.filter(c=>!c.got);
  for(let p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=Math.pow(.08,dt);p.vy*=Math.pow(.08,dt);p.life-=dt}particles=particles.filter(p=>p.life>0);for(const beam of weaponBeams)beam.life-=dt;weaponBeams=weaponBeams.filter(beam=>beam.life>0);
  for(const b of bloodStains)b.life-=dt;bloodStains=bloodStains.filter(b=>b.life>0);

@@ -54,7 +54,8 @@ button:active{transform:translateY(2px);filter:brightness(1.15)}
 .choice-weapon .choice-rank{color:#c5aaff}.choice-weapon .choice-icon{border-color:#b9a0ff;background:linear-gradient(145deg,#514078,#1b1934);color:#e2d7ff}
 .choice-general{border-left-color:#66d9bb}
 .choice-general .choice-rank{color:#8fe4ce}.choice-general .choice-icon{border-color:#75d8c3;background:linear-gradient(145deg,#24594f,#102a2b);color:#c5fff0}
-.choice-evolution{border:1px solid #e6bd62;border-left:4px solid #ffd66e;background:linear-gradient(110deg,#50371b,#211b22 65%,#111522);box-shadow:inset 0 1px #fff0b455,0 0 16px #ffce5a1c,0 3px 0 #050a13}
+.choice-rare{border-color:#ffbf57!important;background:linear-gradient(135deg,rgba(101,61,14,.92),rgba(38,29,22,.97))!important;box-shadow:inset 0 0 0 1px rgba(255,207,102,.22),0 0 18px rgba(255,171,55,.12)}.choice-rare .choice-rank{color:#ffd17a}.choice-rare .choice-icon{color:#ffe19a;text-shadow:0 0 14px rgba(255,181,69,.6)}
+ .choice-evolution{border:1px solid #e6bd62;border-left:4px solid #ffd66e;background:linear-gradient(110deg,#50371b,#211b22 65%,#111522);box-shadow:inset 0 1px #fff0b455,0 0 16px #ffce5a1c,0 3px 0 #050a13}
 .choice-evolution .choice-rank{color:#ffdf8d}.choice-evolution .choice-icon{border-color:#f0c66c;background:linear-gradient(145deg,#98632d,#3e291e);color:#fff0b4;text-shadow:0 0 10px #ffb32e}
 @media(min-width:520px){#choices{grid-template-columns:1fr 1fr}.choice{min-height:105px}.choice-evolution{grid-column:1/-1}}
 @media(prefers-reduced-motion:reduce){.choice{transition:none}}
@@ -415,7 +416,7 @@ let loot=[],paused=false,walkFrame=0,questOpenFrom='menu';
 let roomIndex=1,roomKills=0,roomGoal=6,secretFound=false,secretPos={x:24,y:330},roomProps=[],roomDoorOpen=false,armor=0,artifact=null,artifactLevel=1,artifactPulse=0,guardianCooldown=0,attackAnim=0;
 let nextBossTime=180,landscapePhase=0,finalBoss=false,bossWarning=0;
 let dashCooldown=0,dashTime=0,dashRequested=false,dashDir={x:1,y:0},checkpointTimer=0,heroHealTimer=0,ultCooldown=0,ultRequested=false;
-let critChance=.08,pierce=0,orbitTimer=0,orbitAngle=0,killStreak=0,streakTimer=0,weaponSynergyHits=0,petAttackTimer=0,petCardLevel=0,artifactCardLevel=0;
+let critChance=.08,pierce=0,orbitTimer=0,orbitAngle=0,killStreak=0,streakTimer=0,weaponSynergyHits=0,petAttackTimer=0,petCardLevel=0,artifactCardLevel=0,rareChainLevel=0,rareBlastLevel=0;
 const rand=(a,b)=>a+Math.random()*(b-a),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
 const ICON_PALETTES={heroes:['#9bdcff','#e8f6ff'],weapons:['#ffc66d','#e8f6ff'],pets:['#9df4e5','#f3ffff'],artifacts:['#c5a0ff','#fff0a8'],items:['#b6c9df','#f6fbff'],rarity:['#c6d7ef','#fff2bb'],skins:['#8beaff','#fff0a8']};
@@ -697,7 +698,9 @@ function killEnemy(e,cause){
  if(!e||e.adminDummy||e.dead)return;
  e.dead=true;
  cause=cause||e.deathCause||(e.burn>0?'fire':e.poison>0?'poison':'physical');
- sfx(e.type==='boss'?'boss':cause==='fire'?'burnDeath':cause==='poison'?'poisonDeath':cause==='lightning'?'lightningDeath':cause==='explosion'?'explodeDeath':'hit');kills++;meta.totalKills++;streakTimer=3;killStreak=Math.min(10,killStreak+1);if(artifact==='vampire'&&Math.random()<Math.min(.85,.22+.10*(artifactLevel-1)))player.hp=Math.min(player.maxhp,player.hp+(player.hp<player.maxhp*.35?Math.min(1.5,.5+.2*artifactLevel):1));if(e.type!=='boss'){roomKills++;}gold+=e.type==='boss'?8:((Math.random()<.28?1:0)+(hordeEventLeft>0&&Math.random()<.25?1:0));xp+=e.type==='boss'?5:1;
+ sfx(e.type==='boss'?'boss':cause==='fire'?'burnDeath':cause==='poison'?'poisonDeath':cause==='lightning'?'lightningDeath':cause==='explosion'?'explodeDeath':'hit');kills++;meta.totalKills++;streakTimer=3;killStreak=Math.min(10,killStreak+1);
+ if(cause!=='lightning'&&rareChainLevel>0){let targets=enemies.filter(t=>t!==e&&!t.adminDummy&&!t.dead&&t.hp>0&&Math.hypot(t.x-e.x,t.y-e.y)<(105+rareChainLevel*28)).sort((a,b)=>Math.hypot(a.x-e.x,a.y-e.y)-Math.hypot(b.x-e.x,b.y-e.y)).slice(0,Math.min(3,rareChainLevel+1));for(const t of targets){t.hp-=player.damage*(.55+rareChainLevel*.2);t.flash=.12;particle(t.x,t.y,'#9cf6ff',5);if(t.hp<=0)killEnemy(t,'lightning');}}
+ if(rareBlastLevel>0&&kills>0&&kills%8===0){const radius=95+rareBlastLevel*22;particle(e.x,e.y,'#ffb14d',24);shake=Math.max(shake,3+rareBlastLevel);for(const t of enemies){if(t!==e&&!t.adminDummy&&!t.dead&&t.hp>0&&Math.hypot(t.x-e.x,t.y-e.y)<radius){t.hp-=player.damage*(1.2+rareBlastLevel*.55);t.flash=.18;if(t.hp<=0)killEnemy(t,'explosion');}}}if(artifact==='vampire'&&Math.random()<Math.min(.85,.22+.10*(artifactLevel-1)))player.hp=Math.min(player.maxhp,player.hp+(player.hp<player.maxhp*.35?Math.min(1.5,.5+.2*artifactLevel):1));if(e.type!=='boss'){roomKills++;}gold+=e.type==='boss'?8:((Math.random()<.28?1:0)+(hordeEventLeft>0&&Math.random()<.25?1:0));xp+=e.type==='boss'?5:1;
  if(kills>0&&kills%25===0){gold+=5;toast('ОХОТНИЧИЙ РУБЕЖ! '+kills+' УБИЙСТВ · +5 МОНЕТ');sfx('coin');for(let j=0;j<18;j++){const a=Math.PI*2*j/18,sp=rand(35,115);particles.push({x:e.x,y:e.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:rand(.35,.8),color:['#ffc83d','#8df5ff','#aaffdd'][j%3],flame:true,scale:rand(2,4)});}}
  const chunks=cause==='explosion'?10:cause==='physical'?8:5;
  for(let i=0;i<chunks;i++){const a=Math.random()*Math.PI*2,sp=rand(cause==='explosion'?55:22,cause==='explosion'?180:100);particles.push({x:e.x+rand(-e.r/2,e.r/2),y:e.y+rand(-e.r/2,e.r/2),vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-8,life:rand(.35,.95),color:cause==='fire'?['#ff8b37','#e34b22','#4a4140'][i%3]:cause==='poison'?['#8dff4d','#3fae48','#244e2b'][i%3]:cause==='lightning'?'#a5f6ff':cause==='explosion'?['#a9253d','#d95761','#4d2635'][i%3]:['#a91f39','#e34858','#5b192b'][i%3],chunk:cause==='explosion'||cause==='physical'});}
@@ -776,6 +779,10 @@ function showUpgrades(){
   {key:'heal',title:'ВТОРОЕ ДЫХАНИЕ',desc:'Восстанови 1 ♥.',apply:()=>{player.hp=Math.min(player.maxhp,player.hp+1);upgrades.heal++}},
   {key:'streak',title:'БОЕВОЙ АЗАРТ',desc:'Ускорение после убийства длится дольше.',apply:()=>{killStreak=Math.min(10,killStreak+1);streakTimer=3.5}}
  ];
+ const rareCards=[
+  {key:'rareChain',rare:true,title:'ЦЕПНАЯ МОЛНИЯ',desc:'Убийства выпускают молнию по ближайшим врагам — до 3 целей.',apply:()=>{rareChainLevel=Math.min(3,rareChainLevel+1)}},
+  {key:'rareBlast',rare:true,title:'СМЕРТЕЛЬНЫЙ РИТМ',desc:'Каждые 8 убийств — взрыв вокруг павшего врага.',apply:()=>{rareBlastLevel=Math.min(3,rareBlastLevel+1)}}
+ ].filter(c=>c.key==='rareChain'?rareChainLevel<3:rareBlastLevel<3);
  const evolutionNames={pistol:'ПРОБОЙ ПУСТОТЫ',shotgun:'СОЛНЕЧНЫЙ ЗАЛП',rifle:'ШТОРМОВОЙ АВТОМАТ',laser:'СИНГУЛЯРНЫЙ ЛАЗЕР',burst:'ГРОМОВОЙ ШКВАЛ',rail:'РАЗЛОМ ТИТАНА',grenade:'ЗВЁЗДНЫЙ АРСЕНАЛ',crossbow:'АПОКАЛИПТИЧЕСКИЙ АРБАЛЕТ'};
  const evolution=(wu.trait>=10&&!wu.evolved)?['✦ ЭВОЛЮЦИЯ · '+(evolutionNames[id]||'ПРЕДЕЛЬНАЯ ФОРМА'),'Оружие получает новую форму и +25% урона до конца забега.',()=>{wu.evolved=true;particle(player.x,player.y,'#ffe27a',34);shake=Math.max(shake,7);sfx('upgrade')}]:null;
  const cards=(weaponCards[id]||weaponCards.pistol).filter((_,i)=>i===0?(wu.trait||0)<10:i===1?(wu.tempo||0)<10:(wu.power||0)<10);
@@ -786,12 +793,14 @@ function showUpgrades(){
  const weaponChoices=shuffled(cards).slice(0,Math.min(2,cards.length));
  const generalChoices=shuffled(availableGeneral).slice(0,Math.max(0,3-(evolution?1:0)-weaponChoices.length));
  const opts=[...(evolution?[evolution]:[]),...weaponChoices,...generalChoices].slice(0,3);
+ // Rare cards appear occasionally and replace the last ordinary choice.
+ if(rareCards.length&&Math.random()<.14){const rare=rareCards[Math.floor(Math.random()*rareCards.length)];opts[opts.length?opts.length-1:0]=rare;}
  $('choices').innerHTML='';
  opts.forEach(o=>{
   const title=Array.isArray(o)?o[0]:o.title,desc=Array.isArray(o)?o[1]:o.desc,apply=Array.isArray(o)?o[2]:o.apply;
-  const evolutionCard=title.includes('ЭВОЛЮЦИЯ'),weaponCard=title.includes('·'),icon=evolutionCard?'✦':weaponCard?'⚔':({'damage':'✹','rate':'➶','speed':'➤','maxhp':'♥','crit':'✧','pierce':'➤','orbit':'◉','heal':'✚','streak':'ϟ'}[(o.key)||'']||'✦');
-  const category=evolutionCard?'ЛЕГЕНДАРНОЕ · ЭВОЛЮЦИЯ':weaponCard?'УЛУЧШЕНИЕ ОРУЖИЯ':'БОЕВОЙ НАВЫК';
-  const b=document.createElement('button');b.className='choice'+(evolutionCard?' choice-evolution':weaponCard?' choice-weapon':' choice-general');
+  const evolutionCard=title.includes('ЭВОЛЮЦИЯ'),weaponCard=title.includes('·'),rareCard=!!o.rare,icon=evolutionCard?'✦':rareCard?'ϟ':weaponCard?'⚔':({'damage':'✹','rate':'➶','speed':'➤','maxhp':'♥','crit':'✧','pierce':'➤','orbit':'◉','heal':'✚','streak':'ϟ'}[(o.key)||'']||'✦');
+  const category=evolutionCard?'ЛЕГЕНДАРНОЕ · ЭВОЛЮЦИЯ':rareCard?'РЕДКАЯ КАРТА':weaponCard?'УЛУЧШЕНИЕ ОРУЖИЯ':'БОЕВОЙ НАВЫК';
+  const b=document.createElement('button');b.className='choice'+(evolutionCard?' choice-evolution':rareCard?' choice-rare':weaponCard?' choice-weapon':' choice-general');
   b.innerHTML='<span class="choice-rank">'+category+'</span><span class="choice-icon" aria-hidden="true">'+icon+'</span><span class="choice-copy"><b>'+title+'</b><span class="choice-desc">'+desc+'</span></span><span class="choice-arrow">›</span>';
   b.onclick=()=>{apply();sfx('upgrade');$('upgrade').style.display='none';$('stick').style.display='block';state='play';updateHud();toast(title.includes('ЭВОЛЮЦИЯ')?'ЭВОЛЮЦИЯ АКТИВИРОВАНА!':'УЛУЧШЕНИЕ ПОЛУЧЕНО')};$('choices').appendChild(b)
  });

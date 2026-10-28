@@ -231,6 +231,39 @@ button{min-height:42px;font-size:clamp(12px,3.2vw,14px);padding:11px 12px}
 @media(prefers-reduced-motion:reduce){#menu .menu-art .menu-smoke-puff{animation:none!important;opacity:.18}}
 
 
+/* In-run HUD polish: readable fantasy status panels and tactile mobile controls */
+#hud .hudbox{border:1px solid #5c7596;border-top:2px solid #8ab9d8;border-radius:8px;background:linear-gradient(145deg,#14233be8,#060d1beF);box-shadow:0 4px 14px #0008,inset 0 1px 0 #d9f3ff18;padding:8px 10px;backdrop-filter:blur(3px)}
+#hud .hudbox>div:not(.hp-line):not(#xpOuter){letter-spacing:.35px}
+#hud #stage{color:#ffe18a;text-shadow:1px 2px #000,0 0 8px #e7a82b35}
+#hud #biome{color:#a9dff4}
+#hud #kills{color:#d6e1f4}
+#hud #weapon{color:#ffcb91}
+#hud #heroName{color:#c8b8ff}
+#hud .hp-track{height:9px;border-radius:3px;background:#260f1c;border-color:#b55366;box-shadow:inset 0 1px 3px #000a}
+#hud .hp-fill{background:linear-gradient(90deg,#c91f40,#ff655c 68%,#ffb47b);box-shadow:0 0 8px #ff425b55}
+#hud #xpOuter{height:6px;border-radius:3px;overflow:hidden;background:#071224;border-color:#506987;box-shadow:inset 0 1px 2px #000}
+#hud #xp{background:linear-gradient(90deg,#2999ef,#7cecff);box-shadow:0 0 8px #48d9ff88}
+#hud #bossbar{border-radius:4px;overflow:hidden;box-shadow:0 0 12px #ff405755}
+#hud #bossfill{background:linear-gradient(90deg,#c91e48,#ff5368,#ff9a7a)}
+#hud button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+#hud button:focus-visible{outline:2px solid #fff0a0;outline-offset:3px}
+#hud #pauseBtn,#hud #audioToggle{border:1px solid #7795b8;border-radius:7px;background:linear-gradient(180deg,#263c5a,#0b172a)!important;box-shadow:inset 0 1px #ffffff20,0 3px 0 #030813,0 4px 10px #0006}
+#hud #pauseBtn:active,#hud #audioToggle:active{transform:translateY(2px);filter:brightness(1.25)}
+#hud #stick{box-shadow:0 0 0 4px #02061166,inset 0 0 20px #5c8ed822}
+#hud #knob{box-shadow:inset 0 1px 0 #ffffff88,0 3px 9px #0009}
+#hud #dashBtn,#hud #ultBtn{box-shadow:0 0 0 3px #050915b8,0 0 16px #a56cff44,inset 0 1px 0 #ffffff30}
+#hud #dashBtn:active,#hud #ultBtn:active,#hud #interactBtn:active{filter:brightness(1.22);transform:scale(.95)}
+@media(max-width:420px){
+ #hud .hudtop{left:7px;right:7px;gap:6px;font-size:11px}
+ #hud .hudbox{min-width:0;padding:6px 7px;border-radius:6px}
+ #hud .hp-line{gap:4px}
+ #hud #hp{font-size:10px;min-width:42px}
+ #hud .hp-track{width:min(24vw,120px)}
+ #hud #xpOuter{width:min(38vw,170px)}
+ #hud #stage,#hud #biome,#hud #kills,#hud #weapon,#hud #heroName{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){#hud #pauseBtn,#hud #audioToggle,#hud #dashBtn,#hud #ultBtn{transition:none!important}}
+
 /* Shared dungeon-panel visual system: pause, armory, shop, quests and rewards */
 .overlay:not(#menu) .card{border:1px solid #58769a;border-top:3px solid #6ccfe8;border-radius:10px;background:linear-gradient(155deg,#1b2d49f5 0%,#101a30f7 46%,#080f20fa 100%);box-shadow:0 0 0 3px #050a14cc,0 18px 50px #000b,inset 0 1px 0 #d9f3ff16;scrollbar-color:#547ba4 #0a1222;scrollbar-width:thin}
 .overlay:not(#menu) .card .logo{color:#f0f6ff;text-shadow:2px 2px 0 #050a14,0 0 16px #67dfff24;letter-spacing:-.8px}

@@ -1472,7 +1472,7 @@ shootBtn.addEventListener('pointerup',releaseFire);shootBtn.addEventListener('po
 $('dashBtn').addEventListener('pointerdown',e=>{e.preventDefault();if(state==='play')dashRequested=true});
  $('ultBtn').addEventListener('pointerdown',e=>{e.preventDefault();if(state==='play')ultRequested=true});
 $('interactBtn').style.display='none';
-window.addEventListener('keydown',e=>{keys[e.key]=true;if(e.code==='Space'&&state==='play'){e.preventDefault();dashRequested=true}if((e.key==='q'||e.key==='Q')&&state==='play'){e.preventDefault();ultRequested=true}if((e.key==='f'||e.key==='F')&&!e.repeat){e.preventDefault();if(!document.fullscreenElement){const target=document.documentElement;if(target.requestFullscreen)target.requestFullscreen().catch(()=>{})}else if(document.exitFullscreen)document.exitFullscreen().catch(()=>{})}});
+window.addEventListener('keydown',e=>{keys[e.key]=true;if(state==='play'&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();if(e.code==='Space'&&state==='play'){e.preventDefault();dashRequested=true}if((e.key==='q'||e.key==='Q')&&state==='play'){e.preventDefault();ultRequested=true}if((e.key==='f'||e.key==='F')&&!e.repeat){e.preventDefault();if(!document.fullscreenElement){const target=document.documentElement;if(target.requestFullscreen)target.requestFullscreen().catch(()=>{})}else if(document.exitFullscreen)document.exitFullscreen().catch(()=>{})}});
 canvas.addEventListener('pointerdown',e=>{
  if(state!=='play'||e.pointerType==='touch')return;
  if(e.button===0){const target=nearest();if(target){shootAt(target);shoot=Math.max(.075,player.fireRate*Math.pow(.94,weaponUpgrades.tempo||0)/(ultRateMult||1));}}
@@ -1539,6 +1539,8 @@ stick.addEventListener('pointermove',e=>{if(joyActive)setJoy(e)});
 function releaseJoy(){joyActive=false;joy={x:0,y:0};knob.style.left='32px';knob.style.top='32px'}
 stick.addEventListener('pointerup',releaseJoy);stick.addEventListener('pointercancel',releaseJoy);
 window.addEventListener('keyup',e=>{keys[e.key]=false});
+// Never leave movement stuck if the browser loses focus during a run.
+window.addEventListener('blur',()=>{keys={};manualFire=false;});
 document.addEventListener('contextmenu',e=>e.preventDefault());
 })();
 </script>

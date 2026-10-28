@@ -356,6 +356,35 @@ button{min-height:42px;font-size:clamp(12px,3.2vw,14px);padding:11px 12px}
  #hud #audioToggle{top:39px!important}
 }
 
+
+/* Combat controls: clearer touch targets and readable cooldown states */
+#hud #dashBtn,#hud #ultBtn{
+ width:clamp(58px,10.5vh,72px)!important;height:clamp(58px,10.5vh,72px)!important;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+ border-radius:50%;padding:4px!important;line-height:1.08;font-weight:900;letter-spacing:.2px;
+ text-shadow:0 2px 3px #080713;backdrop-filter:blur(5px);
+ transition:filter .12s,transform .12s,box-shadow .18s,border-color .18s;
+}
+#hud #dashBtn{background:radial-gradient(circle at 32% 22%,#8d70c9,#34224f 72%)!important;border:2px solid #d8b5ff!important;color:#fff!important}
+#hud #ultBtn{background:radial-gradient(circle at 32% 22%,#d08aff,#54206f 72%)!important;border:2px solid #f0caff!important;color:#fff!important}
+#hud #dashBtn.ready,#hud #ultBtn.ready{opacity:1!important;filter:none;box-shadow:0 0 0 3px #090b17c9,0 0 13px #c5a0ff80,inset 0 1px 0 #ffffff55!important}
+#hud #dashBtn.cooling,#hud #ultBtn.cooling{opacity:.82!important;filter:saturate(.65);border-color:#7e7395!important;background:radial-gradient(circle at 32% 22%,#5d526d,#24202f 72%)!important;box-shadow:0 0 0 3px #090b17c9,inset 0 0 0 3px #0005!important}
+#hud #dashBtn.cooling span,#hud #ultBtn.cooling span{color:#ffd7a0}
+#hud #dashStatus,#hud #ultStatus{display:inline-block;min-width:32px;padding:2px 4px;border-radius:5px;background:#090914b8;color:#d5ffdd;font-size:9px;font-weight:1000;white-space:nowrap}
+#hud #dashBtn.ready #dashStatus,#hud #ultBtn.ready #ultStatus{color:#b9ffcf;background:#102b20d9}
+#hud #dashBtn.cooling #dashStatus,#hud #ultBtn.cooling #ultStatus{color:#ffe1ad;background:#382b24e8}
+#hud #shootBtn{width:clamp(72px,13vh,88px);height:clamp(72px,13vh,88px);gap:1px;box-shadow:0 0 0 4px #190a12b8,0 0 20px #ff536b66,inset 0 -7px #75172a}
+#hud #shootBtn .shootIcon{font-size:clamp(24px,4.8vh,31px);line-height:1.05}
+#hud #shootBtn:after{content:"";position:absolute;inset:5px;border:1px solid #ffffff55;border-radius:50%;pointer-events:none}
+#hud #stick{border:2px solid #a8c9ff88;background:radial-gradient(circle,#263957a8,#0b1228c9);backdrop-filter:blur(4px)}
+#hud #knob{border:2px solid #d6e7ff;background:radial-gradient(circle at 35% 25%,#f0f7ff,#6e8fc5);box-shadow:0 2px 9px #0008,inset 0 -3px #35517f}
+#hud #dashBtn:focus-visible,#hud #ultBtn:focus-visible,#hud #shootBtn:focus-visible{outline:2px solid #fff;outline-offset:3px}
+@media(max-height:420px){
+ #hud #dashBtn,#hud #ultBtn{width:54px!important;height:54px!important;font-size:9px}
+ #hud #dashStatus,#hud #ultStatus{font-size:8px;padding:1px 3px}
+ #hud #shootBtn{width:68px;height:68px}
+}
+
 </style>
 </head>
 <body>
@@ -706,8 +735,8 @@ function updateHud(){
  const hpNow=Math.max(0,Math.ceil((player?.hp||0)*10)),hpMax=Math.max(10,Math.ceil((player?.maxhp||3)*10));$('hp').textContent=hpNow+'/'+hpMax;const hpFill=$('hpFill');if(hpFill){hpFill.style.width=clamp(hpNow/hpMax*100,0,100)+'%';hpFill.style.background=hpNow/hpMax<.25?'linear-gradient(90deg,#9d1834,#ff536a)':hpNow/hpMax<.55?'linear-gradient(90deg,#c77728,#ffd15c)':'linear-gradient(90deg,#e8344e,#ff8c6c)'}
  $('coins').textContent='◉ '+gold;$('stage').textContent=Math.floor(runTime/60)+':'+String(Math.floor(runTime%60)).padStart(2,'0');$('kills').textContent='☠ '+kills;$('levelLabel').textContent='УР. '+level;$('xpText').textContent=xp+' / '+xpNeed;$('floorLabel').textContent='ЭТАЖ '+floor;$('weapon').textContent=weapon+(weaponUpgrades&&weaponUpgrades.evolved?' ✦':'');
  $('biome').textContent=['ЗАБРОШЕННЫЕ РУИНЫ','ПЕПЕЛЬНЫЕ ПУСТОШИ','ЗАТОПЛЕННЫЙ ХРАМ','КРИСТАЛЬНАЯ БУРЯ','ЦАРСТВО БЕЗДНЫ'][Math.min(4,landscapePhase)];
- $('heroName').textContent=(activeHero?.name||'РАЗВЕДЧИК')+(armor?' · БРОНЯ '+armor:'')+(artifact?' · '+artifact.toUpperCase():'');const us=$('ultStatus'),ub=$('ultBtn');if(us&&ub){us.textContent=ultCooldown<=0?'ГОТОВА':Math.ceil(ultCooldown)+'с';ub.style.opacity=ultCooldown<=0?'1':'.65';ub.style.boxShadow=ultCooldown<=0?'0 0 16px #bd7bff99':'none';}
- const ds=$('dashStatus'),db=$('dashBtn');if(ds&&db){ds.textContent=dashCooldown<=0?'ГОТОВ':dashCooldown.toFixed(1)+'с';db.className=dashCooldown<=0?'ready':'cooling';}
+ $('heroName').textContent=(activeHero?.name||'РАЗВЕДЧИК')+(armor?' · БРОНЯ '+armor:'')+(artifact?' · '+artifact.toUpperCase():'');const us=$('ultStatus'),ub=$('ultBtn');if(us&&ub){us.textContent=ultCooldown<=0?'ГОТОВА':Math.ceil(ultCooldown)+'с';ub.classList.toggle('ready',ultCooldown<=0);ub.classList.toggle('cooling',ultCooldown>0);ub.setAttribute('aria-label',ultCooldown<=0?'Ульта готова':'Ульта перезаряжается: '+Math.ceil(ultCooldown)+' секунд');}
+ const ds=$('dashStatus'),db=$('dashBtn');if(ds&&db){ds.textContent=dashCooldown<=0?'ГОТОВ':dashCooldown.toFixed(1)+'с';db.className=dashCooldown<=0?'ready':'cooling';db.setAttribute('aria-label',dashCooldown<=0?'Рывок готов':'Рывок перезаряжается: '+dashCooldown.toFixed(1)+' секунд');}
  $('xp').style.width=(xp/xpNeed*100)+'%';$('bossbar').style.display=boss?'block':'none';if(boss)$('bossfill').style.width=(boss.hp/boss.maxhp*100)+'%';
 }
 let toastTimer=null,alertToastTimer=null;function toast(t){if(/РЫВОК|УКЛОНИСЬ|АТАКА/i.test(t))return;const el=$('toast');el.textContent=t;el.style.display='block';if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.style.display='none';toastTimer=null},1450)}function alertToast(t){const el=$('alertToast');el.textContent=t;el.style.display='block';if(alertToastTimer)clearTimeout(alertToastTimer);alertToastTimer=setTimeout(()=>{el.style.display='none';alertToastTimer=null},2200)}

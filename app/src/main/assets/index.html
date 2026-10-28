@@ -1393,7 +1393,8 @@ function draw(dt=0){
    const attackT=Math.max(0,Math.min(1,1-(e.attack||0)/.28));
    const attacking=(e.attack||0)>.001&&attackT<1;
    const hurt=typeof hitAge!=='undefined'&&hitAge>=0&&hitAge<.16;
-   const bob=moving?Math.abs(gait)*1.5:Math.sin(runTime*2.8+(e.anim||0))*.65;
+   const idlePulse=(Math.sin(runTime*3.2+(e.anim||0))+1)*.5;
+   const bob=moving?Math.abs(gait)*1.7:Math.sin(runTime*2.8+(e.anim||0))*.75;
    const spriteSize=Math.max(er*3.25,42);
    if(!window.__demonCrimsonSprite){window.__demonCrimsonSprite=new Image();window.__demonCrimsonSprite.src='demon-crimson.svg';}
    const demonImg=window.__demonCrimsonSprite;
@@ -1401,7 +1402,19 @@ function draw(dt=0){
    const lean=attacking?attackT*er*.16:0;
    if(demonImg.complete&&demonImg.naturalWidth){
     ctx.translate(Math.round(e.x+lean),Math.round(e.y+bob));
+    // A faint pulsing ember aura makes the core feel alive without obscuring the sprite.
+    const aura=ctx.createRadialGradient(0,0,spriteSize*.04,0,0,spriteSize*.48);
+    aura.addColorStop(0,'rgba(255,72,45,'+(0.075+idlePulse*.07)+')');
+    aura.addColorStop(.55,'rgba(255,35,30,'+(0.035+idlePulse*.025)+')');
+    aura.addColorStop(1,'rgba(255,35,30,0)');
+    ctx.fillStyle=aura;ctx.beginPath();ctx.ellipse(0,0,spriteSize*(.36+idlePulse*.025),spriteSize*(.43+idlePulse*.02),0,0,Math.PI*2);ctx.fill();
+    // Tiny squash/stretch and shoulder sway provide a readable six-step gait.
+    const squash=moving?1-Math.abs(gait)*.035:1+idlePulse*.008;
+    const stretch=moving?1+Math.abs(gait)*.035:1+idlePulse*.012;
+    ctx.rotate(moving?gait*.025:(idlePulse-.5)*.012);
     if((e.vx||0)<-1)ctx.scale(-1,1);
+    if(attacking){ctx.translate(attackT*er*.07,-Math.sin(attackT*Math.PI)*er*.06);ctx.rotate(Math.sin(attackT*Math.PI)*-.09);}
+    ctx.scale(squash,stretch);
     ctx.drawImage(demonImg,-spriteSize/2,-spriteSize/2,spriteSize,spriteSize);
     if(hurt){ctx.globalCompositeOperation='source-atop';ctx.globalAlpha=.5;ctx.fillStyle='#fff1df';ctx.fillRect(-spriteSize/2,-spriteSize/2,spriteSize,spriteSize);}
     if(attacking&&attackT>.35){

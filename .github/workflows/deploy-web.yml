@@ -1,0 +1,54 @@
+name: Publish Dungeon Survivor Web Version
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'app/src/main/assets/index.html'
+      - '.github/workflows/deploy-web.yml'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout game
+        uses: actions/checkout@v4
+
+      - name: Validate game JavaScript
+        run: node scripts/validate-game.js
+
+      - name: Prepare website from the shared game source
+        run: |
+          mkdir -p public
+          cp app/src/main/assets/index.html public/index.html
+          cat > public/404.html <<'EOF'
+          <!doctype html>
+          <html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+          <title>Dungeon Survivor</title><body style="background:#070b16;color:#eef4ff;font:18px sans-serif;text-align:center;padding:15vh 1rem">
+          <h1>Dungeon Survivor</h1><p>Страница не найдена.</p><p><a style="color:#83eaff" href="./">Вернуться в игру</a></p></body></html>
+          EOF
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload website
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - name: Deploy website
+        id: deployment
+        uses: actions/deploy-pages@v4

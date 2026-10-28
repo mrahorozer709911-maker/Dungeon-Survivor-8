@@ -1236,6 +1236,42 @@ function draw(dt=0){
   if(e.type==='charger'&&e.windup>0){ctx.globalAlpha=.5+Math.sin(runTime*30)*.35;ctx.strokeStyle='#ff754d';ctx.lineWidth=2;ctx.beginPath();ctx.arc(e.x,e.y,e.r+7+Math.sin(runTime*18)*2,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;}
   if(e.burn>0){ctx.save();ctx.globalAlpha=.55+Math.sin(runTime*24)*.25;ctx.fillStyle='#ff642b';ctx.beginPath();ctx.arc(e.x,e.y,e.r+4+Math.sin(runTime*18)*2,0,Math.PI*2);ctx.fill();ctx.restore();}if(e.poison>0){ctx.save();ctx.globalAlpha=.6;ctx.strokeStyle='#a6ff61';ctx.lineWidth=2;ctx.beginPath();ctx.arc(e.x,e.y,e.r+5+Math.sin(runTime*8)*2,0,Math.PI*2);ctx.stroke();ctx.restore();}if(e.type==='spitter'&&e.attack>.05){ctx.globalAlpha=.7;ctx.fillStyle='#c4ff78';ctx.beginPath();ctx.arc(e.x,e.y,e.r+4,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
   rect(e.x-er+3,e.y+er-2+bob,Math.max(3,er*.42),5,'#111827');rect(e.x+er*.12,e.y+er-2+bob,Math.max(3,er*.42),5,'#111827');rect(e.x-er-3,e.y-er*.15+bob,5,Math.max(4,er*.65),color);rect(e.x+er-2,e.y-er*.15+bob,5,Math.max(4,er*.65),color);rect(e.x-er,e.y-er+bob,er*2,er*2,color);rect(e.x-er+2,e.y-er+2+bob,er*2-4,e.r-2,e.type==='boss'?'#d94364':e.type==='ranged'?'#ffd08b':e.type==='brute'?'#e18bab':e.type==='charger'?'#ffac73':e.type==='spitter'?'#d2f58a':'#73e88e');
+  // Animated, segmented pixel limbs and extra material clusters.
+  // The small stepped shapes create a hand-built sprite silhouette without loading image assets.
+  const gait=Math.sin(runTime*(e.type==='fast'?15:e.type==='charger'?12:8)+(e.anim||0));
+  const limb=Math.max(2,Math.floor(er*.22)), joint=Math.max(2,Math.floor(er*.16));
+  const armY=e.y-er*.02+bob, legY=e.y+er*.48+bob;
+  const limbDark=e.type==='boss'?'#651d3c':e.type==='brute'?'#6d3654':e.type==='spitter'?'#527d2b':e.type==='ranged'?'#a76645':'#23563c';
+  const limbLight=e.type==='boss'?'#ff8aa9':e.type==='brute'?'#f3a6c4':e.type==='spitter'?'#c7ee75':e.type==='ranged'?'#ffe0a0':'#a0f5a8';
+  // Arms swing in opposite phases; brute and boss arms stay heavier.
+  const armSwing=gait*er*(e.type==='fast'?.28:e.type==='boss'?.08:.18);
+  rect(e.x-er*.82,armY+armSwing,limb,Math.max(3,er*.43),limbDark);
+  rect(e.x+er*.62,armY-armSwing,limb,Math.max(3,er*.43),limbDark);
+  rect(e.x-er*.78,armY+armSwing+2,joint,joint,limbLight);
+  rect(e.x+er*.64,armY-armSwing+2,joint,joint,limbLight);
+  // Feet alternate to make movement visible even at small canvas sizes.
+  const footShift=Math.max(1,er*.12)*gait;
+  rect(e.x-er*.62-footShift,legY,Math.max(3,er*.48),Math.max(2,er*.18),limbDark);
+  rect(e.x+er*.12+footShift,legY,Math.max(3,er*.48),Math.max(2,er*.18),limbDark);
+  rect(e.x-er*.57-footShift,legY+1,Math.max(2,er*.3),Math.max(1,er*.07),limbLight);
+  rect(e.x+er*.18+footShift,legY+1,Math.max(2,er*.3),Math.max(1,er*.07),limbLight);
+  // Deliberate pixel clusters: cheek plates, shoulder studs and chest/core markings.
+  rect(e.x-er*.55,e.y-er*.02+bob,Math.max(2,er*.16),Math.max(2,er*.2),limbLight);
+  rect(e.x+er*.39,e.y-er*.02+bob,Math.max(2,er*.16),Math.max(2,er*.2),limbLight);
+  rect(e.x-er*.22,e.y+er*.12+bob,Math.max(2,er*.14),Math.max(2,er*.12),limbDark);
+  rect(e.x+er*.08,e.y+er*.2+bob,Math.max(2,er*.14),Math.max(2,er*.12),limbLight);
+  if(e.type==='brute'||e.type==='boss'){
+   rect(e.x-er*.76,e.y-er*.24+bob,Math.max(3,er*.25),Math.max(3,er*.22),limbLight);
+   rect(e.x+er*.52,e.y-er*.24+bob,Math.max(3,er*.25),Math.max(3,er*.22),limbLight);
+   rect(e.x-er*.12,e.y-er*.52+bob,Math.max(3,er*.24),Math.max(2,er*.1),limbDark);
+  }else if(e.type==='spitter'){
+   rect(e.x-er*.14,e.y+er*.34+bob,Math.max(3,er*.28),Math.max(2,er*.12),'#8ebc4c');
+   rect(e.x-er*.06,e.y+er*.36+bob,Math.max(2,er*.1),Math.max(2,er*.1),'#f0ffb0');
+  }else if(e.type==='ranged'){
+   rect(e.x-er*.12,e.y+er*.31+bob,Math.max(3,er*.24),Math.max(3,er*.18),'#80502d');
+   rect(e.x-er*.05,e.y+er*.32+bob,Math.max(2,er*.1),Math.max(2,er*.1),'#fff0b0');
+  }
+
   // Hand-painted material pass: irregular highlights, pores, armor seams and chipped edges.
   ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
   const texSeed=(Math.abs(Math.floor((e.anim||0)*97))+e.type.length*13)%7;

@@ -1384,38 +1384,45 @@ function draw(dt=0){
   if(e.type==='boss'){rect(e.x-5,e.y+2,10,4,'#32142b');rect(e.x-13,e.y- e.r-3,6,4,'#ffbd51');rect(e.x+7,e.y-e.r-3,6,4,'#ffbd51');
    // Animated boss crown, rune halo and layered shoulder armor.
    const ba=runTime*1.8,br=e.r+11+Math.sin(runTime*5)*2;ctx.save();ctx.globalAlpha=.45+.25*Math.sin(runTime*4);ctx.strokeStyle=finalBoss?'#ff6b9e':'#ffcb63';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(e.x,e.y,br,br*.55,ba*.12,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=.8;for(let bi=0;bi<5;bi++){const aa=ba+bi*Math.PI*2/5,bx=e.x+Math.cos(aa)*br,by=e.y+Math.sin(aa)*br*.55;ctx.fillStyle=bi%2?'#ff8aa9':'#fff0a1';ctx.beginPath();ctx.moveTo(bx,by-3);ctx.lineTo(bx+3,by);ctx.lineTo(bx,by+3);ctx.lineTo(bx-3,by);ctx.closePath();ctx.fill()}ctx.restore();rect(e.x-e.r*.8,e.y-e.r*.55+bob,5,Math.max(5,e.r*.55),'#ffbd51');rect(e.x+e.r*.45,e.y-e.r*.55+bob,5,Math.max(5,e.r*.55),'#ffbd51');rect(e.x-3,e.y-e.r-7+bob,6,4,'#fff0a1');rect(e.x-1,e.y-e.r-9+bob,2,3,'#ffcf58');}if(e.adminDummy){ctx.save();ctx.font='bold 9px monospace';ctx.textAlign='center';ctx.fillStyle='#e6c7ff';ctx.shadowColor='#9c5bff';ctx.shadowBlur=lowGraphics?0:(5);ctx.fillText(({grunt:'ОБЫЧНЫЙ',fast:'БЫСТРЫЙ',ranged:'СТРЕЛОК',brute:'ТЯЖЁЛЫЙ',charger:'РЫВОК',spitter:'ЯДОВИТЫЙ',boss:'БОСС'})[e.type]||e.type,e.x,e.y+e.r+13);ctx.fillStyle='#d9a8ff';ctx.fillText('∞ HP',e.x,e.y-e.r-9);ctx.restore();}
-  // High-detail pixel-sprite overlay: layered 7x7 material clusters with frame-based animation.
-  // This is intentionally skipped in low-graphics mode to preserve mobile performance.
+  // Per-enemy pixel-art masks: each character is a deliberate pixel, not a random speckle.
+  // 9x9 patterns create distinct silhouettes; two animated frames add a living sprite feel.
   if(!lowGraphics&&!e.adminDummy){
-   const px=Math.max(1.5,er*.105), frame=Math.floor(runTime*7+(e.anim||0))%4;
-   const palettes=e.type==='boss'?['#6a1738','#a72b49','#ff6b91','#ffd1df','#ffbd51']:
-    e.type==='brute'?['#572b49','#8d4768','#d78bad','#f3bfd6','#ffe0ee']:
-    e.type==='spitter'?['#527d2b','#7ea83c','#b9df64','#efffa1','#f6ffd2']:
-    e.type==='ranged'?['#75452d','#a76645','#d49a62','#ffd18a','#fff0b0']:
-    e.type==='charger'?['#a83d2e','#e86a48','#ffac73','#ffd0a0','#fff0cf']:
-    ['#174b35','#26734b','#3fbd75','#8dffb0','#eaffb5'];
-   const cells=[
-    [0,0,1],[1,0,2],[3,0,3],[5,0,1],
-    [0,1,0],[2,1,1],[4,1,2],[6,1,0],
-    [1,2,2],[3,2,3],[5,2,2],
-    [0,3,1],[2,3,0],[4,3,1],[6,3,2],
-    [1,4,0],[3,4,frame===0?4:2],[5,4,0],
-    [0,5,2],[2,5,1],[4,5,2],[6,5,1],
-    [1,6,1],[3,6,0],[5,6,1]
+   const px=Math.max(1.4,er*.125), frame=Math.floor(runTime*6+(e.anim||0))%4;
+   const art=e.type==='boss'?[
+    '..1...1..','.122.221.','..34443..','..34443..','.155551.','..16661..','..1.7.1..','.1.....1.','1.......1'
+   ]:e.type==='brute'?[
+    '.........','.1.....1.','122...221','122333221','.1244421.','.1244421.','..15551..','..1...1..','..1...1..'
+   ]:e.type==='spitter'?[
+    '...111...','..12221..','.1222221.','.1233321.','.1244421.','..15551..','..16661..','...1.1...','...1.1...'
+   ]:e.type==='ranged'?[
+    '....1....','...111...','..12221..','.1222221.','.1233321.','.1244421.','..15551..','..1...1..','..1...1..'
+   ]:e.type==='charger'?[
+    '..1...1..','.112.211.','..12221..','.1233321.','.1244421.','..14441..','..15551..','.1...1.1.','1.......1'
+   ]:e.type==='fast'?[
+    '1.......1','.11...11.','..12221..','.1233321.','.1244421.','..15551..','.1.1.1.1.','1.......1','.........'
+   ]:[
+    '....1....','...111...','..12221..','.1222221.','.1233321.','.1244421.','..15551..','..1...1..','.........'
    ];
-   ctx.save();ctx.globalAlpha=.82;
-   for(let ci=0;ci<cells.length;ci++){
-    const c=cells[ci],shift=(frame===1&&ci%5===0)?1:(frame===3&&ci%7===0?-1:0);
-    const gx=c[0],gy=c[1]+shift;
-    const xx=e.x-er*.58+gx*px, yy=e.y-er*.48+gy*px+bob;
-    if(Math.abs(xx-e.x)<er*.62&&Math.abs(yy-(e.y+bob))<er*.62){
-     ctx.fillStyle=palettes[c[2]%palettes.length];
-     ctx.fillRect(Math.round(xx),Math.round(yy),Math.max(1,Math.ceil(px)),Math.max(1,Math.ceil(px)));
-    }
+   const palette=e.type==='boss'?['#6a1738','#a72b49','#ff6b91','#ffd1df','#ffbd51','#351126','#ff8aab']:
+    e.type==='brute'?['#572b49','#8d4768','#d78bad','#f3bfd6','#ffe0ee','#351b30','#f6b7d0']:
+    e.type==='spitter'?['#527d2b','#7ea83c','#b9df64','#efffa1','#f6ffd2','#34521f','#d8ff7b']:
+    e.type==='ranged'?['#75452d','#a76645','#d49a62','#ffd18a','#fff0b0','#4d2e2a','#ffda91']:
+    e.type==='charger'?['#a83d2e','#e86a48','#ffac73','#ffd0a0','#fff0cf','#612b29','#ffbd79']:
+    ['#174b35','#26734b','#3fbd75','#8dffb0','#eaffb5','#123c2d','#b4ffc2'];
+   ctx.save();ctx.globalAlpha=.9;
+   for(let y=0;y<art.length;y++)for(let x=0;x<art[y].length;x++){
+    let ch=art[y][x];if(ch==='.')continue;
+    // Blink the central energy pixel and alternate two foot pixels across frames.
+    if(ch==='4'&&x===4&&frame===2)ch='3';
+    if(y>=7&&((x===1||x===7)&&frame%2===1))continue;
+    const xx=Math.round(e.x+(x-4)*px),yy=Math.round(e.y+(y-4)*px+bob);
+    ctx.fillStyle=palette[Number(ch)-1]||palette[0];
+    ctx.fillRect(xx,yy,Math.ceil(px),Math.ceil(px));
    }
-   // Tiny moving highlights provide a genuine four-phase visual cycle.
-   ctx.globalAlpha=.9;ctx.fillStyle=palettes[frame===2?4:3];
-   ctx.fillRect(Math.round(e.x-er*.12+Math.sin(runTime*8+(e.anim||0))*px),Math.round(e.y+er*.43+bob),Math.max(1,Math.ceil(px)),Math.max(1,Math.ceil(px)));
+   // A small eye glint shifts subtly to suggest attention and movement.
+   ctx.globalAlpha=.95;ctx.fillStyle=palette[4];
+   const eyeShift=frame===1?px:frame===3?-px:0;
+   ctx.fillRect(Math.round(e.x+eyeShift-px*1.4),Math.round(e.y-er*.13+bob),Math.max(1,Math.ceil(px*.65)),Math.max(1,Math.ceil(px*.55)));
    ctx.restore();
   }
  }

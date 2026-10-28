@@ -1244,6 +1244,19 @@ function draw(dt=0){
   ctx.globalAlpha=.38;ctx.strokeStyle=e.type==='boss'?'#641b3b':'#183126';ctx.lineWidth=Math.max(1,e.r*.07);
   ctx.beginPath();ctx.moveTo(e.x-er*.55,e.y+er*.16+bob);ctx.lineTo(e.x-er*.2,e.y+er*.28+bob);ctx.lineTo(e.x+er*.12,e.y+er*.18+bob);ctx.stroke();
   for(let ti=0;ti<3;ti++){const tx=e.x+((ti*17+texSeed*5)%Math.max(3,Math.floor(er*1.2)))-er*.55,ty=e.y+((ti*11+texSeed*3)%Math.max(3,Math.floor(er*1.1)))-er*.48+bob;ctx.globalAlpha=.28+(ti%2)*.12;ctx.fillStyle=ti===1?'#fff0c4':(e.type==='boss'?'#6c1b40':'#1c3c30');ctx.fillRect(tx,ty,Math.max(1,er*.09),Math.max(1,er*.07));}
+  // Directional face details make the pixel-creatures read more clearly at a glance.
+  const faceY=e.y-er*.12+bob, eyeW=Math.max(2,er*.2), eyeH=Math.max(2,er*.13);
+  ctx.globalAlpha=.95;
+  if(e.type==='boss'){
+   rect(e.x-er*.48,faceY-eyeH,eyeW,eyeH,'#fff0bd');rect(e.x+er*.22,faceY-eyeH,eyeW,eyeH,'#fff0bd');
+   rect(e.x-er*.32,faceY+er*.18,er*.64,Math.max(2,er*.08),'#541a36');
+   if(!lowGraphics){ctx.globalAlpha=.55;ctx.fillStyle='#ff4d96';ctx.beginPath();ctx.arc(e.x,e.y,er+7+Math.sin(runTime*8)*2,0,Math.PI*2);ctx.strokeStyle='#ff4d96';ctx.lineWidth=1;ctx.stroke();}
+  }else{
+   const eyeColor=e.type==='spitter'?'#efffa1':e.type==='ranged'?'#fff0b0':e.type==='brute'?'#ffb8d0':'#eaffd8';
+   rect(e.x-er*.42,faceY,eyeW,eyeH,eyeColor);rect(e.x+er*.18,faceY,eyeW,eyeH,eyeColor);
+   rect(e.x-er*.08,faceY+er*.3,Math.max(2,er*.16),Math.max(1,er*.07),'#173026');
+  }
+  ctx.globalAlpha=1;
   // Each creature type gets a distinct animated accent.
   if(e.type==='fast'){ctx.globalAlpha=.7;ctx.strokeStyle='#d9ffe1';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(e.x-er*.4,e.y-er*.2+bob);ctx.lineTo(e.x+er*.35,e.y+er*.1+bob);ctx.stroke();}
   if(e.type==='ranged'){ctx.globalAlpha=.65;ctx.fillStyle='#fff0b0';ctx.beginPath();ctx.arc(e.x,e.y+er*.22+bob,Math.max(1,er*.12),0,Math.PI*2);ctx.fill();}

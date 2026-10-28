@@ -309,14 +309,61 @@ button{min-height:42px;font-size:clamp(12px,3.2vw,14px);padding:11px 12px}
 .overlay:not(#menu) .card :focus-visible{outline:2px solid #8feaff;outline-offset:2px}
 @media(prefers-reduced-motion:reduce){.overlay:not(#menu) .card button{transition:none!important}}
 
+
+/* Combat HUD refresh v1: compact, readable panels and clearer progression */
+#hud .hudtop{left:max(10px,env(safe-area-inset-left));right:max(10px,env(safe-area-inset-right));top:max(8px,env(safe-area-inset-top));align-items:flex-start;gap:8px;font-size:12px;text-shadow:0 1px 3px #000}
+#hud .hudbox{min-width:0;padding:8px 10px;border:1px solid #7c9bbb;border-radius:8px;background:linear-gradient(145deg,#091426ed,#0b1223e8);box-shadow:0 4px 14px #0006,inset 0 1px #e8f6ff20;backdrop-filter:blur(7px)}
+#hud .hud-primary{width:clamp(150px,28vw,240px);border-left:3px solid #ff6b7d}
+#hud .hud-secondary{width:clamp(145px,26vw,218px);border-right:3px solid #70dfff;text-align:right!important}
+#hud .hp-line{gap:6px}.hud-label{color:#ff8290;font-size:14px}.hp-track{flex:1;min-width:34px;width:auto;height:9px;border-radius:4px;border:1px solid #a34a5b;background:#250e1b}.hp-fill{border-radius:3px}
+.hud-resource-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px}
+#hud .hud-coins{font-size:13px;color:#ffdb73;font-weight:900;text-shadow:0 0 9px #ffbf4338}
+#hud .hud-level{font-size:11px;color:#8ce9ff;font-weight:900;border:1px solid #4b91aa;border-radius:5px;padding:3px 6px;background:#0c2a3b}
+#hud .xp-caption{display:flex;justify-content:space-between;gap:8px;margin-top:6px;font-size:9px;color:#a7c5e0;letter-spacing:.7px}
+#hud #xpOuter{width:100%;height:7px;margin-top:3px;border-radius:4px;border:1px solid #496b91;background:#07101d;overflow:hidden}
+#hud #xp{height:100%;border-radius:4px;background:linear-gradient(90deg,#35b9ff,#9af6ff);box-shadow:0 0 8px #55dfff88;transition:width .18s}
+#hud #stage{font-size:17px;font-weight:1000;letter-spacing:1px;color:#fff0b4;line-height:1.1}
+#hud #biome{font-size:9px;letter-spacing:.7px;color:#a9c8e8;margin-top:3px}
+#hud .hud-stat-row{display:flex;justify-content:flex-end;gap:9px;align-items:center;margin-top:5px;color:#ffb5bc;font-size:10px}
+#hud #floorLabel{color:#9be9ff}
+#hud .hud-weapon-row{display:flex;justify-content:flex-end;align-items:center;gap:5px;margin-top:5px;color:#e7d2ff;font-size:10px}
+#hud .hud-dot{width:6px;height:6px;border-radius:50%;background:#bd9aff;box-shadow:0 0 7px #bd9aff}
+#hud #heroName{font-size:9px;color:#91a8c4;margin-top:3px;white-space:normal;overflow-wrap:anywhere}
+#hud #pauseBtn,#hud #audioToggle{top:max(8px,env(safe-area-inset-top))!important;right:max(8px,env(safe-area-inset-right))!important;border-radius:7px;border:1px solid #7d9bbd;background:#091426ed;box-shadow:0 3px 10px #0006;min-height:30px}
+#hud #pauseBtn{top:max(8px,env(safe-area-inset-top))!important;padding:6px 9px!important}
+#hud #audioToggle{top:max(44px,calc(env(safe-area-inset-top) + 38px))!important;padding:5px 8px!important}
+#hud #bossbar{top:calc(max(8px,env(safe-area-inset-top)) + 72px);left:30%;width:40%;height:11px;border-radius:6px;overflow:hidden;background:#270f22;box-shadow:0 3px 10px #0007}
+#hud #bossfill{background:linear-gradient(90deg,#e52e58,#ff9b72);box-shadow:0 0 8px #ff4b5e}
+#hud #toast,#hud #alertToast{z-index:8}
+#hud #stick{box-shadow:0 3px 12px #0008,inset 0 0 18px #87aaff18}
+#hud #shootBtn{border-radius:50%;border-width:3px}
+@media(max-width:650px){
+ #hud .hudtop{gap:5px;left:6px;right:6px}
+ #hud .hud-primary{width:clamp(135px,31vw,190px);padding:6px 7px}
+ #hud .hud-secondary{width:clamp(130px,29vw,175px);padding:6px 7px}
+ #hud .hudbox{font-size:10px}
+ #hud #stage{font-size:15px}
+ #hud .hud-resource-row{margin-top:4px}
+ #hud .xp-caption{margin-top:4px}
+}
+@media(max-height:420px){
+ #hud .hudtop{top:4px;left:6px;right:6px}
+ #hud .hudbox{padding:5px 7px}
+ #hud .hud-primary{width:clamp(130px,27vw,190px)}
+ #hud .hud-secondary{width:clamp(125px,25vw,175px)}
+ #hud #bossbar{top:62px}
+ #hud #pauseBtn{top:5px!important}
+ #hud #audioToggle{top:39px!important}
+}
+
 </style>
 </head>
 <body>
 <div id="wrap"><canvas id="game" width="640" height="360" aria-label="Игровое поле"></canvas></div>
 <div id="hud">
  <div class="hudtop">
-  <div class="hudbox"><div class="hp-line"><span>HP</span><div class="hp-track"><div id="hpFill" class="hp-fill"></div></div><span id="hp">30/30</span></div><div id="coins">◉ 0</div><div id="xpOuter"><div id="xp"></div></div></div>
-  <div class="hudbox" style="text-align:right"><div id="stage">ЭТАЖ 1</div><div id="biome">КАТАКОМБЫ</div><div id="kills">УБИЙСТВА: 0</div><div id="weapon">ПИСТОЛЕТ</div><div id="heroName">РАЗВЕДЧИК</div></div>
+  <div class="hudbox hud-primary"><div class="hp-line"><span class="hud-label">♥</span><div class="hp-track"><div id="hpFill" class="hp-fill"></div></div><span id="hp">30/30</span></div><div class="hud-resource-row"><div id="coins" class="hud-coins">◉ 0</div><div id="levelLabel" class="hud-level">УР. 1</div></div><div class="xp-caption"><span>ОПЫТ</span><span id="xpText">0 / 6</span></div><div id="xpOuter"><div id="xp"></div></div></div>
+  <div class="hudbox hud-secondary"><div id="stage">00:00</div><div id="biome">ЗАБРОШЕННЫЕ РУИНЫ</div><div class="hud-stat-row"><span id="kills">☠ 0</span><span id="floorLabel">ЭТАЖ 1</span></div><div class="hud-weapon-row"><span class="hud-dot"></span><span id="weapon">ПИСТОЛЕТ</span></div><div id="heroName">РАЗВЕДЧИК</div></div>
  </div>
  <div id="bossbar"><div id="bossfill"></div></div>
  <button id="pauseBtn" style="pointer-events:auto;position:absolute;top:150px;right:12px;width:auto;margin:0;padding:7px 10px;font-size:11px">Ⅱ ПАУЗА</button>
@@ -657,7 +704,7 @@ function reset(){
 }
 function updateHud(){
  const hpNow=Math.max(0,Math.ceil((player?.hp||0)*10)),hpMax=Math.max(10,Math.ceil((player?.maxhp||3)*10));$('hp').textContent=hpNow+'/'+hpMax;const hpFill=$('hpFill');if(hpFill){hpFill.style.width=clamp(hpNow/hpMax*100,0,100)+'%';hpFill.style.background=hpNow/hpMax<.25?'linear-gradient(90deg,#9d1834,#ff536a)':hpNow/hpMax<.55?'linear-gradient(90deg,#c77728,#ffd15c)':'linear-gradient(90deg,#e8344e,#ff8c6c)'}
- $('coins').textContent='◉ '+gold;$('stage').textContent='ВЫЖИВАНИЕ '+Math.floor(runTime/60)+':'+String(Math.floor(runTime%60)).padStart(2,'0');$('kills').textContent='УБИЙСТВА: '+kills;$('weapon').textContent=weapon+(weaponUpgrades&&weaponUpgrades.evolved?' ✦':'');
+ $('coins').textContent='◉ '+gold;$('stage').textContent=Math.floor(runTime/60)+':'+String(Math.floor(runTime%60)).padStart(2,'0');$('kills').textContent='☠ '+kills;$('levelLabel').textContent='УР. '+level;$('xpText').textContent=xp+' / '+xpNeed;$('floorLabel').textContent='ЭТАЖ '+floor;$('weapon').textContent=weapon+(weaponUpgrades&&weaponUpgrades.evolved?' ✦':'');
  $('biome').textContent=['ЗАБРОШЕННЫЕ РУИНЫ','ПЕПЕЛЬНЫЕ ПУСТОШИ','ЗАТОПЛЕННЫЙ ХРАМ','КРИСТАЛЬНАЯ БУРЯ','ЦАРСТВО БЕЗДНЫ'][Math.min(4,landscapePhase)];
  $('heroName').textContent=(activeHero?.name||'РАЗВЕДЧИК')+(armor?' · БРОНЯ '+armor:'')+(artifact?' · '+artifact.toUpperCase():'');const us=$('ultStatus'),ub=$('ultBtn');if(us&&ub){us.textContent=ultCooldown<=0?'ГОТОВА':Math.ceil(ultCooldown)+'с';ub.style.opacity=ultCooldown<=0?'1':'.65';ub.style.boxShadow=ultCooldown<=0?'0 0 16px #bd7bff99':'none';}
  const ds=$('dashStatus'),db=$('dashBtn');if(ds&&db){ds.textContent=dashCooldown<=0?'ГОТОВ':dashCooldown.toFixed(1)+'с';db.className=dashCooldown<=0?'ready':'cooling';}

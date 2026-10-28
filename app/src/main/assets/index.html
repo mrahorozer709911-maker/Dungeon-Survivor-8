@@ -385,6 +385,19 @@ button{min-height:42px;font-size:clamp(12px,3.2vw,14px);padding:11px 12px}
  #hud #shootBtn{width:68px;height:68px}
 }
 
+
+/* Combat feedback: reward, level-up and danger messages */
+#hud #toast.toast-pop{animation:combatToastIn .22s cubic-bezier(.2,.8,.2,1) both}
+#hud #toast.toast-reward{color:#fff0a1;border-color:#e9bd52;background:linear-gradient(110deg,#34250cf5,#101b25f2);box-shadow:0 0 18px #ffc83d44,0 4px 14px #0009}
+#hud #toast.toast-skill{color:#dffaff;border-color:#69e6ff;background:linear-gradient(110deg,#102c43f5,#1b1436f2);box-shadow:0 0 18px #53dfff44,0 4px 14px #0009}
+#hud #toast.toast-level{color:#f4dcff;border-color:#c18cff;background:linear-gradient(110deg,#301447f5,#11162cf5);box-shadow:0 0 22px #b76cff66,0 4px 14px #0009;font-size:clamp(12px,3vw,16px);letter-spacing:.35px}
+#hud #alertToast.alert-pop{animation:alertToastIn .2s ease-out both}
+#hud #alertToast{border-width:2px;letter-spacing:.3px}
+@keyframes combatToastIn{from{opacity:0;translate:0 -7px;scale:.94}to{opacity:1;translate:0 0;scale:1}}
+@keyframes alertToastIn{from{opacity:0;scale:.92}to{opacity:1;scale:1}}
+@media(max-height:420px){#hud #toast{top:calc(env(safe-area-inset-top,0px) + 64px)}#hud #alertToast{top:calc(env(safe-area-inset-top,0px) + 65px)}}
+@media(prefers-reduced-motion:reduce){#hud #toast.toast-pop,#hud #alertToast.alert-pop{animation:none!important}}
+
 </style>
 </head>
 <body>
@@ -739,7 +752,7 @@ function updateHud(){
  const ds=$('dashStatus'),db=$('dashBtn');if(ds&&db){ds.textContent=dashCooldown<=0?'ГОТОВ':dashCooldown.toFixed(1)+'с';db.className=dashCooldown<=0?'ready':'cooling';db.setAttribute('aria-label',dashCooldown<=0?'Рывок готов':'Рывок перезаряжается: '+dashCooldown.toFixed(1)+' секунд');}
  $('xp').style.width=(xp/xpNeed*100)+'%';$('bossbar').style.display=boss?'block':'none';if(boss)$('bossfill').style.width=(boss.hp/boss.maxhp*100)+'%';
 }
-let toastTimer=null,alertToastTimer=null;function toast(t){if(/РЫВОК|УКЛОНИСЬ|АТАКА/i.test(t))return;const el=$('toast');el.textContent=t;el.style.display='block';if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.style.display='none';toastTimer=null},1450)}function alertToast(t){const el=$('alertToast');el.textContent=t;el.style.display='block';if(alertToastTimer)clearTimeout(alertToastTimer);alertToastTimer=setTimeout(()=>{el.style.display='none';alertToastTimer=null},2200)}
+let toastTimer=null,alertToastTimer=null;function toast(t){if(/РЫВОК|УКЛОНИСЬ|АТАКА/i.test(t))return;const el=$('toast');const msg=String(t);el.textContent=msg;el.className='toast-pop';el.classList.add(/МОНЕТ|ЗОЛОТ|НАГРАД|СУНДУК/i.test(msg)?'toast-reward':/УЛЬТ|СПОСОБНОСТ|ГОТОВ/i.test(msg)?'toast-skill':/УРОВЕН|УРОВН|ПОВЫШ/i.test(msg)?'toast-level':'toast-info');el.style.display='block';if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.style.display='none';el.className='';toastTimer=null},1900)}function alertToast(t){const el=$('alertToast');el.textContent=t;el.className='alert-pop';el.style.display='block';if(alertToastTimer)clearTimeout(alertToastTimer);alertToastTimer=setTimeout(()=>{el.style.display='none';el.className='';alertToastTimer=null},2500)}
 function addEnemy(){
  let side=Math.floor(rand(0,4)),x=side===0?-10:side===1?W+10:rand(0,W),y=side===2?-10:side===3?H+10:rand(0,H);
  if(Math.hypot(x-player.x,y-player.y)<145){x=x<W/2?W+10:-10;y=rand(30,H-30)}
@@ -796,7 +809,7 @@ function killEnemy(e,cause){
  else if(Math.random()<.012)loot.push({x:e.x,y:e.y,type:'gear',life:22});
  
  else if(Math.random()<.045)coins.push({x:e.x,y:e.y,r:5});
- if(xp>=xpNeed){xp-=xpNeed;level++;xpNeed=Math.ceil(xpNeed*(level<=5?1.18:level<=10?1.25:1.36));showUpgrades()}
+ if(xp>=xpNeed){xp-=xpNeed;level++;xpNeed=Math.ceil(xpNeed*(level<=5?1.18:level<=10?1.25:1.36));toast('✦ УРОВЕНЬ '+level+' · НОВОЕ УЛУЧШЕНИЕ');sfx('level');showUpgrades()}
 }
 function showUpgrades(){
  sfx('level');state='upgrade';$('upgrade').style.display='flex';$('stick').style.display='none';
@@ -1361,7 +1374,7 @@ if(activeHero.id==='scout')ctx.restore();ctx.restore();
  if(screenFlash>0){ctx.fillStyle=`rgba(255,55,80,${Math.min(.18,screenFlash)})`;ctx.fillRect(0,0,W,H)}
 
  // Floating damage numbers with dark outlines for contrast.
- for(const n of damageNumbers){ctx.globalAlpha=Math.max(0,n.life/n.maxLife);ctx.font='bold 12px ui-monospace, monospace';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='#080b13';ctx.strokeText(String(n.value),n.x,n.y);ctx.fillStyle=n.color;ctx.fillText(String(n.value),n.x,n.y);ctx.globalAlpha=1;}
+ for(const n of damageNumbers){const a=Math.max(0,n.life/n.maxLife);ctx.globalAlpha=a;const critical=String(n.value).includes('HP')||Number(n.value)>=Math.max(18,player.damage*2);ctx.font=(critical?'900 14px':'800 12px')+' ui-monospace, monospace';ctx.textAlign='center';ctx.lineWidth=critical?4:3;ctx.lineJoin='round';ctx.strokeStyle='#080b13';ctx.strokeText(String(n.value),n.x,n.y);ctx.shadowColor=n.color;ctx.shadowBlur=critical?7:2;ctx.fillStyle=n.color;ctx.fillText(String(n.value),n.x,n.y);ctx.shadowBlur=0;ctx.globalAlpha=1;}
  // Extra sparks around active projectiles and particles fade smoothly.
  for(const p of particles){const alpha=Math.max(0,Math.min(1,p.life/.45));if(p.flame){ctx.save();ctx.globalAlpha=alpha;ctx.fillStyle=p.color;ctx.shadowColor=p.color;ctx.shadowBlur=7;ctx.beginPath();ctx.ellipse(p.x,p.y,Math.max(1,(p.scale||3)*alpha),Math.max(1,(p.scale||3)*1.5*alpha),0,0,Math.PI*2);ctx.fill();ctx.restore()}else{rect(p.x-1,p.y-1,3,3,p.color);if(alpha>.5)rect(p.x,p.y,1,1,'#ffffff')}}
  ctx.restore();

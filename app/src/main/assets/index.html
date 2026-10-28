@@ -757,6 +757,7 @@ function resumeRun(){
 }
 function clearRunSave(){try{localStorage.removeItem('ds_run7')}catch(e){}const b=$('continueRun');if(b)b.style.display='none';}
 
+function restoreMobileControls(){if(!window.matchMedia('(any-pointer:coarse)').matches)return;const hud=$('hud');if(hud)hud.style.display='block';[['stick','block'],['shootBtn','flex'],['shootHint','block'],['dashBtn','block'],['ultBtn','block']].forEach(([id,display])=>{const el=$(id);if(el){el.style.setProperty('display',display,'important');el.style.setProperty('visibility','visible','important');el.style.setProperty('opacity','1','important');}});const desktop=$('desktopControls');if(desktop)desktop.style.setProperty('display','none','important');}
 function reset(){
  initAudio();setAudio(audioOn);sfx('upgrade');
  activeHero=HEROES.find(h=>h.id===chosenHero)||HEROES[0];
@@ -766,7 +767,7 @@ function reset(){
  hordeEventTimer=75;hordeEventLeft=0;ultBuffTimer=0;ultRateMult=1;ultDamageMult=1;ultSpeedMult=1;ultPulseTimer=0;ultPulseKind='';
  enemies=[];bullets=[];ebullets=[];coins=[];particles=[];bloodStains=[];deathFx=[];damageNumbers=[];ambientDecor=[];loot=[];weaponBeams=[];laserTargetId=null;laserTargetX=0;laserTargetY=0;runTime=0;spawn=0;shoot=0;enemyId=0;level=1;xp=0;xpNeed=6;gold=0;kills=0;floor=1;shake=0;boss=null;nextBossTime=180;landscapePhase=0;finalBoss=false;bossWarning=0;dashCooldown=0;dashTime=0;dashRequested=false;ultCooldown=0;ultRequested=false;dashDir={x:1,y:0};roomIndex=1;roomKills=0;roomGoal=6;secretFound=false;armor=0;artifact=null;artifactLevel=1;artifactPulse=0;guardianCooldown=0;attackAnim=0;weaponSynergyHits=0;petAttackTimer=0;petCardLevel=0;artifactCardLevel=0;makeRoomProps();
  upgrades={damage:0,rate:0,speed:0,maxhp:0,magnet:0,crit:0,pierce:0,orbit:0,heal:0};weaponUpgrades={power:0,tempo:0,trait:0,evolved:false};critChance=.08;pierce=0;if(artifact==='guardian')armor=Math.min(3,Math.ceil(artifactLevel/2));if(artifact==='storm')critChance=Math.min(.65,.08+.08*artifactLevel);if(artifact==='void')pierce=Math.min(6,artifactLevel+1);orbitTimer=0;orbitAngle=0;killStreak=0;streakTimer=0;weapon=activeWeapon.name;
- updateHud();state='play';$('menu').style.display='none';$('armory').style.display='none';$('pause').style.display='none';$('shop').style.display='none';$('quests').style.display='none';$('upgrade').style.display='none';$('end').style.display='none';$('hud').style.display='block';$('stick').style.display='block';joy={x:0,y:0};joyActive=false;knob.style.left='32px';knob.style.top='32px';
+ updateHud();state='play';$('menu').style.display='none';$('armory').style.display='none';$('pause').style.display='none';$('shop').style.display='none';$('quests').style.display='none';$('upgrade').style.display='none';$('end').style.display='none';$('hud').style.display='block';$('stick').style.display='block';restoreMobileControls();joy={x:0,y:0};joyActive=false;knob.style.left='32px';knob.style.top='32px';
 }
 function updateHud(){
  const hpNow=Math.max(0,Math.ceil((player?.hp||0)*10)),hpMax=Math.max(10,Math.ceil((player?.maxhp||3)*10));$('hp').textContent=hpNow+'/'+hpMax;const hpFill=$('hpFill');if(hpFill){hpFill.style.width=clamp(hpNow/hpMax*100,0,100)+'%';hpFill.style.background=hpNow/hpMax<.25?'linear-gradient(90deg,#9d1834,#ff536a)':hpNow/hpMax<.55?'linear-gradient(90deg,#c77728,#ffd15c)':'linear-gradient(90deg,#e8344e,#ff8c6c)'}
@@ -1525,7 +1526,7 @@ $('home').onclick=()=>{$('end').style.display='none';$('menu').style.display='fl
 $('pauseBtn').onclick=()=>{if(state==='play'){saveRun();state='paused';$('pause').style.display='flex';$('stick').style.display='none'}};
 $('pause').querySelector('.card').insertAdjacentHTML('beforeend','<button id="pauseSettings">🎮 НАСТРОИТЬ КНОПКИ</button>');
 document.getElementById('pauseSettings').onclick=()=>openControlSettings('pause');
-$('resume').onclick=()=>{$('pause').style.display='none';$('stick').style.display='block';state='play'};
+$('resume').onclick=()=>{$('pause').style.display='none';$('stick').style.display='block';restoreMobileControls();state='play'};
 $('pauseHome').onclick=()=>{$('pause').style.display='none';$('hud').style.display='none';$('menu').style.display='flex';state='menu';renderMeta()};
 $('shopOpen').onclick=openShop;
 let miniActive=false,miniTime=30,miniHits=0,miniClock=null,miniCombo=0,miniBestCombo=0,miniGoldHits=0,miniTargetMover=null,miniPoints=0;

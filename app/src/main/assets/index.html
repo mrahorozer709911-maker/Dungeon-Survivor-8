@@ -404,6 +404,14 @@ button{min-height:42px;font-size:clamp(12px,3.2vw,14px);padding:11px 12px}
 @media(max-height:420px){#hud #toast{top:calc(env(safe-area-inset-top,0px) + 64px)}#hud #alertToast{top:calc(env(safe-area-inset-top,0px) + 65px)}}
 @media(prefers-reduced-motion:reduce){#hud #toast.toast-pop,#hud #alertToast.alert-pop{animation:none!important}}
 
+
+/* Desktop browser controls: keep mobile touch controls unchanged. */
+@media (hover:hover) and (pointer:fine) and (min-width:700px){
+ #stick,#shootBtn,#shootHint,#dashBtn,#ultBtn{display:none!important}
+ #desktopControls{display:block!important}
+ #game{cursor:crosshair}
+}
+#desktopControls{display:none;position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:12;padding:7px 12px;border:1px solid #7b94bb88;border-radius:8px;background:#071126d9;color:#e8f2ff;font-size:12px;font-weight:800;white-space:nowrap;pointer-events:none;text-shadow:1px 1px #000}
 </style>
 </head>
 <body>
@@ -477,6 +485,7 @@ button{min-height:42px;font-size:clamp(12px,3.2vw,14px);padding:11px 12px}
 </div>
 <div id="end" class="overlay" style="display:none">
  <div class="card"><div class="logo" style="font-size:34px">ЗАБЕГ<span>ОКОНЧЕН</span></div><div class="subtitle" id="endStats"></div><button class="primary" id="again">↻ ЕЩЁ ОДИН ЗАБЕГ</button><button id="home">В МЕНЮ</button></div>
+<div id="desktopControls">WASD — движение · ЛКМ — выстрел · ПКМ / Space — рывок · Q — ульта</div>
 </div>
 <script>
 (()=>{
@@ -1464,6 +1473,12 @@ $('dashBtn').addEventListener('pointerdown',e=>{e.preventDefault();if(state==='p
  $('ultBtn').addEventListener('pointerdown',e=>{e.preventDefault();if(state==='play')ultRequested=true});
 $('interactBtn').style.display='none';
 window.addEventListener('keydown',e=>{keys[e.key]=true;if(e.code==='Space'&&state==='play'){e.preventDefault();dashRequested=true}if((e.key==='q'||e.key==='Q')&&state==='play'){e.preventDefault();ultRequested=true}});
+canvas.addEventListener('pointerdown',e=>{
+ if(state!=='play'||e.pointerType==='touch')return;
+ if(e.button===0){const target=nearest();if(target){shootAt(target);shoot=Math.max(.075,player.fireRate*Math.pow(.94,weaponUpgrades.tempo||0)/(ultRateMult||1));}}
+ if(e.button===2){e.preventDefault();dashRequested=true;}
+});
+canvas.addEventListener('contextmenu',e=>e.preventDefault());
 
 function loop(t){let dt=Math.min(.033,(t-last)/1000||0);last=t;if(state!=='paused')update(dt);if(state==='play'||state==='upgrade'||state==='paused')draw(dt);requestAnimationFrame(loop)}
 requestAnimationFrame(loop);

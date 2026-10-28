@@ -798,7 +798,7 @@ function showUpgrades(){
  $('choices').innerHTML='';
  opts.forEach(o=>{
   const title=Array.isArray(o)?o[0]:o.title,desc=Array.isArray(o)?o[1]:o.desc,apply=Array.isArray(o)?o[2]:o.apply;
-  const evolutionCard=title.includes('ЭВОЛЮЦИЯ'),weaponCard=title.includes('·'),rareCard=!!o.rare,icon=evolutionCard?'✦':rareCard?'ϟ':weaponCard?'⚔':({'damage':'✹','rate':'➶','speed':'➤','maxhp':'♥','crit':'✧','pierce':'➤','orbit':'◉','heal':'✚','streak':'ϟ'}[(o.key)||'']||'✦');
+  const evolutionCard=title.includes('ЭВОЛЮЦИЯ'),weaponCard=Array.isArray(o)&&!evolutionCard,rareCard=!!o.rare,icon=evolutionCard?'✦':rareCard?'ϟ':weaponCard?'⚔':({'damage':'✹','rate':'➶','speed':'➤','maxhp':'♥','crit':'✧','pierce':'➤','orbit':'◉','heal':'✚','streak':'ϟ'}[(o.key)||'']||'✦');
   const category=evolutionCard?'ЛЕГЕНДАРНОЕ · ЭВОЛЮЦИЯ':rareCard?'РЕДКАЯ КАРТА':weaponCard?'УЛУЧШЕНИЕ ОРУЖИЯ':'БОЕВОЙ НАВЫК';
   const b=document.createElement('button');b.className='choice'+(evolutionCard?' choice-evolution':rareCard?' choice-rare':weaponCard?' choice-weapon':' choice-general');
   b.innerHTML='<span class="choice-rank">'+category+'</span><span class="choice-icon" aria-hidden="true">'+icon+'</span><span class="choice-copy"><b>'+title+'</b><span class="choice-desc">'+desc+'</span></span><span class="choice-arrow">›</span>';

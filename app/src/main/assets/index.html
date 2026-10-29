@@ -543,7 +543,7 @@ const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
 ctx.imageSmoothingEnabled=false;
 const W=1200,H=700,VIEW_W=640,VIEW_H=360;
 // Adaptive graphics: trim expensive cosmetic effects on slower phones, restore them when performance recovers.
-let lowGraphics=false,perfSampleTime=0,perfFrames=0;
+let lowGraphics=!!(window.matchMedia&&window.matchMedia('(any-pointer:coarse)').matches),perfSampleTime=0,perfFrames=0,perfGoodSamples=0;
 const $=id=>document.getElementById(id);
 let state='menu',player,enemies=[],bullets=[],ebullets=[],coins=[],particles=[],keys={},joy={x:0,y:0},joyActive=false,adminArena=false;
 let bloodStains=[],deathFx=[],damageNumbers=[],manualFire=false,caseOpening=false,weaponBeams=[],ambientDecor=[];
@@ -822,6 +822,8 @@ function updateHud(){
 }
 let toastTimer=null,alertToastTimer=null;function toast(t){if(/РЫВОК|УКЛОНИСЬ|АТАКА/i.test(t))return;const el=$('toast');const msg=String(t);el.textContent=msg;el.className='toast-pop';el.classList.add(/МОНЕТ|ЗОЛОТ|НАГРАД|СУНДУК/i.test(msg)?'toast-reward':/УЛЬТ|СПОСОБНОСТ|ГОТОВ/i.test(msg)?'toast-skill':/УРОВЕН|УРОВН|ПОВЫШ/i.test(msg)?'toast-level':'toast-info');el.style.display='block';if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.style.display='none';el.className='';toastTimer=null},1900)}function alertToast(t){const el=$('alertToast');el.textContent=t;el.className='alert-pop';el.style.display='block';if(alertToastTimer)clearTimeout(alertToastTimer);alertToastTimer=setTimeout(()=>{el.style.display='none';el.className='';alertToastTimer=null},2500)}
 function addEnemy(){
+ // Keep horde simulation bounded on phones; bosses and existing enemies are unaffected.
+ if(enemies.length>=(lowGraphics?95:170))return;
  let side=Math.floor(rand(0,4)),x=side===0?-10:side===1?W+10:rand(0,W),y=side===2?-10:side===3?H+10:rand(0,H);
  if(Math.hypot(x-player.x,y-player.y)<145){x=x<W/2?W+10:-10;y=rand(30,H-30)}
  const roll=Math.random();let type=roll<.16?'fast':roll<.29?'ranged':roll<.39?'brute':roll<.51?'charger':roll<.62?'spitter':'grunt';
@@ -1088,9 +1090,9 @@ if(e.type==='boss'&&boss){boss.hp=e.hp;boss.x=e.x;boss.y=e.y;}b.pierce=b.pierce|
  for(let c of coins){let d=Math.hypot(c.x-player.x,c.y-player.y);if(d<55){c.x+=(player.x-c.x)*Math.min(1,dt*5);c.y+=(player.y-c.y)*Math.min(1,dt*5)}if(d<player.r+c.r+4){c.got=true;gold++;sfx('coin');particle(c.x,c.y,'#ffce45',5)}}
  coins=coins.filter(c=>!c.got);
  for(let p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=Math.pow(.08,dt);p.vy*=Math.pow(.08,dt);p.life-=dt}particles=particles.filter(p=>p.life>0);for(const beam of weaponBeams)beam.life-=dt;weaponBeams=weaponBeams.filter(beam=>beam.life>0);
- for(const b of bloodStains)b.life-=dt;bloodStains=bloodStains.filter(b=>b.life>0);
- for(const d of deathFx)d.life-=dt;deathFx=deathFx.filter(d=>d.life>0);
- for(const n of damageNumbers){n.y-=n.v*dt;n.life-=dt}damageNumbers=damageNumbers.filter(n=>n.life>0);screenFlash=Math.max(0,screenFlash-dt);walkFrame+=dt*(Math.hypot(dx,dy)>.08?13:3);
+ for(const b of bloodStains)b.life-=dt;bloodStains=bloodStains.filter(b=>b.life>0);if(bloodStains.length>(lowGraphics?65:150))bloodStains.splice(0,bloodStains.length-(lowGraphics?65:150));
+ for(const d of deathFx)d.life-=dt;deathFx=deathFx.filter(d=>d.life>0);if(deathFx.length>(lowGraphics?38:90))deathFx.splice(0,deathFx.length-(lowGraphics?38:90));
+ for(const n of damageNumbers){n.y-=n.v*dt;n.life-=dt}damageNumbers=damageNumbers.filter(n=>n.life>0);if(damageNumbers.length>(lowGraphics?24:60))damageNumbers.splice(0,damageNumbers.length-(lowGraphics?24:60));if(particles.length>(lowGraphics?48:120))particles.splice(0,particles.length-(lowGraphics?48:120));screenFlash=Math.max(0,screenFlash-dt);walkFrame+=dt*(Math.hypot(dx,dy)>.08?13:3);
  updateHud();
 }
 function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h))}
@@ -1120,9 +1122,11 @@ function draw(dt=0){
  // Static floor tiles are cached per biome instead of redrawn every frame.
  ctx.drawImage(getFloorLayer(landscapePhase),0,0);
  // Blood remains on the dungeon floor for about 10 seconds.
- for(const b of bloodStains){const fade=Math.min(1,b.life/1.4);ctx.globalAlpha=.68*fade;ctx.fillStyle=b.seed>.5?'#741f35':'#9b263b';ctx.beginPath();ctx.ellipse(b.x,b.y,b.r*(1.2+b.seed*.45),b.r*.55,b.seed*2,0,Math.PI*2);ctx.fill();if(b.splatter){for(let k=0;k<8;k++){const a=k*Math.PI/4+b.seed;ctx.beginPath();ctx.ellipse(b.x+Math.cos(a)*b.r*1.05,b.y+Math.sin(a)*b.r*.6,Math.max(1,b.r*.13),Math.max(1,b.r*.34),a,0,Math.PI*2);ctx.fill();}}ctx.fillStyle='#4d1728';ctx.beginPath();ctx.ellipse(b.x-2,b.y-1,b.r*.55,b.r*.25,0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
+ for(const b of bloodStains){const fade=Math.min(1,b.life/1.4);ctx.globalAlpha=.55*fade;ctx.fillStyle=b.seed>.5?'#741f35':'#9b263b';ctx.beginPath();ctx.ellipse(b.x,b.y,b.r*(1.2+b.seed*.45),b.r*.55,b.seed*2,0,Math.PI*2);ctx.fill();if(b.splatter&&!lowGraphics){for(let k=0;k<4;k++){const a=k*Math.PI/2+b.seed;ctx.beginPath();ctx.ellipse(b.x+Math.cos(a)*b.r*1.05,b.y+Math.sin(a)*b.r*.6,Math.max(1,b.r*.13),Math.max(1,b.r*.34),a,0,Math.PI*2);ctx.fill();}}ctx.globalAlpha=1;}
  // Scenery silhouettes are purely visual: no collision, pickups or gameplay effects.
- for(const p of ambientDecor){
+ for(let decorIndex=0;decorIndex<ambientDecor.length;decorIndex++){
+  if(lowGraphics&&decorIndex%3!==0)continue;
+  const p=ambientDecor[decorIndex];
   if(p.x<cameraX-36||p.x>cameraX+VIEW_W+36||p.y<cameraY-36||p.y>cameraY+VIEW_H+36)continue;
   const x=p.x,y=p.y,z=p.scale,wig=Math.sin(runTime*1.6+p.phase)*2;
   ctx.save();ctx.translate(x,y);ctx.rotate(p.rot*.08);ctx.scale(z,z);
@@ -1877,7 +1881,7 @@ function loop(t){
  if(!perfSampleTime)perfSampleTime=t;
  if(t-perfSampleTime>=1200){
   const fps=perfFrames*1000/(t-perfSampleTime);
-  if(fps<46)lowGraphics=true;else if(fps>54)lowGraphics=false;
+  if(fps<48){lowGraphics=true;perfGoodSamples=0;}else if(fps>57){perfGoodSamples++;if(perfGoodSamples>=5){lowGraphics=false;perfGoodSamples=0;}}else{perfGoodSamples=0;}
   perfFrames=0;perfSampleTime=t;
  }
  if(state!=='paused')update(dt);

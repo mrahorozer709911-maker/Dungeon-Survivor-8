@@ -93,10 +93,10 @@ canvas{width:100vw;height:100dvh;object-fit:fill;image-rendering:auto}
 @media (max-height:380px){
  .hudtop{top:4px}
  .hudbox{padding:4px 6px}
- #stick{width:86px;height:86px}
- #knob{left:21px;top:21px}
- #shootBtn{width:70px;height:70px}
- #dashBtn{width:54px;height:54px;bottom:max(91px,calc(env(safe-area-inset-bottom) + 91px))}
+ #stick{width:94px;height:94px}
+ #knob{width:42px;height:42px;left:26px;top:26px}
+ #shootBtn{width:76px;height:76px}
+ #dashBtn{width:58px;height:58px;bottom:max(91px,calc(env(safe-area-inset-bottom) + 91px))}
 }
 
 #settings .card{width:min(92vw,500px)}
@@ -104,10 +104,10 @@ canvas{width:100vw;height:100dvh;object-fit:fill;image-rendering:auto}
 #layoutPreview .dragControl[data-control="stick"]{left:16%;top:65%}
 #layoutPreview .dragControl[data-control="shootBtn"]{left:84%;top:65%;background:#922b3c}
 #layoutPreview .dragControl[data-control="dashBtn"]{left:75%;top:28%;background:#39285d}
-#stick{left:var(--stick-x,14px);bottom:var(--stick-y,14px);width:100px;height:100px}
-#knob{width:40px;height:40px;left:28px;top:28px}
-#shootBtn{right:var(--shoot-x,18px);bottom:var(--shoot-y,18px)}
-#dashBtn{right:var(--dash-x,26px);bottom:var(--dash-y,112px)}
+#stick{left:var(--stick-x,14px);bottom:var(--stick-y,14px);width:120px;height:120px;touch-action:none;user-select:none}
+#knob{width:48px;height:48px;left:34px;top:34px;pointer-events:none}
+#shootBtn{right:var(--shoot-x,18px);bottom:var(--shoot-y,18px);width:92px;height:92px;touch-action:none;user-select:none}
+#dashBtn{right:var(--dash-x,26px);bottom:var(--dash-y,112px);width:70px;height:70px;touch-action:manipulation;user-select:none}
 #pauseBtn{top:48px!important;right:10px!important}
 #interactBtn{display:none!important}
 
@@ -1888,12 +1888,12 @@ $('settingsOpen').onclick=()=>{openControlSettings('menu')};
 $('settingsClose').onclick=()=>{saveControlLayout();$('settings').style.display='none';if(settingsReturn==='menu')$('menu').style.display='flex';else $('pause').style.display='flex'};
 $('layoutReset').onclick=()=>{localStorage.removeItem('ds_control_layout');applyControlLayout({});renderControlPreview()};
 let settingsReturn='menu';
-function applyControlLayout(layout){const vw=Math.max(1,document.documentElement.clientWidth||innerWidth),vh=Math.max(1,document.documentElement.clientHeight||innerHeight);const defaults={stick:{x:14,y:14},shootBtn:{x:18,y:18},dashBtn:{x:26,y:112}};for(const id of ['stick','shootBtn','dashBtn']){const el=$(id);if(!el)continue;const d=defaults[id];let x=d.x,y=d.y;const xprop=id==='stick'?'--stick-x':id==='shootBtn'?'--shoot-x':'--dash-x',yprop=id==='stick'?'--stick-y':id==='shootBtn'?'--shoot-y':'--dash-y';/* Keep controls anchored to their own screen edge; never reuse stale pixel positions from a different viewport. */el.style.setProperty(xprop,x+'px');el.style.setProperty(yprop,y+'px');}}
+function applyControlLayout(layout){const vw=Math.max(1,document.documentElement.clientWidth||innerWidth),vh=Math.max(1,document.documentElement.clientHeight||innerHeight);let saved=layout; if(!saved){try{saved=JSON.parse(localStorage.getItem('ds_control_layout')||'{}')}catch(e){saved={}}}const defaults={stick:{x:14,y:14},shootBtn:{x:18,y:18},dashBtn:{x:26,y:112}};for(const id of ['stick','shootBtn','dashBtn']){const el=$(id);if(!el)continue;const d=defaults[id],p=saved[id]||{};const rect=el.getBoundingClientRect();const ew=Math.max(1,rect.width||({stick:120,shootBtn:92,dashBtn:70}[id])),eh=Math.max(1,rect.height||({stick:120,shootBtn:92,dashBtn:70}[id]));const maxX=Math.max(8,vw-ew-8),maxY=Math.max(8,vh-eh-8);let x=Number.isFinite(+p.x)?+p.x:d.x,y=Number.isFinite(+p.y)?+p.y:d.y;x=Math.max(8,Math.min(maxX,x));y=Math.max(8,Math.min(maxY,y));const xprop=id==='stick'?'--stick-x':id==='shootBtn'?'--shoot-x':'--dash-x',yprop=id==='stick'?'--stick-y':id==='shootBtn'?'--shoot-y':'--dash-y';el.style.setProperty(xprop,x+'px');el.style.setProperty(yprop,y+'px');}}
 function readControlLayout(){const o={};for(const id of ['stick','shootBtn','dashBtn']){const el=$(id),r=el.getBoundingClientRect();o[id]={x:Math.round(id==='stick'?r.left:innerWidth-r.right),y:Math.round(innerHeight-r.bottom)};}return o}
 function saveControlLayout(){try{localStorage.setItem('ds_control_layout',JSON.stringify(readControlLayout()))}catch(e){}}
 function renderControlPreview(){const preview=$('layoutPreview');const saved=JSON.parse(localStorage.getItem('ds_control_layout')||'{}');for(const el of preview.querySelectorAll('.dragControl')){const id=el.dataset.control,p=saved[id]||{};const xp=p.x!=null?(id==='stick'?p.x/innerWidth*100:100-p.x/innerWidth*100):({stick:16,shootBtn:84,dashBtn:75}[id]);el.style.left=Math.max(8,Math.min(92,xp))+'%';el.style.top=(p.y!=null?Math.max(12,Math.min(88,100-p.y/innerHeight*100)):({stick:65,shootBtn:65,dashBtn:28}[id]))+'%';}}
 function openControlSettings(from){settingsReturn=from;$('menu').style.display='none';$('pause').style.display='none';$('settings').style.display='flex';renderControlPreview();}
-(function initControlSettings(){try{localStorage.removeItem('ds_control_layout')}catch(e){}applyControlLayout({});window.addEventListener('resize',()=>applyControlLayout({}));window.addEventListener('orientationchange',()=>setTimeout(()=>applyControlLayout({}),180));const preview=$('layoutPreview');let drag=null;preview.querySelectorAll('.dragControl').forEach(el=>{el.addEventListener('pointerdown',e=>{drag={el,p:preview.getBoundingClientRect()};el.setPointerCapture(e.pointerId);e.preventDefault()});el.addEventListener('pointermove',e=>{if(!drag||drag.el!==el)return;const r=preview.getBoundingClientRect();el.style.left=Math.max(8,Math.min(92,(e.clientX-r.left)/r.width*100))+'%';el.style.top=Math.max(12,Math.min(88,(e.clientY-r.top)/r.height*100))+'%';});el.addEventListener('pointerup',()=>{if(!drag||drag.el!==el)return;const x=parseFloat(el.style.left)/100,y=parseFloat(el.style.top)/100;const id=el.dataset.control;const map={};try{Object.assign(map,JSON.parse(localStorage.getItem('ds_control_layout')||'{}'))}catch(e){}map[id]={x:Math.round((id==='stick'?x*innerWidth:(1-x)*innerWidth)-45),y:Math.round((1-y)*innerHeight-27)};localStorage.setItem('ds_control_layout',JSON.stringify(map));applyControlLayout(map);drag=null});});})();
+(function initControlSettings(){applyControlLayout();window.addEventListener('resize',()=>applyControlLayout());window.addEventListener('orientationchange',()=>setTimeout(()=>applyControlLayout(),180));const preview=$('layoutPreview');let drag=null;preview.querySelectorAll('.dragControl').forEach(el=>{el.addEventListener('pointerdown',e=>{drag={el,p:preview.getBoundingClientRect()};el.setPointerCapture(e.pointerId);e.preventDefault()});el.addEventListener('pointermove',e=>{if(!drag||drag.el!==el)return;const r=preview.getBoundingClientRect();el.style.left=Math.max(8,Math.min(92,(e.clientX-r.left)/r.width*100))+'%';el.style.top=Math.max(12,Math.min(88,(e.clientY-r.top)/r.height*100))+'%';});el.addEventListener('pointerup',()=>{if(!drag||drag.el!==el)return;const x=parseFloat(el.style.left)/100,y=parseFloat(el.style.top)/100;const id=el.dataset.control;const map={};try{Object.assign(map,JSON.parse(localStorage.getItem('ds_control_layout')||'{}'))}catch(e){}map[id]={x:Math.round((id==='stick'?x*innerWidth:(1-x)*innerWidth)-45),y:Math.round((1-y)*innerHeight-27)};localStorage.setItem('ds_control_layout',JSON.stringify(map));applyControlLayout(map);drag=null});});})();
 $('armoryOpen').onclick=()=>{renderArmory();$('menu').style.display='none';$('armory').style.display='flex'};
 
 $('armoryBack').onclick=()=>{$('armory').style.display='none';$('menu').style.display='flex'};
@@ -1922,10 +1922,10 @@ $('questOpen').onclick=()=>{renderQuests();$('menu').style.display='none';$('que
 $('questClose').onclick=()=>{$('quests').style.display='none';$('menu').style.display='flex';renderMeta()};
 $('how').onclick=()=>{$('help').style.display=$('help').style.display==='none'?'block':'none'};
 const stick=$('stick'),knob=$('knob');
-function setJoy(e){let r=stick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let dx=e.clientX-cx,dy=e.clientY-cy,m=Math.hypot(dx,dy),max=36;if(m>max){dx=dx/m*max;dy=dy/m*max}joy.x=dx/max;joy.y=dy/max;knob.style.left=(r.width/2-22+dx)+'px';knob.style.top=(r.height/2-22+dy)+'px'}
-stick.addEventListener('pointerdown',e=>{joyActive=true;stick.setPointerCapture(e.pointerId);setJoy(e)});
-stick.addEventListener('pointermove',e=>{if(joyActive)setJoy(e)});
-function releaseJoy(){joyActive=false;joy={x:0,y:0};knob.style.left='32px';knob.style.top='32px'}
+function setJoy(e){const r=stick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let dx=e.clientX-cx,dy=e.clientY-cy,m=Math.hypot(dx,dy),max=Math.max(18,(r.width-knob.offsetWidth)/2-5);if(m>max){dx=dx/m*max;dy=dy/m*max}joy.x=dx/max;joy.y=dy/max;knob.style.left=(r.width/2-knob.offsetWidth/2+dx)+'px';knob.style.top=(r.height/2-knob.offsetHeight/2+dy)+'px'}
+stick.addEventListener('pointerdown',e=>{e.preventDefault();joyActive=true;try{stick.setPointerCapture(e.pointerId)}catch(_){}setJoy(e)});
+stick.addEventListener('pointermove',e=>{if(joyActive){e.preventDefault();setJoy(e)}});
+function releaseJoy(){joyActive=false;joy={x:0,y:0};knob.style.left=(stick.clientWidth/2-knob.offsetWidth/2)+'px';knob.style.top=(stick.clientHeight/2-knob.offsetHeight/2)+'px'}
 stick.addEventListener('pointerup',releaseJoy);stick.addEventListener('pointercancel',releaseJoy);
 window.addEventListener('keyup',e=>{keys[e.key]=false});
 // Never leave movement stuck if the browser loses focus during a run.

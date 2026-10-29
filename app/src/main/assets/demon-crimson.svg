@@ -34,4 +34,31 @@
 <path d="M18 35 20 36 19 38M30 35 28 36 29 38" fill="none" stroke="#d44a57" stroke-width=".7"/>
 <path d="M17 40 19 41 18 42M31 40 29 41 30 42" fill="none" stroke="#f7c4a0" stroke-width=".6"/>
 <!-- engraved armor and highlights --> <path d="M17 22 19 23 18 26M31 22 29 23 30 26M21 32 22 34M27 32 26 34" fill="none" stroke="#ff9a78" stroke-width=".8"/><path d="M15 19 17 20M33 19 31 20" stroke="#ffd18c" stroke-width="1"/><rect x="19" y="29" width="2" height="1" fill="#f8bd72"/><rect x="27" y="29" width="2" height="1" fill="#f8bd72"/>
+
+<!-- Demon refinement pass: stronger facial expression, horn ridges, wing membranes and armor seams -->
+<path d="M17 8 18 10 19 11M31 8 30 10 29 11" fill="none" stroke="#c9a18e" stroke-width=".65"/>
+<path d="M18 14 20 13 22 14M30 14 28 13 26 14" fill="none" stroke="#ffb17b" stroke-width=".7"/>
+<path d="M19 15 21 14 23 15 21 16Z M29 15 27 14 25 15 27 16Z" fill="#ffcf77"/>
+<path d="M20 16 22 17 21 18M28 16 26 17 27 18" fill="none" stroke="#fff7cf" stroke-width=".65"/>
+<path d="M22 18 24 19 26 18" fill="none" stroke="#ff8b69" stroke-width=".8"/>
+<path d="M22 20 24 21 26 20" fill="none" stroke="#f7c4a0" stroke-width=".6"/>
+<path d="M18 21 19 23 18 25M30 21 29 23 30 25" fill="none" stroke="#ffcc8c" stroke-width=".65"/>
+<path d="M20 23 21 24 20 26M28 23 27 24 28 26" fill="none" stroke="#ff8a65" stroke-width=".6"/>
+<path d="M21 26 22 27M27 26 26 27" stroke="#ffd18c" stroke-width=".7"/>
+<path d="M22 31 23 32 22 33M26 31 25 32 26 33" fill="none" stroke="#ffb17b" stroke-width=".65"/>
+<path d="M14 20 15 22 14 23M34 20 33 22 34 23" fill="none" stroke="#ff9b71" stroke-width=".6"/>
+<path d="M10 22 12 24 11 26M38 22 36 24 37 26" fill="none" stroke="#a52c45" stroke-width=".75"/>
+<path d="M9 24 10 25M39 24 38 25" stroke="#ffb17b" stroke-width=".65"/>
+<path d="M11 27 13 28 12 30M37 27 35 28 36 30" fill="none" stroke="#ffcc8c" stroke-width=".6"/>
+<path d="M16 25 17 27 16 28M32 25 31 27 32 28" fill="none" stroke="#f45d61" stroke-width=".65"/>
+<path d="M19 24 20 25M29 24 28 25" stroke="#ffd6a1" stroke-width=".7"/>
+<path d="M21 22 22 23M27 22 26 23" stroke="#f9a16f" stroke-width=".65"/>
+<path d="M21 33 22 34 23 34M27 33 26 34 25 34" fill="none" stroke="#ffcf8c" stroke-width=".6"/>
+<path d="M18 36 19 37 18 39M30 36 29 37 30 39" fill="none" stroke="#ff8b69" stroke-width=".65"/>
+<path d="M17 38 19 39 18 40M31 38 29 39 30 40" fill="none" stroke="#8f263f" stroke-width=".8"/>
+<path d="M20 40 21 41M28 40 27 41" stroke="#ffcf8c" stroke-width=".6"/>
+<path d="M12 12 14 15 14 17M36 12 34 15 34 17" fill="none" stroke="#e84a57" stroke-width=".6"/>
+<path d="M6 17 8 18 8 21M42 17 40 18 40 21" fill="none" stroke="#a52c45" stroke-width=".65"/>
+<path d="M8 25 10 27M40 25 38 27" stroke="#ff8b72" stroke-width=".55"/>
+<path d="M15 18 16 19M33 18 32 19" stroke="#fff0cf" stroke-width=".6"/>
 </g></svg>

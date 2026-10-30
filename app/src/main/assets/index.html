@@ -1470,9 +1470,25 @@ function draw(dt=0){
     if(attacking&&attackT>.48){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.2+.35*Math.sin(attackT*Math.PI);ctx.fillStyle='#ff5b2f';ctx.shadowColor='#ff3c24';ctx.shadowBlur=lowGraphics?0:er*.65;ctx.beginPath();ctx.arc(0,spriteSize*.04,Math.max(2,er*.12),0,Math.PI*2);ctx.fill();ctx.restore();}
     if(hurt){ctx.globalCompositeOperation='source-atop';ctx.globalAlpha=.5;ctx.fillStyle='#fff1df';ctx.fillRect(-spriteSize/2,-spriteSize/2,spriteSize,spriteSize);}
     if(attacking&&attackT>.35){
-     ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.7;
-     ctx.strokeStyle='#ff7653';ctx.lineWidth=Math.max(1,er*.06);
-     ctx.beginPath();ctx.arc(spriteSize*.2,-spriteSize*.03,spriteSize*.28,-.95,.6);ctx.stroke();
+     ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.7;
+     ctx.lineWidth=Math.max(1,er*.06);
+     if(e.type==='brute'){
+      ctx.strokeStyle='#d7aaff';ctx.beginPath();ctx.ellipse(0,spriteSize*.32,spriteSize*(.22+attackT*.13),spriteSize*.07,0,Math.PI*1.05,Math.PI*1.95);ctx.stroke();
+      ctx.strokeStyle='#fff0ff';ctx.lineWidth=Math.max(1,er*.025);ctx.beginPath();ctx.moveTo(-spriteSize*.18,spriteSize*.27);ctx.lineTo(-spriteSize*.28,spriteSize*.18);ctx.moveTo(spriteSize*.18,spriteSize*.27);ctx.lineTo(spriteSize*.28,spriteSize*.18);ctx.stroke();
+     } else if(e.type==='charger'){
+      ctx.strokeStyle='#ffb24e';ctx.beginPath();ctx.moveTo(-spriteSize*.12,spriteSize*.08);ctx.lineTo(-spriteSize*(.48+attackT*.1),spriteSize*.2);ctx.moveTo(spriteSize*.04,spriteSize*.16);ctx.lineTo(-spriteSize*.36,spriteSize*.3);ctx.stroke();
+     } else if(e.type==='ranged'){
+      ctx.strokeStyle='#b7f0ff';ctx.beginPath();ctx.moveTo(spriteSize*.22,-spriteSize*.02);ctx.lineTo(spriteSize*.5,-spriteSize*.02);ctx.stroke();
+      ctx.fillStyle='#e9fbff';ctx.beginPath();ctx.moveTo(spriteSize*.54,-spriteSize*.02);ctx.lineTo(spriteSize*.46,-spriteSize*.075);ctx.lineTo(spriteSize*.46,spriteSize*.035);ctx.closePath();ctx.fill();
+     } else if(e.type==='spitter'){
+      ctx.fillStyle='#a9ff54';ctx.shadowColor='#70ff36';ctx.shadowBlur=lowGraphics?0:er*.2;
+      ctx.beginPath();ctx.arc(spriteSize*.27,spriteSize*.12,Math.max(1,er*.055),0,Math.PI*2);ctx.arc(spriteSize*.34,spriteSize*.19,Math.max(1,er*.04),0,Math.PI*2);ctx.fill();
+     } else if(e.type==='boss'){
+      ctx.strokeStyle='#ffe08a';ctx.lineWidth=Math.max(1,er*.09);ctx.beginPath();ctx.arc(0,0,spriteSize*.42,-.7,.7);ctx.stroke();
+     } else {
+      ctx.strokeStyle='#ff7653';ctx.beginPath();ctx.arc(spriteSize*.2,-spriteSize*.03,spriteSize*.28,-.95,.6);ctx.stroke();
+     }
+     ctx.restore();
     }
    }else{
     // Keep the old silhouette visible during the first frame while the SVG loads.

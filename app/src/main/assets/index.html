@@ -895,7 +895,7 @@ function killEnemy(e,cause){
  else if(Math.random()<.012)loot.push({x:e.x,y:e.y,type:'gear',life:22});
  
  else if(Math.random()<.045)coins.push({x:e.x,y:e.y,r:5});
- let gainedLevel=false;while(xp>=xpNeed){xp-=xpNeed;level++;player.maxhp+=1;player.hp=Math.min(player.maxhp,player.hp+1);xpNeed=Math.ceil(xpNeed*(level<=5?1.18:level<=10?1.25:1.36));gainedLevel=true;}if(gainedLevel){toast('✦ УРОВЕНЬ '+level+' · +10 МАКС. HP');sfx('level');showUpgrades()}
+ let gainedLevel=false;while(xp>=xpNeed){xp-=xpNeed;level++;player.maxhp+=10;player.hp=Math.min(player.maxhp,player.hp+10);xpNeed=Math.ceil(xpNeed*(level<=5?1.18:level<=10?1.25:1.36));gainedLevel=true;}if(gainedLevel){toast('✦ УРОВЕНЬ '+level+' · +10 МАКС. HP');sfx('level');showUpgrades()}
 }
 function showUpgrades(){
  sfx('level');state='upgrade';$('upgrade').style.display='flex';$('stick').style.display='none';

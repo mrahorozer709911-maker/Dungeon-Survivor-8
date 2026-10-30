@@ -1439,6 +1439,33 @@ function draw(dt=0){
     // A short ember streak follows the demon while it advances, but is skipped on low-end mode.
     if(moving&&!lowGraphics){ctx.save();ctx.globalAlpha=.18+idlePulse*.08;ctx.strokeStyle='#ff6748';ctx.lineWidth=Math.max(1,er*.045);ctx.beginPath();ctx.moveTo(-spriteSize*.24,spriteSize*.12);ctx.lineTo(-spriteSize*.42,spriteSize*.2+gait*2);ctx.moveTo(spriteSize*.18,spriteSize*.2);ctx.lineTo(spriteSize*.32,spriteSize*.27-gait*2);ctx.stroke();ctx.restore();}
     const demonHue={grunt:0,fast:95,ranged:188,brute:285,charger:330,spitter:72,boss:305}; ctx.filter='hue-rotate('+(demonHue[e.type]||0)+'deg) saturate('+(e.type==='boss'?1.3:e.type==='spitter'?1.15:1)+')'; ctx.drawImage(demonImg,-spriteSize/2,-spriteSize/2,spriteSize,spriteSize); ctx.filter='none';
+    // Per-family pixel-art gear overlays preserve the detailed demon base while giving enemies distinct silhouettes.
+    const u=spriteSize/128; ctx.save();ctx.imageSmoothingEnabled=false;
+    if(e.type==='brute'){
+     ctx.fillStyle='#27182f';ctx.fillRect(-spriteSize*.43,-spriteSize*.12,spriteSize*.22,spriteSize*.27);ctx.fillRect(spriteSize*.21,-spriteSize*.12,spriteSize*.22,spriteSize*.27);
+     ctx.fillStyle='#80638e';ctx.fillRect(-spriteSize*.4,-spriteSize*.1,spriteSize*.16,spriteSize*.07);ctx.fillRect(spriteSize*.24,-spriteSize*.1,spriteSize*.16,spriteSize*.07);
+     ctx.fillStyle='#d9b4e8';ctx.fillRect(-spriteSize*.38,-spriteSize*.16,spriteSize*.05,spriteSize*.08);ctx.fillRect(spriteSize*.33,-spriteSize*.16,spriteSize*.05,spriteSize*.08);
+    } else if(e.type==='ranged'){
+     ctx.strokeStyle='#9bdcff';ctx.lineWidth=Math.max(1,u*2);ctx.beginPath();ctx.moveTo(spriteSize*.28,-spriteSize*.24);ctx.quadraticCurveTo(spriteSize*.53,0,spriteSize*.28,spriteSize*.24);ctx.stroke();
+     ctx.strokeStyle='#e6f7ff';ctx.lineWidth=Math.max(1,u);ctx.beginPath();ctx.moveTo(spriteSize*.29,-spriteSize*.22);ctx.lineTo(spriteSize*.29,spriteSize*.22);ctx.stroke();
+     ctx.fillStyle='#b6edff';ctx.fillRect(spriteSize*.26,-spriteSize*.03,spriteSize*.11,spriteSize*.06);
+    } else if(e.type==='fast'){
+     ctx.fillStyle='#baff78';ctx.fillRect(-spriteSize*.46,spriteSize*.12,spriteSize*.13,u*3);ctx.fillRect(-spriteSize*.4,spriteSize*.2,spriteSize*.1,u*2);
+     ctx.fillStyle='#4c9d58';ctx.fillRect(-spriteSize*.22,-spriteSize*.36,spriteSize*.1,spriteSize*.14);ctx.fillRect(spriteSize*.12,-spriteSize*.35,spriteSize*.1,spriteSize*.13);
+    } else if(e.type==='charger'){
+     ctx.fillStyle='#ffb04b';ctx.beginPath();ctx.moveTo(-spriteSize*.2,-spriteSize*.29);ctx.lineTo(-spriteSize*.39,-spriteSize*.48);ctx.lineTo(-spriteSize*.31,-spriteSize*.23);ctx.closePath();ctx.fill();
+     ctx.beginPath();ctx.moveTo(spriteSize*.2,-spriteSize*.29);ctx.lineTo(spriteSize*.39,-spriteSize*.48);ctx.lineTo(spriteSize*.31,-spriteSize*.23);ctx.closePath();ctx.fill();
+     ctx.fillStyle='#fff0a3';ctx.fillRect(-spriteSize*.35,-spriteSize*.43,u*2,u*3);ctx.fillRect(spriteSize*.32,-spriteSize*.43,u*2,u*3);
+    } else if(e.type==='spitter'){
+     ctx.fillStyle='#75e36d';ctx.fillRect(-spriteSize*.39,spriteSize*.02,spriteSize*.15,spriteSize*.18);ctx.fillRect(spriteSize*.24,spriteSize*.02,spriteSize*.15,spriteSize*.18);
+     ctx.fillStyle='#c5ff82';ctx.fillRect(-spriteSize*.35,spriteSize*.04,spriteSize*.07,spriteSize*.07);ctx.fillRect(spriteSize*.28,spriteSize*.04,spriteSize*.07,spriteSize*.07);
+     ctx.fillStyle='rgba(102,255,80,.65)';ctx.fillRect(-spriteSize*.04,spriteSize*.25,spriteSize*.08,spriteSize*.06);
+    } else if(e.type==='boss'){
+     ctx.fillStyle='#ffd56b';ctx.beginPath();ctx.moveTo(-spriteSize*.24,-spriteSize*.32);ctx.lineTo(-spriteSize*.22,-spriteSize*.51);ctx.lineTo(-spriteSize*.09,-spriteSize*.35);ctx.lineTo(0,-spriteSize*.53);ctx.lineTo(spriteSize*.09,-spriteSize*.35);ctx.lineTo(spriteSize*.22,-spriteSize*.51);ctx.lineTo(spriteSize*.24,-spriteSize*.32);ctx.closePath();ctx.fill();
+     ctx.fillStyle='#fff4b0';ctx.fillRect(-spriteSize*.025,-spriteSize*.48,spriteSize*.05,spriteSize*.1);
+     ctx.strokeStyle='rgba(255,211,106,.8)';ctx.lineWidth=Math.max(1,u);ctx.beginPath();ctx.ellipse(0,-spriteSize*.32,spriteSize*.33,spriteSize*.1,0,Math.PI,Math.PI*2);ctx.stroke();
+    }
+    ctx.restore();
     // The core flares at the strike's contact moment, making the attack readable at small scale.
     if(attacking&&attackT>.48){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.2+.35*Math.sin(attackT*Math.PI);ctx.fillStyle='#ff5b2f';ctx.shadowColor='#ff3c24';ctx.shadowBlur=lowGraphics?0:er*.65;ctx.beginPath();ctx.arc(0,spriteSize*.04,Math.max(2,er*.12),0,Math.PI*2);ctx.fill();ctx.restore();}
     if(hurt){ctx.globalCompositeOperation='source-atop';ctx.globalAlpha=.5;ctx.fillStyle='#fff1df';ctx.fillRect(-spriteSize/2,-spriteSize/2,spriteSize,spriteSize);}

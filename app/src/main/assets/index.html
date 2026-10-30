@@ -1493,6 +1493,49 @@ function draw(dt=0){
      ctx.fillStyle='#fff4b0';ctx.fillRect(-spriteSize*.025,-spriteSize*.48,spriteSize*.05,spriteSize*.1);
      ctx.strokeStyle='rgba(255,211,106,.8)';ctx.lineWidth=Math.max(1,u);ctx.beginPath();ctx.ellipse(0,-spriteSize*.32,spriteSize*.33,spriteSize*.1,0,Math.PI,Math.PI*2);ctx.stroke();
     }
+    // Extra high-contrast pixel-art markings give each enemy family a more deliberate, hand-crafted identity.
+    // These are decorative overlays only; hitboxes, stats and AI remain untouched.
+    if(e.type==='grunt'){
+     // Crimson warpaint, a segmented brow crest and a glowing chest sigil.
+     ctx.fillStyle='#421b2a';ctx.fillRect(-spriteSize*.29,-spriteSize*.17,spriteSize*.16,spriteSize*.11);ctx.fillRect(spriteSize*.13,-spriteSize*.17,spriteSize*.16,spriteSize*.11);
+     ctx.fillStyle='#ff6a48';ctx.fillRect(-spriteSize*.25,-spriteSize*.15,spriteSize*.08,spriteSize*.035);ctx.fillRect(spriteSize*.17,-spriteSize*.15,spriteSize*.08,spriteSize*.035);
+     ctx.fillStyle='#5c182b';ctx.fillRect(-spriteSize*.12,spriteSize*.04,spriteSize*.24,spriteSize*.18);
+     ctx.fillStyle='#b72f3f';ctx.fillRect(-spriteSize*.085,spriteSize*.065,spriteSize*.17,spriteSize*.12);
+     ctx.fillStyle='#ffb15d';ctx.fillRect(-spriteSize*.025,spriteSize*.075,spriteSize*.05,spriteSize*.09);ctx.fillRect(-spriteSize*.07,spriteSize*.105,spriteSize*.14,spriteSize*.035);
+     ctx.fillStyle='#fff0b2';ctx.fillRect(-spriteSize*.19,-spriteSize*.24,spriteSize*.055,spriteSize*.035);ctx.fillRect(spriteSize*.135,-spriteSize*.24,spriteSize*.055,spriteSize*.035);
+    } else if(e.type==='fast'){
+     // Small hooked claws and bright segmented leg guards.
+     ctx.fillStyle='#e3ff9a';ctx.fillRect(-spriteSize*.35,spriteSize*.27,spriteSize*.09,u*2);ctx.fillRect(spriteSize*.23,spriteSize*.27,spriteSize*.09,u*2);
+     ctx.fillStyle='#286b50';ctx.fillRect(-spriteSize*.24,spriteSize*.22,spriteSize*.11,spriteSize*.075);ctx.fillRect(spriteSize*.13,spriteSize*.22,spriteSize*.11,spriteSize*.075);
+     ctx.fillStyle='#d9ff9b';ctx.fillRect(-spriteSize*.29,spriteSize*.23,spriteSize*.045,spriteSize*.045);ctx.fillRect(spriteSize*.245,spriteSize*.23,spriteSize*.045,spriteSize*.045);
+    } else if(e.type==='brute'){
+     // Layered chest plates and a luminous central rune make the heavy silhouette read at a glance.
+     ctx.fillStyle='#382448';ctx.fillRect(-spriteSize*.22,-spriteSize*.02,spriteSize*.44,spriteSize*.28);
+     ctx.fillStyle='#79528d';ctx.fillRect(-spriteSize*.18,spriteSize*.015,spriteSize*.36,spriteSize*.19);
+     ctx.fillStyle='#b28bc9';ctx.fillRect(-spriteSize*.13,spriteSize*.045,spriteSize*.26,spriteSize*.035);ctx.fillRect(-spriteSize*.13,spriteSize*.13,spriteSize*.26,spriteSize*.035);
+     ctx.fillStyle='#f1d0ff';ctx.fillRect(-spriteSize*.025,spriteSize*.045,spriteSize*.05,spriteSize*.12);
+    } else if(e.type==='ranged'){
+     // Fine bowstring glint and a rune-lit bracer.
+     ctx.fillStyle='#3b7195';ctx.fillRect(-spriteSize*.32,spriteSize*.12,spriteSize*.1,spriteSize*.18);
+     ctx.fillStyle='#bdefff';ctx.fillRect(-spriteSize*.3,spriteSize*.15,spriteSize*.055,spriteSize*.035);ctx.fillRect(-spriteSize*.3,spriteSize*.22,spriteSize*.055,spriteSize*.035);
+     ctx.fillStyle='#f1fdff';ctx.fillRect(spriteSize*.25,-spriteSize*.055,u*2,spriteSize*.11);
+    } else if(e.type==='charger'){
+     // Ember-hot shoulder plates and a bright center ridge.
+     ctx.fillStyle='#722d28';ctx.fillRect(-spriteSize*.34,-spriteSize*.12,spriteSize*.14,spriteSize*.16);ctx.fillRect(spriteSize*.2,-spriteSize*.12,spriteSize*.14,spriteSize*.16);
+     ctx.fillStyle='#ff783c';ctx.fillRect(-spriteSize*.31,-spriteSize*.085,spriteSize*.08,spriteSize*.035);ctx.fillRect(spriteSize*.23,-spriteSize*.085,spriteSize*.08,spriteSize*.035);
+     ctx.fillStyle='#ffe0a0';ctx.fillRect(-u,spriteSize*.025,u*2,spriteSize*.16);
+    } else if(e.type==='spitter'){
+     // Acid sacs with bright highlights and a dotted toxic gland.
+     ctx.fillStyle='#356e35';ctx.fillRect(-spriteSize*.3,-spriteSize*.02,spriteSize*.12,spriteSize*.14);ctx.fillRect(spriteSize*.18,-spriteSize*.02,spriteSize*.12,spriteSize*.14);
+     ctx.fillStyle='#d9ff9a';ctx.fillRect(-spriteSize*.27,spriteSize*.005,spriteSize*.055,spriteSize*.045);ctx.fillRect(spriteSize*.215,spriteSize*.005,spriteSize*.055,spriteSize*.045);
+     ctx.fillStyle='#efffa8';ctx.fillRect(-spriteSize*.035,spriteSize*.2,u*2,u*2);ctx.fillRect(spriteSize*.035,spriteSize*.23,u*2,u*2);
+    } else if(e.type==='boss'){
+     // Crown facets, layered regalia and a sharp glowing core.
+     ctx.fillStyle='#4b276c';ctx.fillRect(-spriteSize*.29,-spriteSize*.18,spriteSize*.58,spriteSize*.12);
+     ctx.fillStyle='#9866c5';ctx.fillRect(-spriteSize*.24,-spriteSize*.16,spriteSize*.48,spriteSize*.045);
+     ctx.fillStyle='#fff0a4';ctx.fillRect(-spriteSize*.035,-spriteSize*.1,spriteSize*.07,spriteSize*.16);
+     ctx.fillStyle='#d7a2ff';ctx.fillRect(-spriteSize*.2,spriteSize*.08,spriteSize*.07,spriteSize*.035);ctx.fillRect(spriteSize*.13,spriteSize*.08,spriteSize*.07,spriteSize*.035);
+    }
     // Attack anticipation is readable even when the monster sprite is small.
     if(e.type==='ranged'&&attacking){
      const draw=Math.sin(attackT*Math.PI),bx=spriteSize*.29,by=-spriteSize*.02;

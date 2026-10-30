@@ -1406,7 +1406,7 @@ function draw(dt=0){
    // Animated boss crown, rune halo and layered shoulder armor.
    const ba=runTime*1.8,br=e.r+11+Math.sin(runTime*5)*2;ctx.save();ctx.globalAlpha=.45+.25*Math.sin(runTime*4);ctx.strokeStyle=finalBoss?'#ff6b9e':'#ffcb63';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(e.x,e.y,br,br*.55,ba*.12,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=.8;for(let bi=0;bi<5;bi++){const aa=ba+bi*Math.PI*2/5,bx=e.x+Math.cos(aa)*br,by=e.y+Math.sin(aa)*br*.55;ctx.fillStyle=bi%2?'#ff8aa9':'#fff0a1';ctx.beginPath();ctx.moveTo(bx,by-3);ctx.lineTo(bx+3,by);ctx.lineTo(bx,by+3);ctx.lineTo(bx-3,by);ctx.closePath();ctx.fill()}ctx.restore();rect(e.x-e.r*.8,e.y-e.r*.55+bob,5,Math.max(5,e.r*.55),'#ffbd51');rect(e.x+e.r*.45,e.y-e.r*.55+bob,5,Math.max(5,e.r*.55),'#ffbd51');rect(e.x-3,e.y-e.r-7+bob,6,4,'#fff0a1');rect(e.x-1,e.y-e.r-9+bob,2,3,'#ffcf58');}if(e.adminDummy){ctx.save();ctx.font='bold 9px monospace';ctx.textAlign='center';ctx.fillStyle='#e6c7ff';ctx.shadowColor='#9c5bff';ctx.shadowBlur=lowGraphics?0:(5);ctx.fillText(({grunt:'ОБЫЧНЫЙ',fast:'БЫСТРЫЙ',ranged:'СТРЕЛОК',brute:'ТЯЖЁЛЫЙ',charger:'РЫВОК',spitter:'ЯДОВИТЫЙ',boss:'БОСС'})[e.type]||e.type,e.x,e.y+e.r+13);ctx.fillStyle='#d9a8ff';ctx.fillText('∞ HP',e.x,e.y-e.r-9);ctx.restore();}
   // Detailed authored SVG sprite replaces the procedural block-built demon.
-  const bespokeDemon=!['boss','brute','spitter','ranged','charger','fast'].includes(e.type);
+  const bespokeDemon=true; // All enemy families now use the detailed authored demon-style sprite.
   if(!e.adminDummy&&bespokeDemon){
    const phase=runTime*8+(e.anim||0);
    const moving=Math.hypot(e.vx||0,e.vy||0)>4;
@@ -1416,7 +1416,7 @@ function draw(dt=0){
    const hurt=typeof hitAge!=='undefined'&&hitAge>=0&&hitAge<.16;
    const idlePulse=(Math.sin(runTime*3.2+(e.anim||0))+1)*.5;
    const bob=moving?Math.abs(gait)*1.7:Math.sin(runTime*2.8+(e.anim||0))*.75;
-   const spriteSize=Math.max(er*3.25,42);
+   const spriteScale={boss:3.75,brute:3.5,charger:3.45,fast:3.15,ranged:3.25,spitter:3.3,grunt:3.25}; const spriteSize=Math.max(er*(spriteScale[e.type]||3.25),42);
    if(!window.__demonCrimsonSprite){window.__demonCrimsonSprite=new Image();window.__demonCrimsonSprite.src='demon-crimson.svg';}
    const demonImg=window.__demonCrimsonSprite;
    ctx.save();ctx.imageSmoothingEnabled=false;
@@ -1438,7 +1438,7 @@ function draw(dt=0){
     ctx.scale(squash,stretch);
     // A short ember streak follows the demon while it advances, but is skipped on low-end mode.
     if(moving&&!lowGraphics){ctx.save();ctx.globalAlpha=.18+idlePulse*.08;ctx.strokeStyle='#ff6748';ctx.lineWidth=Math.max(1,er*.045);ctx.beginPath();ctx.moveTo(-spriteSize*.24,spriteSize*.12);ctx.lineTo(-spriteSize*.42,spriteSize*.2+gait*2);ctx.moveTo(spriteSize*.18,spriteSize*.2);ctx.lineTo(spriteSize*.32,spriteSize*.27-gait*2);ctx.stroke();ctx.restore();}
-    ctx.drawImage(demonImg,-spriteSize/2,-spriteSize/2,spriteSize,spriteSize);
+    const demonHue={grunt:0,fast:95,ranged:188,brute:285,charger:330,spitter:72,boss:305}; ctx.filter='hue-rotate('+(demonHue[e.type]||0)+'deg) saturate('+(e.type==='boss'?1.3:e.type==='spitter'?1.15:1)+')'; ctx.drawImage(demonImg,-spriteSize/2,-spriteSize/2,spriteSize,spriteSize); ctx.filter='none';
     // The core flares at the strike's contact moment, making the attack readable at small scale.
     if(attacking&&attackT>.48){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.2+.35*Math.sin(attackT*Math.PI);ctx.fillStyle='#ff5b2f';ctx.shadowColor='#ff3c24';ctx.shadowBlur=lowGraphics?0:er*.65;ctx.beginPath();ctx.arc(0,spriteSize*.04,Math.max(2,er*.12),0,Math.PI*2);ctx.fill();ctx.restore();}
     if(hurt){ctx.globalCompositeOperation='source-atop';ctx.globalAlpha=.5;ctx.fillStyle='#fff1df';ctx.fillRect(-spriteSize/2,-spriteSize/2,spriteSize,spriteSize);}

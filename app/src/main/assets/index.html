@@ -1074,11 +1074,23 @@ function update(dt){
   if(e.type==='boss'){e.x+=Math.sin(runTime*1.5)*e.speed*.45*dt;e.y+=Math.sign(player.y-e.y)*e.speed*.3*dt;if(boss){boss.x=e.x;boss.y=e.y;boss.hp=e.hp;}}
   else{
    if(e.type==='ranged'||e.type==='spitter'){
-    if(d>(e.type==='spitter'?175:120)){e.x-=vx/d*e.speed*dt;e.y-=vy/d*e.speed*dt}else if(d<(e.type==='spitter'?125:85)){e.x+=vx/d*e.speed*dt;e.y+=vy/d*e.speed*dt}
+    const ideal=e.type==='spitter'?175:145,inner=e.type==='spitter'?125:100;
+    if(e.strafeTimer===undefined){e.strafeTimer=rand(1.2,2.8);e.strafeDir=Math.random()<.5?-1:1}
+    e.strafeTimer-=dt;if(e.strafeTimer<=0){e.strafeTimer=rand(1.2,2.8);e.strafeDir=-e.strafeDir}
+    let moveX=0,moveY=0;
+    if(d>ideal){moveX-=vx/d;moveY-=vy/d}else if(d<inner){moveX+=vx/d;moveY+=vy/d}
+    if(d<=ideal+75&&d>=inner-35){moveX+=(-vy/d)*e.strafeDir*.48;moveY+=(vx/d)*e.strafeDir*.48}
+    const moveLen=Math.hypot(moveX,moveY)||1;e.x+=moveX/moveLen*e.speed*dt;e.y+=moveY/moveLen*e.speed*dt;
     const aimX=player.x-e.x,aimY=player.y-e.y,aimD=Math.hypot(aimX,aimY)||1;e.fire-=dt;if(e.fire<=0&&aimD<(e.type==='spitter'?360:320)){e.fire=e.type==='spitter'?1.75:1.35;const sp=e.type==='spitter'?145:125,col=e.type==='spitter'?'#a5f078':'#ffb66b';ebullets.push({x:e.x+aimX/aimD*(e.r+5),y:e.y+aimY/aimD*(e.r+5),vx:aimX/aimD*sp,vy:aimY/aimD*sp,r:e.type==='spitter'?5:4,life:4,damage:e.damage||1,color:col});e.attack=.22;particle(e.x,e.y,col,5)}
    }else if(e.type==='charger'){
     e.attack-=dt;if(e.windup>0){e.windup-=dt;if(e.windup<=0){e.chargeX=vx/d;e.chargeY=vy/d;e.attack=2.1;particle(e.x,e.y,'#ff8c59',8)}}else if(e.attack<=0&&d<230){e.windup=.55;e.attack=2.1;toast('РЫВОК! УКЛОНИСЬ');}
     if(e.windup>0){particle(e.x,e.y,'#ff8c59',1)}else if(e.attack>1.75){e.x+=e.chargeX*e.speed*3.2*dt;e.y+=e.chargeY*e.speed*3.2*dt}else{e.x+=vx/d*e.speed*dt;e.y+=vy/d*e.speed*dt}
+   }else if(e.type==='fast'){
+    // Agile enemies arc around the player at close range, then dart back in.
+    const orbit=e.strafeDir||(e.strafeDir=Math.random()<.5?-1:1);
+    const side=(d<155&&d>e.r+player.r+12)?.62:0;
+    let mx=vx/d+(-vy/d)*orbit*side,my=vy/d+(vx/d)*orbit*side;
+    const ml=Math.hypot(mx,my)||1;e.x+=mx/ml*e.speed*dt;e.y+=my/ml*e.speed*dt;
    }else{e.x+=vx/d*e.speed*dt;e.y+=vy/d*e.speed*dt}
   }
   if(d<e.r+player.r&&player.inv<=0){if(artifact==='guardian'&&guardianCooldown<=0){guardianCooldown=Math.max(3.2,7.5- .7*artifactLevel);player.inv=.38;particle(player.x,player.y,'#a8c7ff',18);toast('ПЕЧАТЬ СТРАЖА: УДАР ЗАБЛОКИРОВАН');continue}if(artifact==='phoenix'&&!player.phoenixUsed&&player.hp<=1){player.phoenixUsed=true;player.hp=Math.min(player.maxhp,2);player.inv=2;for(const near of enemies){if(!near.adminDummy&&Math.hypot(near.x-player.x,near.y-player.y)<125){near.hp-=player.damage*(3+artifactLevel);near.burn=2.5;near.deathCause='fire';if(near.hp<=0)killEnemy(near,'fire')}}particle(player.x,player.y,'#ff9d48',28);toast('ПЕПЕЛ ФЕНИКСА: ВОЗРОЖДЕНИЕ И ВОЛНА ОГНЯ!');continue}const taken=Math.max(.35,(e.damage||1)*(1-armor*.25));player.hp-=taken;damageNumbers.push({x:player.x+rand(-5,5),y:player.y-18,v:rand(24,38),value:Math.ceil(taken*10)+' HP',life:.9,maxLife:.9,color:'#ff5266'});player.inv=.9;shake=7;screenFlash=.16;particle(player.x,player.y,'#ff5266',12);particle(player.x,player.y,'#fff0d2',4);if(player.hp<=0){updateHud();endGame();return}}

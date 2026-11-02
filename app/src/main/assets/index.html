@@ -1434,7 +1434,7 @@ function draw(dt=0){
    const attacking=(e.attack||0)>.001&&attackT<1;
    const hurt=typeof hitAge!=='undefined'&&hitAge>=0&&hitAge<.16;
    const idlePulse=(Math.sin(runTime*3.2+(e.anim||0))+1)*.5;
-   const bob=moving?Math.abs(gait)*1.7:Math.sin(runTime*2.8+(e.anim||0))*.75;
+   const bob=moving?(e.type==='brute'?Math.abs(gait)*2.8:e.type==='fast'?Math.abs(gait)*1.1:Math.abs(gait)*1.7):e.type==='spitter'?Math.sin(runTime*4.2+(e.anim||0))*1.25:Math.sin(runTime*2.8+(e.anim||0))*.75;
    const spriteScale={boss:3.75,brute:3.5,charger:3.45,fast:3.15,ranged:3.25,spitter:3.3,grunt:3.25}; const spriteSize=Math.max(er*(spriteScale[e.type]||3.25),42);
    if(!window.__demonCrimsonSprite){window.__demonCrimsonSprite=new Image();window.__demonCrimsonSprite.src='demon-crimson.svg';}
    const demonImg=window.__demonCrimsonSprite;
@@ -1458,11 +1458,11 @@ function draw(dt=0){
     const stretch=moving?1+Math.abs(gait)*(heavy?.025:quick?.075:.05):1+idlePulse*.016;
     // Enemy families have different movement weight and attack anticipation.
     const lunge=charging?-.16:quick&&moving?-.055:heavy&&moving?-.018:0;
-    ctx.rotate((moving?gait*(heavy?.055:quick?.045:.025):(idlePulse-.5)*.012)+lunge+(rangedAttack?-.045*Math.sin(attackT*Math.PI):0)+(bossAttack?-.07*Math.sin(attackT*Math.PI):0));
+    const bossWingSway=e.type==='boss'?Math.sin(runTime*4.5+(e.anim||0))*.035:0;\n    const spitterPulse=e.type==='spitter'?Math.sin(runTime*7+(e.anim||0))*.018:0;\n    const rangedRecoil=rangedAttack?-.075*Math.sin(attackT*Math.PI):0;\n    const bruteStomp=heavy&&moving?Math.sin(phase*2)*.018:0;\n    ctx.rotate((moving?gait*(heavy?.055:quick?.045:.025):(idlePulse-.5)*.012)+lunge+bossWingSway+spitterPulse+bruteStomp+(rangedAttack?-.045*Math.sin(attackT*Math.PI):0)+(bossAttack?-.07*Math.sin(attackT*Math.PI):0)+rangedRecoil);
     if((e.vx||0)<-1)ctx.scale(-1,1);
     if(attacking){ctx.translate((heavy?-.035:quick?.06:.1)*Math.sin(attackT*Math.PI)*er,-Math.sin(attackT*Math.PI)*er*(heavy?.025:.09));ctx.rotate(Math.sin(attackT*Math.PI)*(heavy?.09:quick?.18:.13));}
     if(charging){const prep=.5+.5*Math.sin(runTime*34);ctx.translate(-spriteSize*.035,-spriteSize*.015);ctx.scale(1+prep*.035,1-prep*.025);}
-    if(heavy&&moving)ctx.translate(0,Math.abs(gait)*spriteSize*.018);
+    if(heavy&&moving)ctx.translate(0,Math.abs(gait)*spriteSize*.028);\n    if(quick&&moving)ctx.translate(Math.sin(phase*1.7)*spriteSize*.012,0);\n    if(e.type==='boss')ctx.scale(1+Math.sin(runTime*2.4+(e.anim||0))*.012,1-Math.sin(runTime*2.4+(e.anim||0))*.009);\n    if(e.type==='spitter')ctx.scale(1+idlePulse*.018,1-idlePulse*.012);
     ctx.scale(squash,stretch);
     // A short ember streak follows the demon while it advances, but is skipped on low-end mode.
     if(moving&&!lowGraphics){ctx.save();ctx.globalAlpha=.18+idlePulse*.08;ctx.strokeStyle='#ff6748';ctx.lineWidth=Math.max(1,er*.045);ctx.beginPath();ctx.moveTo(-spriteSize*.24,spriteSize*.12);ctx.lineTo(-spriteSize*.42,spriteSize*.2+gait*2);ctx.moveTo(spriteSize*.18,spriteSize*.2);ctx.lineTo(spriteSize*.32,spriteSize*.27-gait*2);ctx.stroke();ctx.restore();}

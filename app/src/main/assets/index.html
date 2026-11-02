@@ -1466,6 +1466,40 @@ function draw(dt=0){
     ctx.scale(squash,stretch);
     // A short ember streak follows the demon while it advances, but is skipped on low-end mode.
     if(moving&&!lowGraphics){ctx.save();ctx.globalAlpha=.18+idlePulse*.08;ctx.strokeStyle='#ff6748';ctx.lineWidth=Math.max(1,er*.045);ctx.beginPath();ctx.moveTo(-spriteSize*.24,spriteSize*.12);ctx.lineTo(-spriteSize*.42,spriteSize*.2+gait*2);ctx.moveTo(spriteSize*.18,spriteSize*.2);ctx.lineTo(spriteSize*.32,spriteSize*.27-gait*2);ctx.stroke();ctx.restore();}
+    // Silhouette pass: make each enemy readable by shape, not just hue.
+    // Drawn behind the shared base sprite; gameplay stats and collision remain unchanged.
+    ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
+    if(e.type==='brute'){
+     ctx.fillStyle='#30203b';ctx.strokeStyle='#b18acb';ctx.lineWidth=Math.max(1.5,u*2);
+     ctx.beginPath();ctx.moveTo(-spriteSize*.22,-spriteSize*.19);ctx.lineTo(-spriteSize*.48,-spriteSize*.31);ctx.lineTo(-spriteSize*.53,-spriteSize*.05);ctx.lineTo(-spriteSize*.38,spriteSize*.13);ctx.lineTo(-spriteSize*.2,spriteSize*.08);ctx.closePath();ctx.fill();ctx.stroke();
+     ctx.beginPath();ctx.moveTo(spriteSize*.22,-spriteSize*.19);ctx.lineTo(spriteSize*.48,-spriteSize*.31);ctx.lineTo(spriteSize*.53,-spriteSize*.05);ctx.lineTo(spriteSize*.38,spriteSize*.13);ctx.lineTo(spriteSize*.2,spriteSize*.08);ctx.closePath();ctx.fill();ctx.stroke();
+    } else if(e.type==='fast'){
+     ctx.fillStyle='#6ca94e';ctx.strokeStyle='#d7ff91';ctx.lineWidth=Math.max(1,u*1.5);
+     for(const side of [-1,1]){ctx.beginPath();ctx.moveTo(side*spriteSize*.2,-spriteSize*.2);ctx.lineTo(side*spriteSize*.49,-spriteSize*.39-gait*spriteSize*.025);ctx.lineTo(side*spriteSize*.37,-spriteSize*.12);ctx.closePath();ctx.fill();ctx.stroke();
+     ctx.beginPath();ctx.moveTo(side*spriteSize*.22,spriteSize*.02);ctx.lineTo(side*spriteSize*.48,spriteSize*.17);ctx.lineTo(side*spriteSize*.3,spriteSize*.2);ctx.closePath();ctx.fill();ctx.stroke();}
+    } else if(e.type==='ranged'){
+     // Tall hood and a long bow silhouette.
+     ctx.fillStyle='#18344b';ctx.strokeStyle='#91dfff';ctx.lineWidth=Math.max(1.5,u*2);
+     ctx.beginPath();ctx.moveTo(-spriteSize*.19,-spriteSize*.27);ctx.lineTo(0,-spriteSize*.49);ctx.lineTo(spriteSize*.19,-spriteSize*.27);ctx.lineTo(spriteSize*.12,-spriteSize*.08);ctx.lineTo(-spriteSize*.12,-spriteSize*.08);ctx.closePath();ctx.fill();ctx.stroke();
+     ctx.beginPath();ctx.moveTo(spriteSize*.34,-spriteSize*.31);ctx.quadraticCurveTo(spriteSize*.62,0,spriteSize*.34,spriteSize*.31);ctx.stroke();
+     ctx.beginPath();ctx.moveTo(spriteSize*.34,-spriteSize*.31);ctx.lineTo(spriteSize*.34,spriteSize*.31);ctx.strokeStyle='#eafaff';ctx.stroke();
+    } else if(e.type==='charger'){
+     // Oversized forward-pointing horns and a swept-back crest.
+     ctx.fillStyle='#712c24';ctx.strokeStyle='#ffb45d';ctx.lineWidth=Math.max(1.5,u*2);
+     for(const side of [-1,1]){ctx.beginPath();ctx.moveTo(side*spriteSize*.14,-spriteSize*.25);ctx.lineTo(side*spriteSize*.48,-spriteSize*.54);ctx.lineTo(side*spriteSize*.37,-spriteSize*.17);ctx.closePath();ctx.fill();ctx.stroke();}
+     ctx.fillStyle='#ffcf75';ctx.beginPath();ctx.moveTo(-spriteSize*.12,-spriteSize*.34);ctx.lineTo(0,-spriteSize*.52);ctx.lineTo(spriteSize*.12,-spriteSize*.34);ctx.closePath();ctx.fill();
+    } else if(e.type==='spitter'){
+     // Bulbous poison sacs extend beyond the body and pulse during idle.
+     const sac=spriteSize*(.095+idlePulse*.012);
+     ctx.fillStyle='#245b35';ctx.strokeStyle='#a5ff78';ctx.lineWidth=Math.max(1,u*2);
+     for(const side of [-1,1]){ctx.beginPath();ctx.ellipse(side*spriteSize*.36,spriteSize*.04,sac*1.05,sac*1.35,side*.25,0,Math.PI*2);ctx.fill();ctx.stroke();
+     ctx.fillStyle='#e5ff9a';ctx.fillRect(side*spriteSize*.36-sac*.22,spriteSize*.01,sac*.32,sac*.28);ctx.fillStyle='#245b35';}
+    } else if(e.type==='boss'){
+     // The boss gets a broad, jagged wing span rather than the standard outline.
+     ctx.fillStyle='#301238';ctx.strokeStyle='#df7cff';ctx.lineWidth=Math.max(2,u*2.5);
+     for(const side of [-1,1]){ctx.beginPath();ctx.moveTo(side*spriteSize*.2,-spriteSize*.08);ctx.lineTo(side*spriteSize*.53,-spriteSize*.38+gait*2);ctx.lineTo(side*spriteSize*.46,-spriteSize*.02);ctx.lineTo(side*spriteSize*.56,spriteSize*.19);ctx.lineTo(side*spriteSize*.29,spriteSize*.12);ctx.closePath();ctx.fill();ctx.stroke();}
+    }
+    ctx.restore();
     const demonHue={grunt:0,fast:95,ranged:188,brute:285,charger:330,spitter:72,boss:305}; ctx.filter='hue-rotate('+(demonHue[e.type]||0)+'deg) saturate('+(e.type==='boss'?1.3:e.type==='spitter'?1.15:1)+')'; ctx.drawImage(demonImg,-spriteSize/2,-spriteSize/2,spriteSize,spriteSize); ctx.filter='none';
     // Per-family pixel-art gear overlays preserve the detailed demon base while giving enemies distinct silhouettes.
     const u=spriteSize/128; ctx.save();ctx.imageSmoothingEnabled=false;

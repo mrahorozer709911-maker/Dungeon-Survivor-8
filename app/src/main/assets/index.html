@@ -1466,6 +1466,7 @@ function draw(dt=0){
     ctx.scale(squash,stretch);
     // A short ember streak follows the demon while it advances, but is skipped on low-end mode.
     if(moving&&!lowGraphics){ctx.save();ctx.globalAlpha=.18+idlePulse*.08;ctx.strokeStyle='#ff6748';ctx.lineWidth=Math.max(1,er*.045);ctx.beginPath();ctx.moveTo(-spriteSize*.24,spriteSize*.12);ctx.lineTo(-spriteSize*.42,spriteSize*.2+gait*2);ctx.moveTo(spriteSize*.18,spriteSize*.2);ctx.lineTo(spriteSize*.32,spriteSize*.27-gait*2);ctx.stroke();ctx.restore();}
+    const u=spriteSize/128;
     // Silhouette pass: make each enemy readable by shape, not just hue.
     // Drawn behind the shared base sprite; gameplay stats and collision remain unchanged.
     ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
@@ -1502,7 +1503,7 @@ function draw(dt=0){
     ctx.restore();
     const demonHue={grunt:0,fast:95,ranged:188,brute:285,charger:330,spitter:72,boss:305}; ctx.filter='hue-rotate('+(demonHue[e.type]||0)+'deg) saturate('+(e.type==='boss'?1.3:e.type==='spitter'?1.15:1)+')'; ctx.drawImage(demonImg,-spriteSize/2,-spriteSize/2,spriteSize,spriteSize); ctx.filter='none';
     // Per-family pixel-art gear overlays preserve the detailed demon base while giving enemies distinct silhouettes.
-    const u=spriteSize/128; ctx.save();ctx.imageSmoothingEnabled=false;
+    ctx.save();ctx.imageSmoothingEnabled=false;
     if(e.type==='brute'){
      ctx.fillStyle='#27182f';ctx.fillRect(-spriteSize*.43,-spriteSize*.12,spriteSize*.22,spriteSize*.27);ctx.fillRect(spriteSize*.21,-spriteSize*.12,spriteSize*.22,spriteSize*.27);
      ctx.fillStyle='#80638e';ctx.fillRect(-spriteSize*.4,-spriteSize*.1,spriteSize*.16,spriteSize*.07);ctx.fillRect(spriteSize*.24,-spriteSize*.1,spriteSize*.16,spriteSize*.07);

@@ -1593,6 +1593,23 @@ function draw(dt=0){
     // The core flares at the strike's contact moment, making the attack readable at small scale.
     if(attacking&&attackT>.48){ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.2+.35*Math.sin(attackT*Math.PI);ctx.fillStyle='#ff5b2f';ctx.shadowColor='#ff3c24';ctx.shadowBlur=lowGraphics?0:er*.65;ctx.beginPath();ctx.arc(0,spriteSize*.04,Math.max(2,er*.12),0,Math.PI*2);ctx.fill();ctx.restore();}
     if(hurt){ctx.globalCompositeOperation='source-atop';ctx.globalAlpha=.5;ctx.fillStyle='#fff1df';ctx.fillRect(-spriteSize/2,-spriteSize/2,spriteSize,spriteSize);}
+    // Small family-specific tells: different enemies now read differently before they attack.
+    if(!lowGraphics&&e.type==='boss'){
+     ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.34;
+     for(let shard=0;shard<3;shard++){const a=runTime*1.4+shard*Math.PI*2/3;const px=Math.cos(a)*spriteSize*.48,py=Math.sin(a*1.2)*spriteSize*.39;
+      ctx.fillStyle=shard===1?'#fff0a8':'#d98bff';ctx.beginPath();ctx.moveTo(px,py-spriteSize*.035);ctx.lineTo(px+spriteSize*.025,py);ctx.lineTo(px,py+spriteSize*.035);ctx.lineTo(px-spriteSize*.025,py);ctx.closePath();ctx.fill();}
+     ctx.restore();
+    }
+    if(e.type==='fast'&&moving){
+     ctx.save();ctx.globalAlpha=.3;ctx.fillStyle='#c8ff9b';const dust=1+(Math.floor(runTime*16+(e.anim||0))%2);
+     ctx.fillRect(-spriteSize*.3,-spriteSize*.16,dust*u*2,u*2);ctx.fillRect(-spriteSize*.23,spriteSize*.19,u*2,u*2);ctx.restore();
+    }
+    if(e.type==='brute'&&moving&&Math.abs(gait)>.88){
+     ctx.save();ctx.globalAlpha=.24;ctx.strokeStyle='#d6b5ef';ctx.lineWidth=Math.max(1,u*1.5);ctx.beginPath();ctx.ellipse(0,spriteSize*.36,spriteSize*(.22+Math.abs(gait)*.07),spriteSize*.045,0,0,Math.PI*2);ctx.stroke();ctx.restore();
+    }
+    if(e.type==='charger'&&e.windup>0){
+     ctx.save();const warn=.5+.5*Math.sin(runTime*22);ctx.globalAlpha=.35+warn*.4;ctx.strokeStyle='#ffad54';ctx.lineWidth=Math.max(1,u*2);ctx.beginPath();ctx.moveTo(-spriteSize*.16,spriteSize*.16);ctx.lineTo(-spriteSize*(.43+warn*.08),spriteSize*.16);ctx.moveTo(-spriteSize*.16,spriteSize*.23);ctx.lineTo(-spriteSize*(.35+warn*.08),spriteSize*.23);ctx.stroke();ctx.restore();
+    }
     if(attacking&&attackT>.35){
      ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.7;
      ctx.lineWidth=Math.max(1,er*.06);

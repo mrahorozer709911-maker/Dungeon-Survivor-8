@@ -803,6 +803,7 @@ function clearRunSave(){try{localStorage.removeItem('ds_run7')}catch(e){}const b
 
 function restoreMobileControls(){if(!window.matchMedia('(any-pointer:coarse)').matches)return;const hud=$('hud');if(hud)hud.style.display='block';[['stick','block'],['shootBtn','flex'],['shootHint','block'],['dashBtn','block'],['ultBtn','block']].forEach(([id,display])=>{const el=$(id);if(el){el.style.setProperty('display',display,'important');el.style.setProperty('visibility','visible','important');el.style.setProperty('opacity','1','important');}});const desktop=$('desktopControls');if(desktop)desktop.style.setProperty('display','none','important');}
 function reset(){
+ runtimeFault=false;
  initAudio();setAudio(audioOn);sfx('upgrade');
  activeHero=HEROES.find(h=>h.id===chosenHero)||HEROES[0];
  {const base=WEAPONS.find(w=>w.id===chosenWeapon)||WEAPONS[0],wl=Math.min(5,(meta.weaponLevels||{})[base.id]||0);activeWeapon={...base,damage:base.damage*(1+wl*.08),rate:Math.max(.12,base.rate*Math.pow(.985,wl))};}
@@ -2070,18 +2071,32 @@ canvas.addEventListener('pointerdown',e=>{
 });
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 
+let runtimeFault=false;
 function loop(t){
  let dt=Math.min(.05,(t-last)/1000||0);last=t;
- perfFrames++;
- if(!perfSampleTime)perfSampleTime=t;
- if(t-perfSampleTime>=1200){
-  const fps=perfFrames*1000/(t-perfSampleTime);
-  if(fps<48){lowGraphics=true;perfGoodSamples=0;}else if(fps>57){perfGoodSamples++;if(perfGoodSamples>=5){lowGraphics=false;perfGoodSamples=0;}}else{perfGoodSamples=0;}
-  perfFrames=0;perfSampleTime=t;
+ try{
+  perfFrames++;
+  if(!perfSampleTime)perfSampleTime=t;
+  if(t-perfSampleTime>=1200){
+   const fps=perfFrames*1000/(t-perfSampleTime);
+   if(fps<48){lowGraphics=true;perfGoodSamples=0;}else if(fps>57){perfGoodSamples++;if(perfGoodSamples>=5){lowGraphics=false;perfGoodSamples=0;}}else{perfGoodSamples=0;}
+   perfFrames=0;perfSampleTime=t;
+  }
+  if(!runtimeFault){
+   if(state!=='paused')update(dt);
+   if(player&&(state==='play'||state==='upgrade'||state==='paused'))draw(dt);
+  }
+ }catch(error){
+  runtimeFault=true;
+  console.error('Dungeon Survivor runtime error:',error);
+  state='paused';
+  const pause=$('pause'),stick=$('stick');
+  if(pause)pause.style.display='flex';
+  if(stick)stick.style.display='none';
+  toast('ОШИБКА ИГРОВОГО ЦИКЛА · ПЕРЕЗАПУСТИ ЗАБЕГ');
+ }finally{
+  requestAnimationFrame(loop);
  }
- if(state!=='paused')update(dt);
- if(state==='play'||state==='upgrade'||state==='paused')draw(dt);
- requestAnimationFrame(loop)
 }
 requestAnimationFrame(loop);
 // Browser safety: pause the run when the player switches tabs or minimizes the window.

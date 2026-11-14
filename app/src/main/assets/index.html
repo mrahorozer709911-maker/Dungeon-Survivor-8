@@ -1487,7 +1487,7 @@ function draw(dt=0){
   const bespokeDemon=true; // All enemy families now use the detailed authored demon-style sprite.
   if(!e.adminDummy&&bespokeDemon){
    const phase=runTime*8+(e.anim||0);
-   const moving=Math.hypot(e.vx||0,e.vy||0)>4;
+   const moveDX=e.x-(e.__animX??e.x),moveDY=e.y-(e.__animY??e.y);const moving=Math.hypot(moveDX,moveDY)>.035;e.__animX=e.x;e.__animY=e.y;
    const gait=moving?Math.sin(phase):Math.sin(runTime*2.1+(e.anim||0))*.12;
    const attackT=Math.max(0,Math.min(1,1-(e.attack||0)/.28));
    const attacking=(e.attack||0)>.001&&attackT<1;

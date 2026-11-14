@@ -1493,7 +1493,7 @@ function draw(dt=0){
    const attacking=(e.attack||0)>.001&&attackT<1;
    const hurt=typeof hitAge!=='undefined'&&hitAge>=0&&hitAge<.16;
    const idlePulse=(Math.sin(runTime*3.2+(e.anim||0))+1)*.5;
-   const bob=moving?(e.type==='brute'?Math.abs(gait)*2.8:e.type==='fast'?Math.abs(gait)*1.1:Math.abs(gait)*1.7):e.type==='spitter'?Math.sin(runTime*4.2+(e.anim||0))*1.25:Math.sin(runTime*2.8+(e.anim||0))*.75;
+   const bob=moving?(e.type==='brute'?Math.abs(gait)*4.2:e.type==='fast'?Math.abs(gait)*2.7:Math.abs(gait)*3.2):e.type==='spitter'?Math.sin(runTime*4.2+(e.anim||0))*1.8:Math.sin(runTime*2.8+(e.anim||0))*1.15;
    const spriteScale={boss:3.75,brute:3.5,charger:3.45,fast:3.15,ranged:3.25,spitter:3.3,grunt:3.25}; const spriteSize=Math.max(er*(spriteScale[e.type]||3.25),42);
    if(!window.__demonCrimsonSprite){window.__demonCrimsonSprite=new Image();window.__demonCrimsonSprite.src='demon-crimson.svg';}
    const demonImg=window.__demonCrimsonSprite;
@@ -1521,7 +1521,7 @@ function draw(dt=0){
     const spitterPulse=e.type==='spitter'?Math.sin(runTime*7+(e.anim||0))*.018:0;
     const rangedRecoil=rangedAttack?-.075*Math.sin(attackT*Math.PI):0;
     const bruteStomp=heavy&&moving?Math.sin(phase*2)*.018:0;
-    ctx.rotate((moving?gait*(heavy?.055:quick?.045:.025):(idlePulse-.5)*.012)+lunge+bossWingSway+spitterPulse+bruteStomp+(rangedAttack?-.045*Math.sin(attackT*Math.PI):0)+(bossAttack?-.07*Math.sin(attackT*Math.PI):0)+rangedRecoil);
+    ctx.rotate((moving?gait*(heavy?.105:quick?.095:.075):(idlePulse-.5)*.025)+lunge+bossWingSway+spitterPulse+bruteStomp+(rangedAttack?-.075*Math.sin(attackT*Math.PI):0)+(bossAttack?-.11*Math.sin(attackT*Math.PI):0)+rangedRecoil);
     if((e.vx||0)<-1)ctx.scale(-1,1);
     if(attacking){ctx.translate((heavy?-.035:quick?.06:.1)*Math.sin(attackT*Math.PI)*er,-Math.sin(attackT*Math.PI)*er*(heavy?.025:.09));ctx.rotate(Math.sin(attackT*Math.PI)*(heavy?.09:quick?.18:.13));}
     if(charging){const prep=.5+.5*Math.sin(runTime*34);ctx.translate(-spriteSize*.035,-spriteSize*.015);ctx.scale(1+prep*.035,1-prep*.025);}

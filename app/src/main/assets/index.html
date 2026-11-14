@@ -518,7 +518,7 @@ button{min-height:42px;font-size:clamp(12px,3.2vw,14px);padding:11px 12px}
 </div>
 <div id="adminPanel" class="overlay" style="display:none"><div class="card"><div class="logo" style="font-size:30px;color:#d9a8ff">ADMIN PANEL</div><div class="subtitle">Режим разработчика · изменения сохраняются в локальном профиле</div><div class="admin-row"><label for="adminGold">Добавить золото</label><input id="adminGold" type="number" min="1" max="1000000" value="1000" inputmode="numeric"></div><button class="primary" id="adminAddGold">＋ ДОБАВИТЬ ЗОЛОТО</button><button id="adminUnlock">🔓 ОТКРЫТЬ ВСЁ ОРУЖИЕ, СКИНЫ И ПИТОМЦЕВ</button><button id="adminArenaStart" class="primary">⚔ ОТКРЫТЬ ТЕСТОВУЮ АРЕНУ</button><div class="small" style="text-align:left;margin:8px 0">На тестовой арене враги каждого типа неподвижны, бессмертны и не наносят урон. Можно проверять атаки и скины.</div><button id="adminBack">НАЗАД В МЕНЮ</button></div></div>
 <div id="settings" class="overlay" style="display:none"><div class="card"><div class="logo" style="font-size:30px">УПРАВЛЕНИЕ</div><div class="subtitle">Перетащи кнопки на нужные места. Положение сохранится на этом устройстве.</div><div id="layoutPreview" style="position:relative;height:190px;border:2px solid #7188aa;background:#111a2b;margin:10px 0;touch-action:none"><div class="dragControl" data-control="stick">🕹 ДВИЖЕНИЕ</div><div class="dragControl" data-control="shootBtn">🔴 ОГОНЬ</div><div class="dragControl" data-control="dashBtn">⚡ РЫВОК</div></div><button id="layoutReset">СБРОСИТЬ РАСПОЛОЖЕНИЕ</button><button class="primary" id="settingsClose">ГОТОВО</button></div></div>
-<div id="pause" class="overlay" style="display:none"><div class="card"><div class="logo" style="font-size:34px">ПАУЗА</div><div class="subtitle">Передохни, охотник.</div><button class="primary" id="resume">▶ ПРОДОЛЖИТЬ</button><button id="pauseHome">В МЕНЮ</button></div></div>
+<div id="pause" class="overlay" style="display:none"><div class="card"><div class="logo" style="font-size:34px">ПАУЗА</div><div class="subtitle" id="pauseSubtitle">Передохни, охотник.</div><button class="primary" id="resume">▶ ПРОДОЛЖИТЬ</button><button id="pauseHome">В МЕНЮ</button></div></div>
 <div id="shop" class="overlay" style="display:none"><div class="card"><div class="logo" style="font-size:30px">АРТЕФАКТЫ</div><div class="subtitle" id="shopCoins">Монеты: 0</div><div id="shopItems"></div><button id="shopClose" class="primary">В ПОДЗЕМЕЛЬЕ</button></div></div>
 <div id="caseShop" class="overlay" style="display:none"><div class="card case-card"><div class="logo" style="font-size:29px">СУНДУКИ</div><div class="subtitle" id="caseCoins">Монеты: 0 · Сундуки: 0</div><button id="buyChestBtn" class="primary">КУПИТЬ СУНДУК · 200 ◉</button><div class="case-stage"><div class="case-dragon" aria-hidden="true"><svg viewBox="0 0 64 64" class="game-icon"><path d="M8 37 4 22l16 7 6-16 10 14 15-8-5 16 13 4-16 8-4 12-13-7-10 6 2-13z" fill="#766c57" stroke="#302d28" stroke-width="3" stroke-linejoin="round"/><circle cx="39" cy="29" r="2" fill="#d2bd88"/></svg></div><div class="case-box" id="caseBox"><div class="case-lid"></div><div class="case-lock">✦</div><div class="case-glow"></div></div><div class="case-track" id="caseTrack"></div><div class="case-result" id="caseResult">ВЫБЕРИ КЕЙС</div></div><button class="primary" id="caseOpenBtn">✨ ОТКРЫТЬ СУНДУК</button><div class="small" id="chestInventory" style="margin:8px 0;color:#ffc83d">В инвентаре: 0 сундуков</div><button id="caseBack">НАЗАД</button></div></div>
 <div id="armory" class="overlay" style="display:none">
@@ -542,6 +542,15 @@ button{min-height:42px;font-size:clamp(12px,3.2vw,14px);padding:11px 12px}
 (()=>{
 const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
 ctx.imageSmoothingEnabled=false;
+// Compatibility fallback for Android WebViews without CanvasRenderingContext2D.roundRect.
+if(!CanvasRenderingContext2D.prototype.roundRect){
+ CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r=0){
+  const radius=Math.max(0,Math.min(Number(r)||0,Math.abs(w)/2,Math.abs(h)/2));
+  this.beginPath();this.moveTo(x+radius,y);this.lineTo(x+w-radius,y);this.quadraticCurveTo(x+w,y,x+w,y+radius);
+  this.lineTo(x+w,y+h-radius);this.quadraticCurveTo(x+w,y+h,x+w-radius,y+h);this.lineTo(x+radius,y+h);
+  this.quadraticCurveTo(x,y+h,x,y+h-radius);this.lineTo(x,y+radius);this.quadraticCurveTo(x,y,x+radius,y);this.closePath();return this;
+ };
+}
 const W=1200,H=700,VIEW_W=640,VIEW_H=360;
 // Adaptive graphics: trim expensive cosmetic effects on slower phones, restore them when performance recovers.
 let lowGraphics=!!(window.matchMedia&&window.matchMedia('(any-pointer:coarse)').matches),perfSampleTime=0,perfFrames=0,perfGoodSamples=0;
@@ -804,6 +813,7 @@ function clearRunSave(){try{localStorage.removeItem('ds_run7')}catch(e){}const b
 function restoreMobileControls(){if(!window.matchMedia('(any-pointer:coarse)').matches)return;const hud=$('hud');if(hud)hud.style.display='block';[['stick','block'],['shootBtn','flex'],['shootHint','block'],['dashBtn','block'],['ultBtn','block']].forEach(([id,display])=>{const el=$(id);if(el){el.style.setProperty('display',display,'important');el.style.setProperty('visibility','visible','important');el.style.setProperty('opacity','1','important');}});const desktop=$('desktopControls');if(desktop)desktop.style.setProperty('display','none','important');}
 function reset(){
  runtimeFault=false;
+ const pauseSubtitle=$('pauseSubtitle');if(pauseSubtitle)pauseSubtitle.textContent='Передохни, охотник.';
  initAudio();setAudio(audioOn);sfx('upgrade');
  activeHero=HEROES.find(h=>h.id===chosenHero)||HEROES[0];
  {const base=WEAPONS.find(w=>w.id===chosenWeapon)||WEAPONS[0],wl=Math.min(5,(meta.weaponLevels||{})[base.id]||0);activeWeapon={...base,damage:base.damage*(1+wl*.08),rate:Math.max(.12,base.rate*Math.pow(.985,wl))};}
@@ -2089,11 +2099,14 @@ function loop(t){
  }catch(error){
   runtimeFault=true;
   console.error('Dungeon Survivor runtime error:',error);
+  const detail=String(error&&error.message||error||'неизвестная ошибка').slice(0,110);
+  try{localStorage.setItem('ds_last_runtime_fault',JSON.stringify({message:detail,time:Date.now(),stack:String(error&&error.stack||'').slice(0,1200)}));}catch(_){}
   state='paused';
-  const pause=$('pause'),stick=$('stick');
+  const pause=$('pause'),stick=$('stick'),subtitle=$('pauseSubtitle');
   if(pause)pause.style.display='flex';
   if(stick)stick.style.display='none';
-  toast('ОШИБКА ИГРОВОГО ЦИКЛА · ПЕРЕЗАПУСТИ ЗАБЕГ');
+  if(subtitle)subtitle.textContent='Ошибка: '+detail;
+  toast('ОШИБКА ИГРЫ: '+detail);
  }finally{
   requestAnimationFrame(loop);
  }

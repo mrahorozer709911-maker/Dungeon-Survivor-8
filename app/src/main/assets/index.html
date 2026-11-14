@@ -1399,18 +1399,24 @@ function draw(dt=0){
   else if(e.type==='spitter'){rect(e.x-er*.35,e.y-er*.4+bob,er*.7,3,'#efffa1');rect(e.x-er*.18,e.y+er*.25+bob,er*.36,er*.35,'#4d7b24');}
   // Demon sprite pass: layered horns, swept wings, armor and glowing eyes.
   if(e.type==='boss'){
-   const sway=Math.sin(runTime*7+(e.anim||0))*1.5;
+   const sway=Math.sin(runTime*7+(e.anim||0))*1.5,wingBeat=Math.sin(runTime*9+(e.anim||0))*er*.12;
    ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
    // Bat wings behind the shoulders.
    ctx.fillStyle='#351126';ctx.strokeStyle='#a72b49';ctx.lineWidth=Math.max(1.5,er*.09);
-   ctx.beginPath();ctx.moveTo(e.x-er*.42,e.y-er*.18+bob);ctx.lineTo(e.x-er*1.05,e.y-er*.72+bob+sway);ctx.lineTo(e.x-er*1.12,e.y+er*.12+bob);ctx.lineTo(e.x-er*.62,e.y+er*.56+bob);ctx.lineTo(e.x-er*.48,e.y+er*.2+bob);ctx.closePath();ctx.fill();ctx.stroke();
-   ctx.beginPath();ctx.moveTo(e.x+er*.42,e.y-er*.18+bob);ctx.lineTo(e.x+er*1.05,e.y-er*.72+bob-sway);ctx.lineTo(e.x+er*1.12,e.y+er*.12+bob);ctx.lineTo(e.x+er*.62,e.y+er*.56+bob);ctx.lineTo(e.x+er*.48,e.y+er*.2+bob);ctx.closePath();ctx.fill();ctx.stroke();
+   ctx.beginPath();ctx.moveTo(e.x-er*.42,e.y-er*.18+bob);ctx.lineTo(e.x-er*1.05,e.y-er*.72+bob+sway-wingBeat);ctx.lineTo(e.x-er*1.12,e.y+er*.12+bob+wingBeat*.35);ctx.lineTo(e.x-er*.62,e.y+er*.56+bob);ctx.lineTo(e.x-er*.48,e.y+er*.2+bob);ctx.closePath();ctx.fill();ctx.stroke();
+   ctx.beginPath();ctx.moveTo(e.x+er*.42,e.y-er*.18+bob);ctx.lineTo(e.x+er*1.05,e.y-er*.72+bob-sway-wingBeat);ctx.lineTo(e.x+er*1.12,e.y+er*.12+bob+wingBeat*.35);ctx.lineTo(e.x+er*.62,e.y+er*.56+bob);ctx.lineTo(e.x+er*.48,e.y+er*.2+bob);ctx.closePath();ctx.fill();ctx.stroke();
    // Wing ribs.
    ctx.strokeStyle='#e04a60';ctx.lineWidth=Math.max(1,er*.045);ctx.beginPath();
-   ctx.moveTo(e.x-er*.48,e.y-er*.12+bob);ctx.lineTo(e.x-er*1.02,e.y-er*.55+bob+sway);
+   ctx.moveTo(e.x-er*.48,e.y-er*.12+bob);ctx.lineTo(e.x-er*1.02,e.y-er*.55+bob+sway-wingBeat*.8);
    ctx.moveTo(e.x-er*.5,e.y+er*.08+bob);ctx.lineTo(e.x-er*.98,e.y+er*.1+bob);
-   ctx.moveTo(e.x+er*.48,e.y-er*.12+bob);ctx.lineTo(e.x+er*1.02,e.y-er*.55+bob-sway);
+   ctx.moveTo(e.x+er*.48,e.y-er*.12+bob);ctx.lineTo(e.x+er*1.02,e.y-er*.55+bob-sway-wingBeat*.8);
    ctx.moveTo(e.x+er*.5,e.y+er*.08+bob);ctx.lineTo(e.x+er*.98,e.y+er*.1+bob);ctx.stroke();
+   // Flexible lower wing membranes ripple between each flap; the ribs stay anchored at the shoulders.
+   ctx.strokeStyle='#d85a72';ctx.globalAlpha=.5+.12*Math.sin(runTime*9+(e.anim||0));ctx.lineWidth=Math.max(1,er*.035);
+   ctx.beginPath();
+   ctx.moveTo(e.x-er*.52,e.y+er*.08+bob);ctx.quadraticCurveTo(e.x-er*.88,e.y+er*.42+bob+wingBeat,e.x-er*.62,e.y+er*.56+bob);
+   ctx.moveTo(e.x+er*.52,e.y+er*.08+bob);ctx.quadraticCurveTo(e.x+er*.88,e.y+er*.42+bob+wingBeat,e.x+er*.62,e.y+er*.56+bob);
+   ctx.stroke();
    // Curved horns, with pale tips.
    ctx.strokeStyle='#171522';ctx.lineWidth=Math.max(2,er*.19);ctx.beginPath();
    ctx.moveTo(e.x-er*.35,e.y-er*.53+bob);ctx.quadraticCurveTo(e.x-er*.8,e.y-er*1.05+bob,e.x-er*.72,e.y-er*1.18+bob);
